@@ -1,19 +1,37 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
+import type { LessonOutcome } from '../../app/motivation';
+import { lessonInsight } from '../../engine/motivation/insight';
+import type { StreakState } from '../../engine/motivation/streak';
 import { keyCpm, type LessonResult } from '../../engine/stats/lessonResult';
 import { Button } from '../components/Button';
 import { buttonClass } from '../components/buttonClass';
 import { Kbd } from '../components/Kbd';
 import { formatDuration, percentFloor, speedValue, type SpeedUnit } from '../format';
+import { useAchievementText } from '../motivation/achievementText';
+import { GoalRing } from '../motivation/GoalRing';
+import type { DailyProgress } from '../motivation/hooks';
+import { Delta } from '../motivation/WeekSummary';
 
-function BigMetric({ label, value, unit }: { label: string; value: number; unit: string }) {
+function BigMetric({
+  label,
+  value,
+  unit,
+  children,
+}: {
+  label: string;
+  value: number;
+  unit: string;
+  children?: React.ReactNode;
+}) {
   return (
     <div>
       <div className="text-ink-muted">{label}</div>
       <div className="text-6xl font-semibold">
         {value} <span className="text-2xl font-normal text-ink-muted">{unit}</span>
       </div>
+      {children}
     </div>
   );
 }
@@ -29,23 +47,39 @@ interface LessonResultViewProps {
   unit: SpeedUnit;
   /** Keys this lesson opened, already shown as labels. */
   unlocked: readonly string[];
+  /** Records and achievements of this lesson. */
+  outcome: LessonOutcome | null;
+  daily: DailyProgress;
+  streak: StreakState;
+  /** How a character is shown: upper-case letter, the space bar by name. */
+  label: (char: string) => string;
   onNext: () => void;
   onRepeat: () => void;
 }
 
+/** Lesson result (docs/screens.md, section 5). */
 export function LessonResultView({
   result,
   unit,
   unlocked,
+  outcome,
+  daily,
+  streak,
+  label,
   onNext,
   onRepeat,
 }: LessonResultViewProps) {
   const { t } = useTranslation();
+  const achievementText = useAchievementText();
   const unitLabel = t(`units.${unit}`);
   const keys = Object.entries(result.keys).sort(([a], [b]) => compareKeys(a, b));
+  const insight = lessonInsight(result);
+  const speed = speedValue(result.cpm, unit);
+  const average =
+    outcome?.previousAverageCpm == null ? null : speedValue(outcome.previousAverageCpm, unit);
 
   return (
-    <section className="mx-auto flex max-w-3xl flex-col items-center gap-8 py-12 text-center">
+    <section className="mx-auto flex max-w-3xl flex-col items-center gap-7 py-10 text-center">
       <h1 className="text-3xl font-semibold">{t('result.title')}</h1>
 
       {unlocked.length > 0 && (
@@ -72,11 +106,19 @@ export function LessonResultView({
       )}
 
       <div className="flex flex-wrap justify-center gap-16">
-        <BigMetric
-          label={t('result.speed')}
-          value={speedValue(result.cpm, unit)}
-          unit={unitLabel}
-        />
+        <BigMetric label={t('result.speed')} value={speed} unit={unitLabel}>
+          {outcome?.record ? (
+            <p className="mt-1 font-semibold text-ok">
+              <span aria-hidden="true">🏆 </span>
+              {t('result.record')}
+            </p>
+          ) : average !== null ? (
+            <p className="mt-1 text-sm text-ink-muted">
+              {t('result.vsAverage', { average })}
+              <Delta value={speed - average} />
+            </p>
+          ) : null}
+        </BigMetric>
         <BigMetric label={t('result.accuracy')} value={percentFloor(result.accuracy)} unit="%" />
       </div>
 
@@ -84,6 +126,59 @@ export function LessonResultView({
         {t('result.time')}: {formatDuration(result.durationMs)} · {t('result.errors')}:{' '}
         {result.errors}
       </p>
+
+      {insight && (
+        <p className="rounded-lg border border-line bg-surface px-5 py-3 text-lg">
+          <span aria-hidden="true">💡 </span>
+          {insight.kind === 'confusion'
+            ? t('result.insight.confusion', {
+                expected: label(insight.expected),
+                typed: label(insight.typed),
+                count: insight.count,
+              })
+            : t('result.insight.slowest', {
+                key: label(insight.key),
+                speed: speedValue(insight.cpm, unit),
+                unit: unitLabel,
+              })}
+        </p>
+      )}
+
+      <div className="flex items-center gap-4 text-left">
+        <GoalRing progress={daily} size={64} />
+        <div>
+          <p className="font-medium">
+            {daily.met
+              ? t('goal.done')
+              : t('goal.left', {
+                  count: Math.max(1, Math.ceil((daily.goalMs - daily.activeMs) / 60_000)),
+                })}
+          </p>
+          <p className="text-sm text-ink-muted">
+            {streak.current > 0 ? t('streak.days', { count: streak.current }) : t('streak.none')}
+          </p>
+        </div>
+      </div>
+
+      {outcome && outcome.unlocks.length > 0 && (
+        <div className="w-full rounded-lg border-2 border-ok bg-surface px-6 py-4 text-left">
+          <h2 className="mb-2 font-semibold">
+            <span aria-hidden="true">★ </span>
+            {t('result.achievements')}
+          </h2>
+          <ul className="flex flex-col gap-1">
+            {outcome.unlocks.map(({ id, level }) => {
+              const { name, condition } = achievementText(id, level);
+              return (
+                <li key={id}>
+                  <span className="font-medium">{name}</span>
+                  <span className="text-ink-muted"> — {condition}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
 
       <div className="w-full">
         <h2 className="mb-3 text-lg font-medium">{t('result.keys')}</h2>

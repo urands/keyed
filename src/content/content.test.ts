@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { Finger } from '../engine/layout/geometry';
 import { keyForChar, type Layout } from '../engine/layout/layout';
-import { stageKeys, type Course } from '../engine/progress/course';
+import { stageKeys, startSetKeys, type Course } from '../engine/progress/course';
 import { isBlocked } from '../engine/textgen/blocklist';
 import {
   ansiGeometry,
@@ -27,6 +27,8 @@ interface LanguageCase {
   /** The finger table from docs/learning-method.md for this layout. */
   zones: Record<Finger, string>;
   startKeys: string;
+  /** Keys of the introductory lessons. */
+  startSet: string;
   order: string;
   wordPattern: RegExp;
 }
@@ -50,6 +52,7 @@ const CASES: LanguageCase[] = [
       rPinky: "0-=p[]\\;'/",
     },
     startKeys: 'fj',
+    startSet: 'fjdksla',
     order: 'dk sl a e i t n o r h u c m g w y p b v x q z',
     wordPattern: /^[a-z]{2,10}$/,
   },
@@ -71,6 +74,7 @@ const CASES: LanguageCase[] = [
       rPinky: '0-=зхъ\\жэ.',
     },
     startKeys: 'ао',
+    startSet: 'аовлыд',
     order: 'вл ыд р п е и н т с к м у я ь г з б ч й ж х ш ю э ц щ ф ъ',
     wordPattern: /^[а-я]{2,10}$/,
   },
@@ -113,6 +117,11 @@ describe.each(CASES)('$name', (c) => {
       if (!letters) return;
       expect(letters.start.join('')).toBe(c.startKeys);
       expect(letters.order.map((group) => group.join('')).join(' ')).toBe(c.order);
+    });
+
+    it('has the starting set of the methodology', () => {
+      if (!letters) return;
+      expect(startSetKeys(letters).join('')).toBe(c.startSet);
     });
 
     it('uses only keys of the layout', () => {

@@ -11,9 +11,45 @@ function keyPaths(value: unknown, prefix = ''): string[] {
   );
 }
 
+const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/;
+
+/** Keys without plural suffixes: Russian has more plural forms than English. */
+function baseKeys(resource: unknown): string[] {
+  return [...new Set(keyPaths(resource).map((path) => path.replace(PLURAL_SUFFIX, '')))].sort();
+}
+
+/** Plural keys of a resource, grouped by base key: { "streak.days": ["one", "other"] }. */
+function pluralForms(resource: unknown): Record<string, string[]> {
+  const forms: Record<string, string[]> = {};
+  for (const path of keyPaths(resource)) {
+    const match = PLURAL_SUFFIX.exec(path);
+    if (match?.[1]) (forms[path.replace(PLURAL_SUFFIX, '')] ??= []).push(match[1]);
+  }
+  return forms;
+}
+
 describe('translations', () => {
   it('have the same keys in Russian and English', () => {
-    expect(keyPaths(ru).sort()).toEqual(keyPaths(en).sort());
+    expect(baseKeys(ru)).toEqual(baseKeys(en));
+  });
+
+  it('have every plural form each language needs', () => {
+    for (const forms of Object.values(pluralForms(en))) {
+      expect(forms.sort()).toEqual(['one', 'other']);
+    }
+    for (const forms of Object.values(pluralForms(ru))) {
+      expect(forms.sort()).toEqual(['few', 'many', 'one', 'other']);
+    }
+    expect(Object.keys(pluralForms(ru)).sort()).toEqual(Object.keys(pluralForms(en)).sort());
+  });
+
+  it('pick the right Russian plural form', async () => {
+    const i18n = (await import('./index')).default;
+    const t = i18n.getFixedT('ru');
+    expect(t('streak.days', { count: 1 })).toBe('Серия: 1 день');
+    expect(t('streak.days', { count: 3 })).toBe('Серия: 3 дня');
+    expect(t('streak.days', { count: 5 })).toBe('Серия: 5 дней');
+    expect(t('streak.days', { count: 21 })).toBe('Серия: 21 день');
   });
 
   it('contain no empty strings', () => {

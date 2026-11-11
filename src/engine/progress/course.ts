@@ -8,6 +8,11 @@ export interface CourseStage {
   start: readonly string[];
   /** Groups of keys in the order they open; a group opens as a whole. */
   order: readonly (readonly string[])[];
+  /**
+   * How many first groups of `order` belong to the starting set of introductory
+   * lessons, such as F J → D K → S L → A (docs/learning-method.md).
+   */
+  intro: number;
 }
 
 export interface Course {
@@ -50,7 +55,16 @@ export function parseCourse(data: unknown): Course {
     if (repeated !== undefined) {
       throw new Error(`Course ${layoutId}/${id}: key "${repeated}" repeats`);
     }
-    return { id, start: stage.start, order };
+    const intro = stage.intro ?? 0;
+    if (
+      typeof intro !== 'number' ||
+      !Number.isInteger(intro) ||
+      intro < 0 ||
+      intro > order.length
+    ) {
+      throw new Error(`Course ${layoutId}/${id}: "intro" must be a number of order groups`);
+    }
+    return { id, start: stage.start, order, intro };
   });
   return { layoutId, stages };
 }
@@ -58,4 +72,9 @@ export function parseCourse(data: unknown): Course {
 /** All keys of a stage in the order they open. */
 export function stageKeys(stage: CourseStage): string[] {
   return [...stage.start, ...stage.order.flat()];
+}
+
+/** The starting set: keys of the introductory lessons. */
+export function startSetKeys(stage: CourseStage): string[] {
+  return [...stage.start, ...stage.order.slice(0, stage.intro).flat()];
 }

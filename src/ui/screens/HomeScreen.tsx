@@ -8,7 +8,12 @@ import { buttonClass } from '../components/buttonClass';
 import { LayoutSwitch } from '../components/LayoutSwitch';
 import { FINGER_BG } from '../practice/fingerColors';
 import { charLabel, codesFor } from '../practice/keyCodes';
+import { GoalRing } from '../motivation/GoalRing';
+import { useDailyProgress, useStreak } from '../motivation/hooks';
+import { StreakInfo } from '../motivation/StreakInfo';
+import { WeekSummary } from '../motivation/WeekSummary';
 import { Keyboard } from '../practice/Keyboard';
+import { useSpeedUnit } from '../useSpeedUnit';
 
 function LegendItem({ swatch, label }: { swatch: ReactNode; label: string }) {
   return (
@@ -25,6 +30,9 @@ export function HomeScreen() {
   const { layout, stage } = useLayoutKit();
   const progress = usePractice((s) => s.progress);
   const started = usePractice((s) => Object.keys(s.keyStats).length > 0);
+  const daily = useDailyProgress();
+  const streak = useStreak();
+  const unit = useSpeedUnit();
   const label = (key: string) => charLabel(layout, key, t('keyboard.space'));
 
   const codes = useMemo(
@@ -61,11 +69,20 @@ export function HomeScreen() {
   const blockers = progress.blockers.map(label).join(', ');
 
   return (
-    <section className="mx-auto flex max-w-4xl flex-col items-center gap-8 py-12">
+    <section className="mx-auto flex max-w-4xl flex-col items-center gap-8 py-10">
       <h1 className="sr-only">{t('nav.home')}</h1>
-      <Link to="/practice" className={`${buttonClass('primary')} px-10 py-4 text-xl`}>
-        {t('home.continue')}
-      </Link>
+      <div className="flex w-full flex-wrap items-center justify-between gap-6 rounded-lg border border-line bg-surface px-6 py-5">
+        <div className="flex items-center gap-5">
+          <GoalRing progress={daily} />
+          <StreakInfo streak={streak} />
+        </div>
+        <Link to="/practice" className={`${buttonClass('primary')} px-10 py-4 text-xl`}>
+          {t('home.continue')}
+        </Link>
+      </div>
+      <div className="w-full px-1">
+        <WeekSummary unit={unit} />
+      </div>
 
       <p className="text-center text-lg">
         {progress.complete

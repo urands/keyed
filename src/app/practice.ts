@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import type { KeyInput } from '../engine/input/toInput';
 import { keyForChar, type KeyCode, type LayoutId } from '../engine/layout/layout';
 import { DEFAULT_PARAMS } from '../engine/params';
+import { stageKeys, startSetKeys } from '../engine/progress/course';
 import { advanceStage, evaluateStage, type StageProgress } from '../engine/progress/progress';
 import { createRandom } from '../engine/random';
 import {
@@ -12,11 +13,12 @@ import {
   resumeLesson,
   type LessonState,
 } from '../engine/session/lesson';
-import { applySamples, type KeyStat } from '../engine/stats/keyStats';
+import { applySamples, isKeyMastered, type KeyStat } from '../engine/stats/keyStats';
 import { summarizeLesson, type LessonResult } from '../engine/stats/lessonResult';
 import { buildLessonText } from '../engine/textgen/lessonText';
 import type { LayoutProgress } from '../storage/types';
-import { kitFor, type LayoutKit } from './layouts';
+import { kitFor, PRACTICE_LAYOUTS, type LayoutKit } from './layouts';
+import { useMotivation, type LayoutFacts, type LessonOutcome } from './motivation';
 import { useSettings } from './settings';
 import { getStorage, saveInBackground, useStorageStatus } from './storage';
 
@@ -80,9 +82,13 @@ interface PracticeState {
   wrongLayout: boolean;
   /** Progress of the other layouts used in this session, so switching back is instant. */
   cache: Partial<Record<LayoutId, SavedProgress>>;
+  /** Records and achievements of the lesson just finished, for the result screen. */
+  outcome: LessonOutcome | null;
 
   /** Replaces the progress of a layout with what was loaded from storage, and shows it. */
   restore: (layoutId: LayoutId, saved: LayoutProgress) => void;
+  /** Keeps the progress of another layout in memory without switching to it. */
+  preload: (layoutId: LayoutId, saved: LayoutProgress) => void;
   /** Switches to another layout with its own progress; the current lesson is dropped. */
   switchLayout: (layoutId: LayoutId) => Promise<void>;
   /** Re-evaluates progress after a setting that affects it (strict mode). */
@@ -115,6 +121,7 @@ function viewOf(layoutId: LayoutId, saved: SavedProgress) {
     introduce: isNew ? kit.stage.start : [],
     feedback: null,
     wrongLayout: false,
+    outcome: null,
   };
 }
 
@@ -131,6 +138,15 @@ export const usePractice = create<PracticeState>()((set, get) => ({
       ...viewOf(layoutId, progress),
       cache: { ...cache, [layoutId]: progress },
     }));
+  },
+
+  preload: (layoutId, saved) => {
+    if (layoutId === get().layoutId) return;
+    const progress: SavedProgress = {
+      keyStats: saved.keyStats,
+      opened: saved.opened[kitFor(layoutId).stage.id] ?? 0,
+    };
+    set(({ cache }) => ({ cache: { ...cache, [layoutId]: progress } }));
   },
 
   switchLayout: async (layoutId) => {
@@ -169,6 +185,7 @@ export const usePractice = create<PracticeState>()((set, get) => ({
       lesson: text === undefined ? lessonFor(kitFor(layoutId), progress) : createLesson(text),
       startedAt: null,
       result: null,
+      outcome: null,
       unlocked: [],
       feedback: null,
       wrongLayout: false,
@@ -211,35 +228,38 @@ export const usePractice = create<PracticeState>()((set, get) => ({
     const strict = useSettings.getState().strictMode;
     const opened = advanceStage(kit.stage, state.opened, keyStats, params, strict);
     const unlocked = opened > state.opened ? (kit.stage.order[state.opened] ?? []) : [];
+    const facts = {
+      layoutId,
+      startedAt,
+      durationMs: result.durationMs,
+      length: result.length,
+      errors: result.errors,
+      cpm: result.cpm,
+      accuracy: result.accuracy,
+    };
     saveInBackground(
       getStorage().saveLesson(
-        {
-          layoutId,
-          stage: kit.stage.id,
-          startedAt,
-          durationMs: result.durationMs,
-          length: result.length,
-          errors: result.errors,
-          cpm: result.cpm,
-          accuracy: result.accuracy,
-          samples: next.chars,
-        },
+        { ...facts, stage: kit.stage.id, samples: next.chars },
         keyStats,
         opened,
       ),
     );
+    const cache = { ...state.cache, [layoutId]: { keyStats, opened } };
+    // The day, the streak, records and achievements.
+    const outcome = useMotivation.getState().recordLesson(facts, layoutFactsOf(cache));
     set({
       lesson: next,
       startedAt,
       feedback,
       wrongLayout: false,
       result,
+      outcome,
       keyStats,
       opened,
       progress: progressOf(kit, keyStats, opened),
       unlocked,
       introduce: unlocked,
-      cache: { ...state.cache, [layoutId]: { keyStats, opened } },
+      cache,
     });
   },
 
@@ -259,6 +279,42 @@ export const usePractice = create<PracticeState>()((set, get) => ({
     set({ introduce: [] });
   },
 }));
+
+/** What achievements need about one layout. Mastery here ignores strict mode: once mastered counts. */
+function factsOf(layoutId: LayoutId, saved: SavedProgress): LayoutFacts {
+  const { stage } = kitFor(layoutId);
+  const mastered = (key: string) => isKeyMastered(saved.keyStats[key], params);
+  const keys = stageKeys(stage);
+  const open = stage.start.length + stage.order.slice(0, saved.opened).flat().length;
+  return {
+    layoutId,
+    startMastered: startSetKeys(stage).every(mastered),
+    openedShare: open / keys.length,
+    complete: saved.opened >= stage.order.length && keys.every(mastered),
+  };
+}
+
+function layoutFactsOf(cache: Partial<Record<LayoutId, SavedProgress>>): LayoutFacts[] {
+  return PRACTICE_LAYOUTS.flatMap((layoutId) => {
+    const saved = cache[layoutId];
+    return saved ? [factsOf(layoutId, saved)] : [];
+  });
+}
+
+/** Facts of every layout with progress in memory, the current one included. */
+export function layoutFactsFrom(state: {
+  cache: Partial<Record<LayoutId, SavedProgress>>;
+  layoutId: LayoutId;
+  keyStats: Record<string, KeyStat>;
+  opened: number;
+}): LayoutFacts[] {
+  const { cache, layoutId, keyStats, opened } = state;
+  return layoutFactsOf({ ...cache, [layoutId]: { keyStats, opened } });
+}
+
+export function currentLayoutFacts(): LayoutFacts[] {
+  return layoutFactsFrom(usePractice.getState());
+}
 
 // Strict mode changes which keys count as mastered.
 useSettings.subscribe((state, previous) => {

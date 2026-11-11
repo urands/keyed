@@ -1,8 +1,16 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { INPUT_MODES, SPEED_UNIT_PREFERENCES, useSettings } from '../../app/settings';
+import { requestNotifications } from '../../app/notify';
+import {
+  DAILY_GOALS,
+  INPUT_MODES,
+  SPEED_UNIT_PREFERENCES,
+  useSettings,
+  type DailyGoal,
+} from '../../app/settings';
 import { LANGUAGES } from '../../i18n';
+import { playErrorSound, playKeySound } from '../sound';
 import { LayoutSwitch } from '../components/LayoutSwitch';
 import { SegmentedControl } from '../components/SegmentedControl';
 import { THEME_PREFERENCES } from '../theme/theme';
@@ -35,6 +43,7 @@ function Row({ label, hint, children }: { label: string; hint?: string; children
 export function SettingsScreen() {
   const { t } = useTranslation();
   const settings = useSettings();
+  const [denied, setDenied] = useState(false);
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 py-10">
@@ -54,6 +63,63 @@ export function SettingsScreen() {
             }}
             className="h-5 w-5 accent-accent"
           />
+        </Row>
+      </Section>
+
+      <Section title={t('settings.section.motivation')}>
+        <Row label={t('settings.goal.label')} hint={t('settings.goal.hint')}>
+          <SegmentedControl
+            name="daily-goal"
+            legend={t('settings.goal.label')}
+            value={String(settings.dailyGoal)}
+            options={DAILY_GOALS.map((value) => ({
+              value: String(value),
+              label: t('goal.minutes', { count: value }),
+            }))}
+            onChange={(value) => {
+              settings.update({ dailyGoal: Number(value) as DailyGoal });
+            }}
+          />
+        </Row>
+        <Row label={t('settings.reminders.label')} hint={t('settings.reminders.hint')}>
+          <div className="flex flex-wrap items-center gap-4">
+            <input
+              type="checkbox"
+              aria-label={t('settings.reminders.label')}
+              checked={settings.remindersEnabled}
+              onChange={(event) => {
+                const enabled = event.target.checked;
+                settings.update({ remindersEnabled: enabled });
+                setDenied(false);
+                if (enabled) {
+                  void requestNotifications().then((granted) => {
+                    if (!granted) {
+                      settings.update({ remindersEnabled: false });
+                      setDenied(true);
+                    }
+                  });
+                }
+              }}
+              className="h-5 w-5 accent-accent"
+            />
+            <label className="flex items-center gap-2 text-sm">
+              {t('settings.reminders.time')}
+              <input
+                type="time"
+                value={settings.reminderTime}
+                disabled={!settings.remindersEnabled}
+                onChange={(event) => {
+                  if (event.target.value) settings.update({ reminderTime: event.target.value });
+                }}
+                className="rounded-md border border-line bg-canvas px-2 py-1 disabled:opacity-50"
+              />
+            </label>
+          </div>
+          {denied && (
+            <p role="alert" className="text-sm text-error">
+              {t('settings.reminders.denied')}
+            </p>
+          )}
         </Row>
       </Section>
 
@@ -92,6 +158,52 @@ export function SettingsScreen() {
             }}
           />
         </Row>
+      </Section>
+
+      <Section title={t('settings.section.sound')}>
+        <label className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={settings.soundKeys}
+            onChange={(event) => {
+              settings.update({ soundKeys: event.target.checked });
+              if (event.target.checked) playKeySound(settings.soundVolume);
+            }}
+            className="h-5 w-5 accent-accent"
+          />
+          {t('settings.sound.keys')}
+        </label>
+        <label className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={settings.soundErrors}
+            onChange={(event) => {
+              settings.update({ soundErrors: event.target.checked });
+              if (event.target.checked) playErrorSound(settings.soundVolume);
+            }}
+            className="h-5 w-5 accent-accent"
+          />
+          {t('settings.sound.errors')}
+        </label>
+        <label className="flex flex-wrap items-center gap-3">
+          {t('settings.sound.volume')}
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            value={settings.soundVolume}
+            disabled={!settings.soundKeys && !settings.soundErrors}
+            onChange={(event) => {
+              settings.update({ soundVolume: Number(event.target.value) });
+            }}
+            onPointerUp={() => {
+              playKeySound(settings.soundVolume);
+            }}
+            className="w-48 accent-accent disabled:opacity-50"
+          />
+          <span className="text-sm text-ink-muted tabular-nums">{settings.soundVolume}%</span>
+        </label>
       </Section>
 
       <Section title={t('settings.section.appearance')}>

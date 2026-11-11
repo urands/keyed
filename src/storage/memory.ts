@@ -1,3 +1,5 @@
+import type { UnlockedAchievement } from '../engine/motivation/achievements';
+import type { DayRecord } from '../engine/motivation/daily';
 import type { KeyStat } from '../engine/stats/keyStats';
 import { isRecord } from '../engine/validate';
 import { lessonKeys, type LessonRecord, type LessonSummary, type Storage } from './types';
@@ -7,6 +9,8 @@ interface MemoryData {
   lessons: (LessonRecord & { id: number })[];
   keyStats: Record<string, Record<string, KeyStat>>;
   opened: Record<string, Record<string, number>>;
+  days: Record<string, DayRecord>;
+  achievements: Record<string, UnlockedAchievement>;
 }
 
 /** Where a memory storage keeps a copy between page loads, as one JSON string. */
@@ -16,7 +20,7 @@ export interface Persistence {
 }
 
 function emptyData(): MemoryData {
-  return { settings: {}, lessons: [], keyStats: {}, opened: {} };
+  return { settings: {}, lessons: [], keyStats: {}, opened: {}, days: {}, achievements: {} };
 }
 
 function restore(persistence: Persistence | undefined): MemoryData {
@@ -92,6 +96,47 @@ export function createMemoryStorage(persistence?: Persistence): Storage {
           }),
         );
       return Promise.resolve(lessons);
+    },
+
+    listHistory() {
+      const ordered = [...data.lessons].sort((a, b) => a.startedAt - b.startedAt || a.id - b.id);
+      return Promise.resolve(
+        ordered.map(({ layoutId, startedAt, durationMs, length, errors, cpm, accuracy }) => ({
+          layoutId,
+          startedAt,
+          durationMs,
+          length,
+          errors,
+          cpm,
+          accuracy,
+        })),
+      );
+    },
+
+    loadDays() {
+      return Promise.resolve(
+        Object.values(data.days)
+          .map((day) => ({ ...day }))
+          .sort((a, b) => a.date.localeCompare(b.date)),
+      );
+    },
+
+    saveDay(day) {
+      data.days[day.date] = { ...day };
+      save();
+      return Promise.resolve();
+    },
+
+    loadAchievements() {
+      return Promise.resolve(structuredClone(data.achievements));
+    },
+
+    saveAchievement(id, achievement) {
+      if (achievement.level > (data.achievements[id]?.level ?? 0)) {
+        data.achievements[id] = { ...achievement };
+        save();
+      }
+      return Promise.resolve();
     },
   };
 }

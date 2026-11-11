@@ -25,6 +25,8 @@ pub fn run() {
             }
         }))
         .plugin(tauri_plugin_window_state::Builder::default().build())
+        // Daily goal reminders (src/app/reminders.ts).
+        .plugin(tauri_plugin_notification::init())
         .plugin(
             tauri_plugin_sql::Builder::default()
                 .add_migrations(DATABASE, migrations())

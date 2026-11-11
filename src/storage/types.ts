@@ -1,4 +1,7 @@
 import type { LayoutId } from '../engine/layout/layout';
+import type { UnlockedAchievement } from '../engine/motivation/achievements';
+import type { DayRecord } from '../engine/motivation/daily';
+import type { LessonFacts } from '../engine/motivation/history';
 import type { KeySample, KeyStat } from '../engine/stats/keyStats';
 
 /** A finished lesson as it is saved. */
@@ -47,6 +50,13 @@ export interface Storage {
   ): Promise<void>;
   /** The latest lessons of a layout, oldest first. */
   listLessons(layoutId: LayoutId, limit: number): Promise<LessonSummary[]>;
+  /** Every lesson of every layout without keystrokes, oldest first: for totals and records. */
+  listHistory(): Promise<LessonFacts[]>;
+  /** Practice per day, oldest first. */
+  loadDays(): Promise<DayRecord[]>;
+  saveDay(day: DayRecord): Promise<void>;
+  loadAchievements(): Promise<Record<string, UnlockedAchievement>>;
+  saveAchievement(id: string, achievement: UnlockedAchievement): Promise<void>;
 }
 
 /** Keys whose statistics a lesson changed. */

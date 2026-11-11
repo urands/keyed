@@ -1,8 +1,10 @@
 import { parseGeometry } from '../engine/layout/geometry';
+import { parseAchievements } from '../engine/motivation/achievements';
 import { parseLayout } from '../engine/layout/layout';
 import { parseCourse } from '../engine/progress/course';
 import { parseLetterModel, type LetterModel } from '../engine/textgen/letterModel';
 import { parseWordList } from '../engine/textgen/wordList';
+import achievementsData from './achievements.json';
 import enUsQwertyCourseData from './courses/en-us-qwerty.json';
 import ruJcukenCourseData from './courses/ru-jcuken.json';
 import enBlocklistData from './en/blocklist.json';
@@ -21,6 +23,7 @@ export const ruJcuken = parseLayout(ruJcukenData);
 export const ansiGeometry = parseGeometry(ansiData);
 export const enUsQwertyCourse = parseCourse(enUsQwertyCourseData);
 export const ruJcukenCourse = parseCourse(ruJcukenCourseData);
+export const achievementDefs = parseAchievements(achievementsData);
 
 /** What the lesson text generator needs for one language. */
 export interface LanguageContent {

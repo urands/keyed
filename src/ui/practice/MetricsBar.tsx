@@ -15,7 +15,15 @@ function Metric({ label, value, unit }: { label: string; value: string; unit: st
   );
 }
 
+interface GoalProgress {
+  activeMs: number;
+  goalMs: number;
+  met: boolean;
+}
+
 interface MetricsBarProps {
+  /** Today's typing time against the daily goal, this lesson included. */
+  goal: GoalProgress;
   /** Characters per minute; null before there is anything to measure. */
   cpm: number | null;
   unit: SpeedUnit;
@@ -29,6 +37,7 @@ interface MetricsBarProps {
 }
 
 export function MetricsBar({
+  goal,
   cpm,
   unit,
   accuracy,
@@ -51,6 +60,11 @@ export function MetricsBar({
         label={t('practice.accuracy')}
         value={accuracy === null ? '—' : String(percentFloor(accuracy))}
         unit="%"
+      />
+      <Metric
+        label={t('goal.label')}
+        value={`${goal.met ? '✓ ' : ''}${Math.floor(goal.activeMs / 60_000)}/${Math.round(goal.goalMs / 60_000)}`}
+        unit={t('goal.unit')}
       />
       <div className="min-w-48 flex-1">
         <div className="mb-1.5 flex justify-between text-sm text-ink-muted">

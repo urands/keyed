@@ -28,6 +28,12 @@ export interface LearningParams {
   idleMs: number;
   /** Daily goal, minutes of typing. */
   dailyGoalMinutes: number;
+  /** A freeze is earned for every this many days of the streak. */
+  freezeEvery: number;
+  /** Freezes that can be kept at once. */
+  maxFreezes: number;
+  /** Lesson accuracy that keeps the "steady hand" run going. */
+  steadyAccuracy: number;
 }
 
 export const DEFAULT_PARAMS: Readonly<LearningParams> = {
@@ -45,4 +51,7 @@ export const DEFAULT_PARAMS: Readonly<LearningParams> = {
   pseudoMaxLength: 7,
   idleMs: 5000,
   dailyGoalMinutes: 10,
+  freezeEvery: 7,
+  maxFreezes: 2,
+  steadyAccuracy: 0.97,
 };

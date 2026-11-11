@@ -1,0 +1,13 @@
+[
+  { "id": "first-step", "metric": "lessons", "levels": [1] },
+  { "id": "home-row", "metric": "startMasteredLayouts", "levels": [1] },
+  { "id": "halfway", "metric": "openedShare", "levels": [0.5] },
+  { "id": "alphabet", "metric": "masteredLayouts", "levels": [1] },
+  { "id": "speed", "metric": "bestCpm", "levels": [100, 150, 200, 250, 300] },
+  { "id": "flawless", "metric": "perfectLessons", "levels": [1] },
+  { "id": "steady-hand", "metric": "bestAccurateRun", "levels": [10] },
+  { "id": "streak", "metric": "bestStreak", "levels": [3, 7, 30, 100] },
+  { "id": "practice-time", "metric": "activeHours", "levels": [1, 10] },
+  { "id": "volume", "metric": "chars", "levels": [10000, 100000] },
+  { "id": "two-layouts", "metric": "startMasteredLayouts", "levels": [2] }
+]

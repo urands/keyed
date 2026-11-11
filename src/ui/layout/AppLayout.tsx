@@ -5,6 +5,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router';
 import { usePractice } from '../../app/practice';
 import { useStorageStatus } from '../../app/storage';
 import { LayoutSwitch } from '../components/LayoutSwitch';
+import { AchievementToasts } from '../motivation/AchievementToasts';
 
 function navClass({ isActive }: { isActive: boolean }): string {
   return `rounded-md px-3 py-1.5 text-sm outline-accent focus-visible:outline-2 ${
@@ -55,6 +56,9 @@ export function AppLayout() {
             <NavLink to="/stats" className={navClass}>
               {t('nav.stats')}
             </NavLink>
+            <NavLink to="/achievements" className={navClass}>
+              {t('nav.achievements')}
+            </NavLink>
             <NavLink to="/settings" className={navClass}>
               {t('nav.settings')}
             </NavLink>
@@ -65,6 +69,7 @@ export function AppLayout() {
       <main className="flex-1 px-6">
         <Outlet />
       </main>
+      <AchievementToasts />
     </div>
   );
 }

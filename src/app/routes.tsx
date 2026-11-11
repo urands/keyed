@@ -1,6 +1,7 @@
 import { Navigate, type RouteObject } from 'react-router';
 
 import { AppLayout } from '../ui/layout/AppLayout';
+import { AchievementsScreen } from '../ui/screens/AchievementsScreen';
 import { HomeScreen } from '../ui/screens/HomeScreen';
 import { PracticeScreen } from '../ui/screens/PracticeScreen';
 import { SettingsScreen } from '../ui/screens/SettingsScreen';
@@ -13,6 +14,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <HomeScreen /> },
       { path: 'practice', element: <PracticeScreen /> },
       { path: 'stats', element: <StatsScreen /> },
+      { path: 'achievements', element: <AchievementsScreen /> },
       { path: 'settings', element: <SettingsScreen /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],

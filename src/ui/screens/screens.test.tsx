@@ -4,10 +4,12 @@ import { createMemoryRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { useMotivation } from '../../app/motivation';
 import { usePractice } from '../../app/practice';
 import { routes } from '../../app/routes';
 import { useSettings } from '../../app/settings';
 import { getStorage, openStorage } from '../../app/storage';
+import { localDate } from '../../engine/motivation/dates';
 import type { KeyStat } from '../../engine/stats/keyStats';
 import i18n from '../../i18n';
 
@@ -92,10 +94,16 @@ describe('statistics screen', () => {
         0,
       );
     }
+    useMotivation.getState().restore({
+      days: await getStorage().loadDays(),
+      history: await getStorage().listHistory(),
+      achievements: {},
+    });
     const { container } = renderAt('/stats');
 
     expect(await screen.findByRole('heading', { name: 'Statistics' })).toBeVisible();
     expect(screen.getByText('Lessons').nextElementSibling).toHaveTextContent('3');
+    expect(screen.getByText('Typing time').nextElementSibling).toHaveTextContent('2 min');
     expect(screen.getByText('Best speed').nextElementSibling).toHaveTextContent('42 WPM');
     expect(screen.getByRole('group', { name: 'Speed by lesson, WPM' })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: 'Accuracy by lesson' })).toBeInTheDocument();
@@ -149,5 +157,72 @@ describe('settings screen', () => {
     await user.click(screen.getByRole('radio', { name: 'System layout' }));
     expect(useSettings.getState().inputMode).toBe('system');
     expect(screen.getByText(/Switch it to the lesson's layout before typing/)).toBeVisible();
+  });
+});
+
+describe('motivation on screens', () => {
+  it('shows the daily goal and the streak on the home screen', () => {
+    usePractice.getState().restore(EN, { keyStats: { f: mastered, j: learning }, opened: {} });
+    const now = new Date();
+    /** The local date `offset` days ago. */
+    const local = (offset: number) =>
+      localDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - offset, 12).getTime());
+    useMotivation.getState().restore({
+      days: [
+        { date: local(2), activeMs: 600_000, lessons: 3, chars: 1800, goalMet: true },
+        { date: local(1), activeMs: 700_000, lessons: 3, chars: 1800, goalMet: true },
+        { date: local(0), activeMs: 360_000, lessons: 2, chars: 1200, goalMet: false },
+      ],
+      history: [],
+      achievements: {},
+    });
+    renderAt('/');
+
+    expect(screen.getByRole('img', { name: 'Today: 6 of 10 minutes' })).toBeInTheDocument();
+    expect(screen.getByText('Streak: 2 days')).toBeVisible();
+    expect(screen.getByText(/0 freezes/)).toBeVisible();
+  });
+
+  it('shows the lesson outcome and a plaque for a new achievement', async () => {
+    const user = userEvent.setup();
+    usePractice.getState().dismissIntro();
+    usePractice.getState().startLesson('fj jf');
+    renderAt('/practice');
+
+    await user.keyboard('fj jf');
+
+    expect(screen.getByRole('heading', { name: 'Lesson complete' })).toBeVisible();
+    expect(screen.getByText('New achievements')).toBeVisible();
+    expect(screen.getByText('Achievement unlocked')).toBeVisible();
+    expect(screen.getAllByText('First step').length).toBeGreaterThan(0);
+  });
+
+  it('lists every achievement with its progress', () => {
+    useMotivation.getState().restore({
+      days: [],
+      history: [],
+      achievements: { 'first-step': { level: 1, unlockedAt: Date.now() } },
+    });
+    const { container } = renderAt('/achievements');
+
+    expect(screen.getByRole('heading', { name: 'Achievements' })).toBeVisible();
+    expect(container.querySelectorAll('[data-achievement]')).toHaveLength(11);
+    expect(container.querySelector('[data-achievement="first-step"]')).toHaveAttribute(
+      'data-level',
+      '1',
+    );
+    expect(container.querySelector('[data-achievement="speed"]')).toHaveTextContent('0 of 100');
+    // A new learner has F and J open: 2 of 26 letters, 7.7% rounded down.
+    expect(container.querySelector('[data-achievement="halfway"]')).toHaveTextContent('7% of 50%');
+    expect(container.querySelector('[data-achievement="flawless"]')).toHaveTextContent(
+      'Not earned yet',
+    );
+  });
+
+  it('changes the daily goal in the settings', async () => {
+    const user = userEvent.setup();
+    renderAt('/settings');
+    await user.click(screen.getByRole('radio', { name: '15 min' }));
+    expect(useSettings.getState().dailyGoal).toBe(15);
   });
 });

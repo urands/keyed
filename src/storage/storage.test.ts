@@ -122,6 +122,49 @@ describe.each([
       accuracy: 2 / 3,
     });
   });
+
+  it('lists the whole history of every layout, oldest first', async () => {
+    const storage = create();
+    await storage.saveLesson(lesson({ startedAt: 2, cpm: 120 }), stats, 0);
+    await storage.saveLesson(lesson({ layoutId: 'ru-jcuken', startedAt: 1, cpm: 90 }), stats, 0);
+    expect(await storage.listHistory()).toEqual([
+      {
+        layoutId: 'ru-jcuken',
+        startedAt: 1,
+        durationMs: 30_000,
+        length: 3,
+        errors: 1,
+        cpm: 90,
+        accuracy: 2 / 3,
+      },
+      expect.objectContaining({ layoutId: 'en-us-qwerty', cpm: 120 }),
+    ]);
+  });
+
+  it('saves days and updates them', async () => {
+    const storage = create();
+    const day = { date: '2026-11-11', activeMs: 60_000, lessons: 1, chars: 120, goalMet: false };
+    await storage.saveDay(day);
+    await storage.saveDay({ date: '2026-11-10', activeMs: 1, lessons: 1, chars: 1, goalMet: true });
+    await storage.saveDay({ ...day, activeMs: 600_000, lessons: 2, goalMet: true });
+    expect(await storage.loadDays()).toEqual([
+      { date: '2026-11-10', activeMs: 1, lessons: 1, chars: 1, goalMet: true },
+      { ...day, activeMs: 600_000, lessons: 2, goalMet: true },
+    ]);
+  });
+
+  it('saves achievement levels and never lowers them', async () => {
+    const storage = create();
+    await storage.saveAchievement('speed', { level: 2, unlockedAt: 100 });
+    await storage.saveAchievement('speed', { level: 1, unlockedAt: 200 });
+    await storage.saveAchievement('first-step', { level: 1, unlockedAt: 50 });
+    expect(await storage.loadAchievements()).toEqual({
+      speed: { level: 2, unlockedAt: 100 },
+      'first-step': { level: 1, unlockedAt: 50 },
+    });
+    await storage.saveAchievement('speed', { level: 3, unlockedAt: 300 });
+    expect((await storage.loadAchievements()).speed).toEqual({ level: 3, unlockedAt: 300 });
+  });
 });
 
 describe('memory storage persistence', () => {

@@ -19,6 +19,8 @@ import { LessonText } from '../practice/LessonText';
 import { MetricsBar } from '../practice/MetricsBar';
 import { NewKeyCard } from '../practice/NewKeyCard';
 import { NextKeyHint } from '../practice/NextKeyHint';
+import { useDailyProgress, useStreak } from '../motivation/hooks';
+import { playErrorSound, playKeySound } from '../sound';
 import { useSpeedUnit } from '../useSpeedUnit';
 
 /** Keys that do not end a pause, so Tab still moves focus and Shift alone does nothing. */
@@ -40,6 +42,7 @@ export function PracticeScreen() {
   const unlocked = usePractice((s) => s.unlocked);
   const introduce = usePractice((s) => s.introduce);
   const wrongLayout = usePractice((s) => s.wrongLayout);
+  const outcome = usePractice((s) => s.outcome);
   const startLesson = usePractice((s) => s.startLesson);
   const repeatLesson = usePractice((s) => s.repeatLesson);
   const pause = usePractice((s) => s.pause);
@@ -47,6 +50,9 @@ export function PracticeScreen() {
   const dismissIntro = usePractice((s) => s.dismissIntro);
   const [capsLock, setCapsLock] = useState(false);
   const { status, lastPressAt } = lesson;
+  // The lesson in progress counts toward today's goal; a finished one is already in the day.
+  const daily = useDailyProgress(status === 'finished' ? 0 : lesson.activeMs);
+  const streak = useStreak();
   const showIntro = introduce.length > 0 && status !== 'finished';
   const courseKeys = useMemo(() => stageKeys(kit.stage), [kit]);
   const openCodes = useMemo(() => codesFor(kit.layout, [...progress.open, ' ']), [kit, progress]);
@@ -129,6 +135,14 @@ export function PracticeScreen() {
     };
   }, [navigate]);
 
+  // Key and error sounds, if the user turned them on (task 4.10).
+  useEffect(() => {
+    if (!feedback) return;
+    const { soundKeys, soundErrors, soundVolume } = useSettings.getState();
+    if (feedback.correct && soundKeys) playKeySound(soundVolume);
+    if (!feedback.correct && soundErrors) playErrorSound(soundVolume);
+  }, [feedback]);
+
   // Pause when the window loses focus, and when the user leaves this screen.
   useEffect(() => {
     const onVisibilityChange = () => {
@@ -158,6 +172,10 @@ export function PracticeScreen() {
         result={result}
         unit={unit}
         unlocked={unlocked.map((key) => charLabel(kit.layout, key, t('keyboard.space')))}
+        outcome={outcome}
+        daily={daily}
+        streak={streak}
+        label={(char) => charLabel(kit.layout, char, t('keyboard.space'))}
         onNext={() => {
           startLesson();
         }}
@@ -190,6 +208,7 @@ export function PracticeScreen() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-4 py-5">
       <MetricsBar
+        goal={daily}
         cpm={live.cpm}
         unit={unit}
         accuracy={live.accuracy}

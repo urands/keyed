@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { practiceGeometry } from '../../app/layouts';
+import { useMotivation } from '../../app/motivation';
 import { useLayoutKit, usePractice } from '../../app/practice';
 import { getStorage } from '../../app/storage';
+import { mostProductiveDay } from '../../engine/motivation/history';
 import { DEFAULT_PARAMS } from '../../engine/params';
 import { stageKeys } from '../../engine/progress/course';
 import type { LessonSummary } from '../../storage/types';
@@ -13,6 +15,9 @@ import { LineChart } from '../charts/LineChart';
 import { niceCeil } from '../charts/scale';
 import { buttonClass } from '../components/buttonClass';
 import { formatDuration, percentFloor, speedValue } from '../format';
+import { ActivityCalendar } from '../motivation/ActivityCalendar';
+import { useDailyProgress, useStreak, useToday } from '../motivation/hooks';
+import { WeekSummary } from '../motivation/WeekSummary';
 import { charLabel, codesFor } from '../practice/keyCodes';
 import { useSpeedUnit } from '../useSpeedUnit';
 
@@ -58,6 +63,12 @@ export function StatsScreen() {
   const unit = useSpeedUnit();
   const keyStats = usePractice((s) => s.keyStats);
   const progress = usePractice((s) => s.progress);
+  const days = useMotivation((s) => s.days);
+  const layoutRecords = useMotivation((s) => s.totals.byLayout[layout.id]);
+  const today = useToday();
+  const daily = useDailyProgress();
+  const streak = useStreak();
+  const bestDay = useMemo(() => mostProductiveDay(Object.values(days)), [days]);
   const [lessons, setLessons] = useState<LessonSummary[] | null>(null);
 
   useEffect(() => {
@@ -87,6 +98,10 @@ export function StatsScreen() {
     [i18n.language],
   );
 
+  const dayFormat = useMemo(
+    () => new Intl.DateTimeFormat(i18n.language, { day: 'numeric', month: 'short' }),
+    [i18n.language],
+  );
   const unitLabel = t(`units.${unit}`);
   const label = (key: string) => charLabel(layout, key, t('keyboard.space'));
 
@@ -125,6 +140,13 @@ export function StatsScreen() {
   }
 
   const speeds = lessons.map((lesson) => speedValue(lesson.cpm, unit));
+  const totalMs = lessons.reduce((sum, lesson) => sum + lesson.durationMs, 0);
+  const hoursAndMinutes = (ms: number) => {
+    const minutes = Math.round(ms / 60_000);
+    return minutes < 60
+      ? t('goal.minutes', { count: minutes })
+      : t('stats.hoursMinutes', { hours: Math.floor(minutes / 60), minutes: minutes % 60 });
+  };
   const accuracies = lessons.map((lesson) => percentFloor(lesson.accuracy));
   const recent = lessons.slice(-RECENT);
   const target = speedValue(DEFAULT_PARAMS.targetCpm, unit);
@@ -145,7 +167,7 @@ export function StatsScreen() {
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatTile label={t('stats.lessons')} value={String(lessons.length)} />
-        <StatTile label={t('stats.best')} value={`${Math.max(...speeds)} ${unitLabel}`} />
+        <StatTile label={t('stats.totalTime')} value={hoursAndMinutes(totalMs)} />
         <StatTile
           label={t('stats.recentSpeed', { count: recent.length })}
           value={`${speedValue(average(recent.map((l) => l.cpm)), unit)} ${unitLabel}`}
@@ -155,6 +177,40 @@ export function StatsScreen() {
           value={`${percentFloor(average(recent.map((l) => l.accuracy)))}%`}
         />
       </div>
+
+      <Panel title={t('records.title')}>
+        <dl className="grid grid-cols-2 gap-x-8 gap-y-3 md:grid-cols-4">
+          <div>
+            <dt className="text-sm text-ink-muted">{t('records.bestSpeed')}</dt>
+            <dd className="text-xl font-semibold">
+              {speedValue(layoutRecords?.bestCpm ?? 0, unit)} {unitLabel}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm text-ink-muted">{t('records.bestAccuracy')}</dt>
+            <dd className="text-xl font-semibold">
+              {percentFloor(layoutRecords?.bestAccuracy ?? 0)}%
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm text-ink-muted">{t('records.bestStreak')}</dt>
+            <dd className="text-xl font-semibold">{t('streak.count', { count: streak.best })}</dd>
+          </div>
+          <div>
+            <dt className="text-sm text-ink-muted">{t('records.bestDay')}</dt>
+            <dd className="text-xl font-semibold">
+              {bestDay
+                ? `${t('goal.minutes', { count: Math.round(bestDay.activeMs / 60_000) })} · ${dayFormat.format(new Date(`${bestDay.date}T12:00:00`))}`
+                : '—'}
+            </dd>
+          </div>
+        </dl>
+        <WeekSummary unit={unit} />
+      </Panel>
+
+      <Panel title={t('calendar.title')}>
+        <ActivityCalendar days={days} goalMs={daily.goalMs} today={today} frozen={streak.frozen} />
+      </Panel>
 
       <Panel title={t('stats.speed', { unit: unitLabel })}>
         <LineChart

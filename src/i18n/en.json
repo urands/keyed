@@ -8,7 +8,8 @@
     "home": "Home",
     "practice": "Practice",
     "stats": "Statistics",
-    "settings": "Settings"
+    "settings": "Settings",
+    "achievements": "Achievements"
   },
   "layout": {
     "label": "Layout",
@@ -121,13 +122,21 @@
     "keys": "Keys in this lesson",
     "next": "Next lesson",
     "repeat": "Repeat",
-    "home": "Home"
+    "home": "Home",
+    "record": "Personal record!",
+    "vsAverage": "Your average: {{average}}",
+    "achievements": "New achievements",
+    "insight": {
+      "confusion": "Instead of {{expected}} you often type {{typed}}",
+      "slowest": "The slowest key: {{key}}, {{speed}} {{unit}}"
+    }
   },
   "stats": {
     "title": "Statistics",
+    "totalTime": "Typing time",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
     "empty": "Finish a lesson to see your statistics.",
     "lessons": "Lessons",
-    "best": "Best speed",
     "recentSpeed": "Speed, last {{count}}",
     "recentAccuracy": "Accuracy, last {{count}}",
     "speed": "Speed by lesson, {{unit}}",
@@ -152,7 +161,9 @@
       "learning": "Learning",
       "practice": "Practice screen",
       "keyboard": "Keyboard",
-      "appearance": "Appearance"
+      "appearance": "Appearance",
+      "motivation": "Daily goal and reminders",
+      "sound": "Sound"
     },
     "layoutHint": "Each layout has its own progress and statistics.",
     "strict": {
@@ -183,6 +194,131 @@
       "system": "System",
       "light": "Light",
       "dark": "Dark"
+    },
+    "goal": {
+      "label": "Daily goal",
+      "hint": "Minutes of typing a day. Only typing time counts, not pauses."
+    },
+    "reminders": {
+      "label": "Remind me",
+      "hint": "A system notification at this time if today’s goal is not reached yet. KeyEd must be running, for example minimised.",
+      "time": "Time",
+      "denied": "Notifications are not allowed. Allow them for KeyEd in the system settings."
+    },
+    "sound": {
+      "keys": "Key sound",
+      "errors": "Error sound",
+      "volume": "Volume"
     }
+  },
+  "goal": {
+    "label": "Daily goal",
+    "unit": "min",
+    "aria": "Today: {{done}} of {{goal}} minutes",
+    "short": "{{done}}/{{goal}} min",
+    "minutes": "{{count}} min",
+    "done": "Daily goal reached",
+    "left_one": "{{count}} minute left to the daily goal",
+    "left_other": "{{count}} minutes left to the daily goal"
+  },
+  "streak": {
+    "days_one": "Streak: {{count}} day",
+    "days_other": "Streak: {{count}} days",
+    "none": "No streak yet: reach today’s goal to start one.",
+    "broken_one": "The streak has ended. Your best was {{count}} day — start a new one today.",
+    "broken_other": "The streak has ended. Your best was {{count}} days — start a new one today.",
+    "freezes_one": "{{count}} freeze",
+    "freezes_other": "{{count}} freezes",
+    "freezesHint": "A freeze keeps the streak when you miss a day. You get one for every 7 days in a row, and can keep two.",
+    "best_one": "best {{count}} day",
+    "best_other": "best {{count}} days",
+    "count_one": "{{count}} day",
+    "count_other": "{{count}} days"
+  },
+  "week": {
+    "title": "Last 7 days",
+    "vsPrevious": "change against the 7 days before",
+    "speed": "Speed",
+    "accuracy": "Accuracy",
+    "time": "Typing time",
+    "noData": "No lessons in the last 7 days."
+  },
+  "records": {
+    "title": "Personal records",
+    "bestSpeed": "Best speed",
+    "bestAccuracy": "Best accuracy",
+    "bestStreak": "Longest streak",
+    "bestDay": "Most productive day"
+  },
+  "calendar": {
+    "title": "Activity",
+    "hint": "Point at a day to see its practice.",
+    "none": "no practice",
+    "goalMet": "goal reached",
+    "frozen": "freeze used",
+    "belowShare": "under {{percent}}% of the goal",
+    "aboveShare": "{{percent}}% of the goal or more"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "toast": "Achievement unlocked",
+    "all": "All achievements",
+    "close": "Close",
+    "levels": "Levels",
+    "reached": "reached",
+    "unlockedOn": "Earned on {{date}}",
+    "progress": "{{value}} of {{next}}",
+    "notYet": "Not earned yet",
+    "list": {
+      "first-step": {
+        "name": "First step",
+        "condition": "Finish your first lesson"
+      },
+      "home-row": {
+        "name": "Home position",
+        "condition": "Master the keys of the first lessons"
+      },
+      "halfway": {
+        "name": "Halfway",
+        "condition": "Open half the letters of a layout"
+      },
+      "alphabet": {
+        "name": "The whole alphabet",
+        "condition": "Master every letter of a layout"
+      },
+      "speed": {
+        "name": "Picking up speed",
+        "condition": "A lesson at {{value}} characters per minute"
+      },
+      "flawless": {
+        "name": "Flawless",
+        "condition": "A lesson without a single mistake"
+      },
+      "steady-hand": {
+        "name": "Steady hand",
+        "condition": "Lessons in a row with 97% accuracy or more: {{value}}"
+      },
+      "streak": {
+        "name": "Streak",
+        "condition": "Days in a row with the daily goal reached: {{value}}"
+      },
+      "practice-time": {
+        "name": "Practice time",
+        "condition": "Hours of typing in total: {{value}}"
+      },
+      "volume": {
+        "name": "Volume",
+        "condition": "Characters typed in total: {{value}}"
+      },
+      "two-layouts": {
+        "name": "Two layouts",
+        "condition": "Master the keys of the first lessons in a second layout"
+      }
+    }
+  },
+  "reminder": {
+    "title": "KeyEd",
+    "body_one": "{{count}} minute left to today’s goal.",
+    "body_other": "{{count}} minutes left to today’s goal."
   }
 }

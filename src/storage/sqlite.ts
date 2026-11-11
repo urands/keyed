@@ -1,5 +1,8 @@
-import type { LayoutId } from '../engine/layout/layout';
+import { LAYOUT_IDS, type LayoutId } from '../engine/layout/layout';
+import type { DayRecord } from '../engine/motivation/daily';
+import type { LessonFacts } from '../engine/motivation/history';
 import type { KeyStat } from '../engine/stats/keyStats';
+import { isOneOf } from '../engine/validate';
 import { encodeSamples } from './samples';
 import { lessonKeys, type LessonSummary, type Storage } from './types';
 
@@ -19,6 +22,14 @@ interface KeyStatRow {
   time_ema: number | null;
   acc_ema: number | null;
   best_confidence: number;
+}
+
+interface DayRow {
+  date: string;
+  active_ms: number;
+  lessons: number;
+  chars: number;
+  goal_met: number;
 }
 
 interface LessonRow {
@@ -158,6 +169,77 @@ export function createSqliteStorage(db: SqlDatabase): Storage {
         cpm: row.cpm,
         accuracy: row.accuracy,
       }));
+    },
+
+    async listHistory() {
+      const rows = await db.select<LessonRow & { layout_id: string }>(
+        `SELECT id, layout_id, stage, started_at, duration_ms, length, errors, cpm, accuracy
+         FROM lesson WHERE profile_id = $1 ORDER BY started_at, id`,
+        [PROFILE],
+      );
+      return rows.flatMap((row): LessonFacts[] =>
+        isOneOf(LAYOUT_IDS, row.layout_id)
+          ? [
+              {
+                layoutId: row.layout_id,
+                startedAt: row.started_at,
+                durationMs: row.duration_ms,
+                length: row.length,
+                errors: row.errors,
+                cpm: row.cpm,
+                accuracy: row.accuracy,
+              },
+            ]
+          : [],
+      );
+    },
+
+    async loadDays() {
+      const rows = await db.select<DayRow>(
+        `SELECT date, active_ms, lessons, chars, goal_met FROM daily
+         WHERE profile_id = $1 ORDER BY date`,
+        [PROFILE],
+      );
+      return rows.map((row): DayRecord => ({
+        date: row.date,
+        activeMs: row.active_ms,
+        lessons: row.lessons,
+        chars: row.chars,
+        goalMet: row.goal_met !== 0,
+      }));
+    },
+
+    async saveDay(day) {
+      // freeze_used stays 0: freezes are worked out from the days themselves.
+      await db.execute(
+        `INSERT INTO daily (profile_id, date, active_ms, lessons, chars, goal_met, freeze_used)
+         VALUES ($1, $2, $3, $4, $5, $6, 0)
+         ON CONFLICT (profile_id, date) DO UPDATE SET
+           active_ms = excluded.active_ms, lessons = excluded.lessons,
+           chars = excluded.chars, goal_met = excluded.goal_met`,
+        [PROFILE, day.date, Math.round(day.activeMs), day.lessons, day.chars, day.goalMet ? 1 : 0],
+      );
+    },
+
+    async loadAchievements() {
+      const rows = await db.select<{ id: string; level: number; unlocked_at: number }>(
+        'SELECT id, level, unlocked_at FROM achievement WHERE profile_id = $1',
+        [PROFILE],
+      );
+      return Object.fromEntries(
+        rows.map((row) => [row.id, { level: row.level, unlockedAt: row.unlocked_at }]),
+      );
+    },
+
+    async saveAchievement(id, achievement) {
+      // A level never goes down, even if two writes race.
+      await db.execute(
+        `INSERT INTO achievement (profile_id, id, level, unlocked_at) VALUES ($1, $2, $3, $4)
+         ON CONFLICT (profile_id, id) DO UPDATE SET
+           level = excluded.level, unlocked_at = excluded.unlocked_at
+         WHERE excluded.level > achievement.level`,
+        [PROFILE, id, achievement.level, Math.round(achievement.unlockedAt)],
+      );
     },
   };
 }

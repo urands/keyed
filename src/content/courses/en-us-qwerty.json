@@ -3,6 +3,7 @@
   "stages": [
     {
       "id": "letters",
+      "intro": 3,
       "start": ["f", "j"],
       "order": [
         "dk",
