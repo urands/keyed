@@ -1,6 +1,9 @@
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 
-/** Placeholder for the home screen (docs/screens.md, section 2). */
+import { buttonClass } from '../components/buttonClass';
+
+/** Placeholder for the home screen (docs/screens.md, section 2; task 2.14). */
 export function HomeScreen() {
   const { t } = useTranslation();
 
@@ -15,6 +18,9 @@ export function HomeScreen() {
       >
         asdf jkl; · фыва олдж
       </p>
+      <Link to="/practice" className={`${buttonClass('primary')} px-6 py-3 text-lg`}>
+        {t('home.start')}
+      </Link>
       <p className="text-sm text-ink-muted">{t('home.stub')}</p>
     </section>
   );

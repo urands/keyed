@@ -1,4 +1,6 @@
 import '@testing-library/jest-dom/vitest';
+// Components translate their text, so every test needs i18next set up.
+import '../src/i18n';
 
 import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';

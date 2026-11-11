@@ -20,6 +20,21 @@
   --color-accent: var(--kd-accent);
   --color-on-accent: var(--kd-on-accent);
 
+  --color-ok: var(--kd-ok);
+  --color-error: var(--kd-error);
+  --color-error-bg: var(--kd-error-bg);
+  --color-fixed: var(--kd-fixed);
+
+  --color-finger-l-pinky: var(--kd-finger-l-pinky);
+  --color-finger-l-ring: var(--kd-finger-l-ring);
+  --color-finger-l-middle: var(--kd-finger-l-middle);
+  --color-finger-l-index: var(--kd-finger-l-index);
+  --color-finger-thumb: var(--kd-finger-thumb);
+  --color-finger-r-index: var(--kd-finger-r-index);
+  --color-finger-r-middle: var(--kd-finger-r-middle);
+  --color-finger-r-ring: var(--kd-finger-r-ring);
+  --color-finger-r-pinky: var(--kd-finger-r-pinky);
+
   --font-sans: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', Consolas, monospace;
 }
@@ -32,5 +47,42 @@
 
   body {
     @apply bg-canvas font-sans text-ink antialiased;
+  }
+}
+
+@layer components {
+  /*
+   * Virtual keyboard: --u is the size of one letter key; the keyboard is 15u wide
+   * and 5u high. It shrinks with the window so the practice screen fits without scrolling.
+   */
+  .kd-keyboard {
+    --u: clamp(2rem, min((100vw - 8rem) / 15, (100vh - 32rem) / 5), 3.1rem);
+  }
+
+  /* Short flash on a pressed key. Color and opacity only, no movement. */
+  .kd-flash {
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    animation: kd-flash 220ms ease-out forwards;
+  }
+
+  .kd-flash-ok {
+    background-color: var(--kd-ok);
+  }
+
+  .kd-flash-bad {
+    background-color: var(--kd-error);
+  }
+}
+
+@keyframes kd-flash {
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 0;
   }
 }

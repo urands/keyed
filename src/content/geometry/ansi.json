@@ -1,0 +1,93 @@
+{
+  "id": "ansi",
+  "rows": [
+    [
+      { "code": "Backquote" },
+      { "code": "Digit1" },
+      { "code": "Digit2" },
+      { "code": "Digit3" },
+      { "code": "Digit4" },
+      { "code": "Digit5" },
+      { "code": "Digit6" },
+      { "code": "Digit7" },
+      { "code": "Digit8" },
+      { "code": "Digit9" },
+      { "code": "Digit0" },
+      { "code": "Minus" },
+      { "code": "Equal" },
+      { "code": "Backspace", "width": 2 }
+    ],
+    [
+      { "code": "Tab", "width": 1.5 },
+      { "code": "KeyQ" },
+      { "code": "KeyW" },
+      { "code": "KeyE" },
+      { "code": "KeyR" },
+      { "code": "KeyT" },
+      { "code": "KeyY" },
+      { "code": "KeyU" },
+      { "code": "KeyI" },
+      { "code": "KeyO" },
+      { "code": "KeyP" },
+      { "code": "BracketLeft" },
+      { "code": "BracketRight" },
+      { "code": "Backslash", "width": 1.5 }
+    ],
+    [
+      { "code": "CapsLock", "width": 1.75 },
+      { "code": "KeyA" },
+      { "code": "KeyS" },
+      { "code": "KeyD" },
+      { "code": "KeyF" },
+      { "code": "KeyG" },
+      { "code": "KeyH" },
+      { "code": "KeyJ" },
+      { "code": "KeyK" },
+      { "code": "KeyL" },
+      { "code": "Semicolon" },
+      { "code": "Quote" },
+      { "code": "Enter", "width": 2.25 }
+    ],
+    [
+      { "code": "ShiftLeft", "width": 2.25 },
+      { "code": "KeyZ" },
+      { "code": "KeyX" },
+      { "code": "KeyC" },
+      { "code": "KeyV" },
+      { "code": "KeyB" },
+      { "code": "KeyN" },
+      { "code": "KeyM" },
+      { "code": "Comma" },
+      { "code": "Period" },
+      { "code": "Slash" },
+      { "code": "ShiftRight", "width": 2.75 }
+    ],
+    [{ "code": "Space", "width": 6.25, "gap": 3.75 }]
+  ],
+  "homing": ["KeyF", "KeyJ"],
+  "fingers": {
+    "lPinky": ["Backquote", "Digit1", "Tab", "KeyQ", "CapsLock", "KeyA", "ShiftLeft", "KeyZ"],
+    "lRing": ["Digit2", "KeyW", "KeyS", "KeyX"],
+    "lMiddle": ["Digit3", "KeyE", "KeyD", "KeyC"],
+    "lIndex": ["Digit4", "Digit5", "KeyR", "KeyT", "KeyF", "KeyG", "KeyV", "KeyB"],
+    "thumb": ["Space"],
+    "rIndex": ["Digit6", "Digit7", "KeyY", "KeyU", "KeyH", "KeyJ", "KeyN", "KeyM"],
+    "rMiddle": ["Digit8", "KeyI", "KeyK", "Comma"],
+    "rRing": ["Digit9", "KeyO", "KeyL", "Period"],
+    "rPinky": [
+      "Digit0",
+      "Minus",
+      "Equal",
+      "Backspace",
+      "KeyP",
+      "BracketLeft",
+      "BracketRight",
+      "Backslash",
+      "Semicolon",
+      "Quote",
+      "Enter",
+      "Slash",
+      "ShiftRight"
+    ]
+  }
+}

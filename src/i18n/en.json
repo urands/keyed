@@ -2,10 +2,61 @@
   "app": {
     "name": "KeyEd"
   },
+  "nav": {
+    "label": "Sections",
+    "home": "Home",
+    "practice": "Practice"
+  },
   "home": {
     "title": "Learn to touch type",
     "intro": "Short lessons adapt to you: new keys open once you have mastered the previous ones.",
-    "stub": "Lessons are not ready yet. This is the application skeleton."
+    "start": "Start practice",
+    "stub": "Early version: lessons use common English words and do not adapt to you yet."
+  },
+  "practice": {
+    "speed": "Speed",
+    "accuracy": "Accuracy",
+    "progress": "Lesson progress",
+    "pause": "Pause",
+    "resume": "Resume",
+    "readyHint": "Start typing: the timer starts with the first key.",
+    "pausedTitle": "Paused",
+    "pausedHint": "Press any key to continue. Esc leaves the lesson.",
+    "nextKey": "Next key",
+    "finger": {
+      "lPinky": "Left little finger",
+      "lRing": "Left ring finger",
+      "lMiddle": "Left middle finger",
+      "lIndex": "Left index finger",
+      "thumb": "Thumb",
+      "rIndex": "Right index finger",
+      "rMiddle": "Right middle finger",
+      "rRing": "Right ring finger",
+      "rPinky": "Right little finger"
+    }
+  },
+  "keyboard": {
+    "backspace": "⌫",
+    "tab": "Tab",
+    "capsLock": "Caps",
+    "enter": "Enter",
+    "shift": "Shift",
+    "space": "Space"
+  },
+  "units": {
+    "wpm": "WPM",
+    "cpm": "cpm"
+  },
+  "result": {
+    "title": "Lesson complete",
+    "speed": "Speed",
+    "accuracy": "Accuracy",
+    "time": "Time",
+    "errors": "Errors",
+    "keys": "Keys in this lesson",
+    "next": "Next lesson",
+    "repeat": "Repeat",
+    "home": "Home"
   },
   "settings": {
     "language": {

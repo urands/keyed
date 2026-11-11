@@ -1,8 +1,8 @@
 /*
  * Design tokens: one set of values per theme.
- * The neutral palette below is a placeholder; the real design replaces these
- * values (docs/screens.md, "Что нужно от дизайна"). Text colors meet WCAG AA
- * on both `canvas` and `surface`.
+ * The palette below is a placeholder; the real design replaces these values
+ * (docs/screens.md, "Что нужно от дизайна"). Text colors meet WCAG AA on
+ * `canvas` and `surface`; key labels (`ink`) meet it on every finger color.
  */
 
 [data-theme='light'] {
@@ -15,6 +15,23 @@
   --kd-ink-muted: #5b6472;
   --kd-accent: #2f5fd0;
   --kd-on-accent: #ffffff;
+
+  /* Typing feedback */
+  --kd-ok: #1d7a3a;
+  --kd-error: #c42b2b;
+  --kd-error-bg: #fde3e3;
+  --kd-fixed: #9a5300;
+
+  /* Finger zones, left to right across the keyboard */
+  --kd-finger-l-pinky: #e6d6f8;
+  --kd-finger-l-ring: #d2dafb;
+  --kd-finger-l-middle: #c8e7f7;
+  --kd-finger-l-index: #c8eedf;
+  --kd-finger-thumb: #e2e5ea;
+  --kd-finger-r-index: #e5f1b9;
+  --kd-finger-r-middle: #fbe6b0;
+  --kd-finger-r-ring: #fcd6ba;
+  --kd-finger-r-pinky: #f9cbd6;
 }
 
 [data-theme='dark'] {
@@ -27,4 +44,19 @@
   --kd-ink-muted: #9aa3b2;
   --kd-accent: #7da2ff;
   --kd-on-accent: #0f1320;
+
+  --kd-ok: #63d38c;
+  --kd-error: #ff8a8a;
+  --kd-error-bg: #4d2227;
+  --kd-fixed: #f2b35b;
+
+  --kd-finger-l-pinky: #4b3a6b;
+  --kd-finger-l-ring: #34426e;
+  --kd-finger-l-middle: #23506a;
+  --kd-finger-l-index: #1f5546;
+  --kd-finger-thumb: #343a45;
+  --kd-finger-r-index: #4a5320;
+  --kd-finger-r-middle: #5c4a1c;
+  --kd-finger-r-ring: #5e3a24;
+  --kd-finger-r-pinky: #5e2c3b;
 }
