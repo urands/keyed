@@ -4,13 +4,15 @@ import { createMemoryRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { practiceLayout, usePractice } from '../../app/practice';
+import { usePractice } from '../../app/practice';
 import { routes } from '../../app/routes';
+import { useSettings } from '../../app/settings';
 import { getStorage, openStorage } from '../../app/storage';
 import type { KeyStat } from '../../engine/stats/keyStats';
 import i18n from '../../i18n';
 
 const mastered: KeyStat = { hits: 40, misses: 0, timeEma: 200, accEma: 1, bestConfidence: 1 };
+const EN = 'en-us-qwerty';
 const learning: KeyStat = { hits: 12, misses: 3, timeEma: 520, accEma: 0.8, bestConfidence: 0 };
 
 function renderAt(path: string) {
@@ -22,7 +24,9 @@ beforeEach(async () => {
   localStorage.clear();
   await openStorage(); // a fresh, empty storage for each test
   await i18n.changeLanguage('en');
-  usePractice.getState().restore({ keyStats: {}, opened: {} });
+  useSettings.setState({ layout: EN, speedUnit: 'auto', inputMode: 'emulate', strictMode: false });
+  usePractice.setState({ cache: {} });
+  usePractice.getState().restore(EN, { keyStats: {}, opened: {} });
 });
 
 describe('new key card', () => {
@@ -48,14 +52,14 @@ describe('new key card', () => {
 
 describe('home screen', () => {
   it('says which keys to practise before the next key opens', () => {
-    usePractice.getState().restore({ keyStats: { f: mastered, j: learning }, opened: {} });
+    usePractice.getState().restore(EN, { keyStats: { f: mastered, j: learning }, opened: {} });
     renderAt('/');
     expect(screen.getByRole('link', { name: 'Continue' })).toBeVisible();
     expect(screen.getByText('D, K opens when you master J.')).toBeVisible();
   });
 
   it('marks mastered keys on the keyboard map', () => {
-    usePractice.getState().restore({ keyStats: { f: mastered, j: learning }, opened: {} });
+    usePractice.getState().restore(EN, { keyStats: { f: mastered, j: learning }, opened: {} });
     const { container } = renderAt('/');
     expect(container.querySelector('[data-code="KeyF"]')).toHaveAttribute('data-mastered');
     expect(container.querySelector('[data-code="KeyJ"]')).not.toHaveAttribute('data-mastered');
@@ -70,11 +74,11 @@ describe('statistics screen', () => {
   });
 
   it('shows summary, charts and key confidence after lessons', async () => {
-    usePractice.getState().restore({ keyStats: { f: mastered, j: learning }, opened: {} });
+    usePractice.getState().restore(EN, { keyStats: { f: mastered, j: learning }, opened: {} });
     for (const [i, cpm] of [150, 180, 210].entries()) {
       await getStorage().saveLesson(
         {
-          layoutId: practiceLayout.id,
+          layoutId: EN,
           stage: 'letters',
           startedAt: 1_800_000_000_000 + i * 60_000,
           durationMs: 40_000,
@@ -98,5 +102,52 @@ describe('statistics screen', () => {
     expect(container.querySelector('[data-code="KeyF"]')).toHaveAttribute('data-step', '5');
     // J: speed 343/520 × accuracy 0.8/0.95 ≈ 0.56 → the 40–59% step.
     expect(container.querySelector('[data-code="KeyJ"]')).toHaveAttribute('data-step', '3');
+  });
+});
+
+describe('layout switch', () => {
+  it('switches the course on every screen and keeps statistics apart', async () => {
+    const user = userEvent.setup();
+    usePractice.getState().restore(EN, { keyStats: { f: mastered, j: learning }, opened: {} });
+    renderAt('/');
+    expect(screen.getByText('D, K opens when you master J.')).toBeVisible();
+
+    await user.click(screen.getByRole('radio', { name: 'RU' }));
+
+    // A new learner of the Russian layout sees the welcome screen with А and О.
+    expect(await screen.findByText(/two keys under your index fingers: А and О/)).toBeVisible();
+    expect(useSettings.getState().layout).toBe('ru-jcuken');
+
+    await user.click(screen.getByRole('radio', { name: 'EN' }));
+    expect(await screen.findByText('D, K opens when you master J.')).toBeVisible();
+  });
+});
+
+describe('settings screen', () => {
+  it('opens with Ctrl+, and changes the speed unit', async () => {
+    const user = userEvent.setup();
+    usePractice.getState().dismissIntro();
+    const { router } = renderAt('/practice');
+    await user.keyboard('{Control>},{/Control}');
+    expect(router.state.location.pathname).toBe('/settings');
+
+    await user.click(screen.getByRole('radio', { name: 'Characters/min' }));
+    expect(useSettings.getState().speedUnit).toBe('cpm');
+
+    await router.navigate('/practice');
+    expect(await screen.findByText('Speed')).toBeVisible();
+    expect(screen.getByText('Speed').nextElementSibling).toHaveTextContent('cpm');
+  });
+
+  it('turns on strict mode and the system layout input', async () => {
+    const user = userEvent.setup();
+    renderAt('/settings');
+
+    await user.click(screen.getByRole('checkbox', { name: 'Strict mode' }));
+    expect(useSettings.getState().strictMode).toBe(true);
+
+    await user.click(screen.getByRole('radio', { name: 'System layout' }));
+    expect(useSettings.getState().inputMode).toBe('system');
+    expect(screen.getByText(/Switch it to the lesson's layout before typing/)).toBeVisible();
   });
 });

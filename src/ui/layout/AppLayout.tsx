@@ -1,12 +1,10 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NavLink, Outlet } from 'react-router';
+import { NavLink, Outlet, useNavigate } from 'react-router';
 
 import { usePractice } from '../../app/practice';
-import { useSettings } from '../../app/settings';
 import { useStorageStatus } from '../../app/storage';
-import { LANGUAGES } from '../../i18n';
-import { SegmentedControl } from '../components/SegmentedControl';
-import { THEME_PREFERENCES } from '../theme/theme';
+import { LayoutSwitch } from '../components/LayoutSwitch';
 
 function navClass({ isActive }: { isActive: boolean }): string {
   return `rounded-md px-3 py-1.5 text-sm outline-accent focus-visible:outline-2 ${
@@ -16,13 +14,24 @@ function navClass({ isActive }: { isActive: boolean }): string {
 
 export function AppLayout() {
   const { t } = useTranslation();
-  const language = useSettings((state) => state.language);
-  const setLanguage = useSettings((state) => state.setLanguage);
-  const theme = useSettings((state) => state.theme);
-  const setTheme = useSettings((state) => state.setTheme);
+  const navigate = useNavigate();
   // Navigation fades while the user types, so it does not distract.
   const typing = usePractice((state) => state.lesson.status === 'running');
   const storageFailed = useStorageStatus((state) => state.failed);
+
+  // Ctrl+, opens the settings (docs/screens.md, "Горячие клавиши").
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === ',') {
+        event.preventDefault();
+        void navigate('/settings');
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [navigate]);
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -46,30 +55,12 @@ export function AppLayout() {
             <NavLink to="/stats" className={navClass}>
               {t('nav.stats')}
             </NavLink>
+            <NavLink to="/settings" className={navClass}>
+              {t('nav.settings')}
+            </NavLink>
           </nav>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <SegmentedControl
-            name="language"
-            legend={t('settings.language.label')}
-            value={language}
-            options={LANGUAGES.map((value) => ({
-              value,
-              label: t(`settings.language.${value}`),
-            }))}
-            onChange={setLanguage}
-          />
-          <SegmentedControl
-            name="theme"
-            legend={t('settings.theme.label')}
-            value={theme}
-            options={THEME_PREFERENCES.map((value) => ({
-              value,
-              label: t(`settings.theme.${value}`),
-            }))}
-            onChange={setTheme}
-          />
-        </div>
+        <LayoutSwitch short name="header-layout" />
       </header>
       <main className="flex-1 px-6">
         <Outlet />

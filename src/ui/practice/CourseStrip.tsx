@@ -21,7 +21,7 @@ export function CourseStrip({ layout, keys, progress }: CourseStripProps) {
   const open = new Set(progress.open);
 
   return (
-    <ol aria-label={t('course.strip')} className="flex flex-wrap justify-center gap-1">
+    <ol aria-label={t('course.strip')} className="flex flex-wrap justify-center gap-[3px]">
       {keys.map((key) => {
         const label = charLabel(layout, key, t('keyboard.space'));
         if (!open.has(key)) {
@@ -29,7 +29,7 @@ export function CourseStrip({ layout, keys, progress }: CourseStripProps) {
             <li
               key={key}
               data-key-state="closed"
-              className="flex h-8 w-8 items-center justify-center rounded-md border border-dashed border-line font-mono text-sm text-ink-muted"
+              className="flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-line font-mono text-sm text-ink-muted"
             >
               <span className="sr-only">{t('course.closed', { key: label })}</span>
               <span aria-hidden="true">{label}</span>
@@ -48,7 +48,7 @@ export function CourseStrip({ layout, keys, progress }: CourseStripProps) {
             data-key-state={mastered ? 'mastered' : 'open'}
             data-focus={focus || undefined}
             title={focus ? `${description}. ${t('course.focus')}` : description}
-            className={`relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-md border border-line bg-surface font-mono text-sm font-medium ${focus ? 'ring-2 ring-accent ring-offset-1 ring-offset-canvas' : ''}`}
+            className={`relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-md border border-line bg-surface font-mono text-sm font-medium ${focus ? 'ring-2 ring-accent ring-offset-1 ring-offset-canvas' : ''}`}
           >
             <span className="sr-only">
               {description}

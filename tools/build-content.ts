@@ -111,6 +111,8 @@ function build(config: LanguageConfig): void {
   for (const [rank, line] of lines.entries()) {
     const word = normalize(line.split(' ')[0] ?? '', config);
     if (!isWord(word) || seen.has(word) || excluded.has(word)) continue;
+    // "ааа", "mmm", "ооо": shouts and abbreviations, never words to practise.
+    if (/(.)\1\1/u.test(word)) continue;
     if (word.length === 2 && rank >= TWO_LETTER_MAX_RANK) continue;
     seen.add(word);
     if (isBlocked(word, blocklist)) {

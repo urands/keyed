@@ -19,7 +19,7 @@ describe('app skeleton', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    useSettings.setState({ language: 'en', theme: 'system' });
+    useSettings.setState({ language: 'en', theme: 'system', speedUnit: 'auto', strictMode: false });
     stopSync = startSettingsSync();
   });
 
@@ -39,20 +39,18 @@ describe('app skeleton', () => {
 
   it('switches the interface language', async () => {
     const user = userEvent.setup();
-    renderApp();
+    renderApp('/settings');
 
     await user.click(screen.getByRole('radio', { name: 'Русский' }));
 
-    expect(
-      await screen.findByRole('heading', { level: 1, name: 'Научитесь печатать вслепую' }),
-    ).toBeVisible();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Настройки' })).toBeVisible();
     expect(screen.getByRole('group', { name: 'Тема' })).toBeInTheDocument();
     expect(document.documentElement.lang).toBe('ru');
   });
 
   it('switches the theme', async () => {
     const user = userEvent.setup();
-    renderApp();
+    renderApp('/settings');
     expect(document.documentElement.dataset.theme).toBe('light');
 
     await user.click(screen.getByRole('radio', { name: 'Dark' }));
@@ -64,7 +62,7 @@ describe('app skeleton', () => {
 
   it('remembers the choice between launches', async () => {
     const user = userEvent.setup();
-    renderApp();
+    renderApp('/settings');
 
     await user.click(screen.getByRole('radio', { name: 'Dark' }));
 
@@ -74,7 +72,24 @@ describe('app skeleton', () => {
   });
 
   it('restores saved settings and ignores outdated values', () => {
-    restoreSettings({ theme: 'dark', language: 'klingon' });
-    expect(useSettings.getState()).toMatchObject({ theme: 'dark', language: 'en' });
+    restoreSettings({
+      theme: 'dark',
+      language: 'klingon',
+      speedUnit: 'furlongs',
+      strictMode: true,
+    });
+    expect(useSettings.getState()).toMatchObject({
+      theme: 'dark',
+      language: 'en',
+      speedUnit: 'auto',
+      strictMode: true,
+    });
+  });
+
+  it('picks the layout by interface language when none was saved', () => {
+    restoreSettings({ language: 'ru' });
+    expect(useSettings.getState().layout).toBe('ru-jcuken');
+    restoreSettings({ language: 'en', layout: 'ru-jcuken' });
+    expect(useSettings.getState().layout).toBe('ru-jcuken');
   });
 });

@@ -7,13 +7,27 @@
     "label": "Sections",
     "home": "Home",
     "practice": "Practice",
-    "stats": "Statistics"
+    "stats": "Statistics",
+    "settings": "Settings"
+  },
+  "layout": {
+    "label": "Layout",
+    "name": {
+      "en-us-qwerty": "English (QWERTY)",
+      "ru-jcuken": "Russian (ЙЦУКЕН)"
+    },
+    "short": {
+      "en-us-qwerty": "EN",
+      "ru-jcuken": "RU"
+    }
   },
   "home": {
     "title": "Learn to touch type",
     "intro": "Short lessons adapt to you: new keys open once you have mastered the previous ones.",
+    "chooseLayout": "Which layout to learn",
+    "and": " and ",
     "how": {
-      "start": "You start with two keys under your index fingers: F and J.",
+      "start": "You start with two keys under your index fingers: {{keys}}.",
       "unlock": "A new key opens when you type the open ones fast and accurately.",
       "focus": "Lessons give more practice to the keys that are hardest for you."
     },
@@ -64,6 +78,11 @@
     "readyHint": "Start typing: the timer starts with the first key.",
     "pausedTitle": "Paused",
     "pausedHint": "Press any key to continue. Esc leaves the lesson.",
+    "capsLock": "Caps Lock is on",
+    "wrongLayout": {
+      "en-us-qwerty": "Switch the system keyboard layout to English",
+      "ru-jcuken": "Switch the system keyboard layout to Russian"
+    },
     "nextKey": "Next key",
     "finger": {
       "lPinky": "Left little finger",
@@ -82,6 +101,7 @@
     "tab": "Tab",
     "capsLock": "Caps",
     "enter": "Enter",
+    "escape": "Esc",
     "shift": "Shift",
     "space": "Space"
   },
@@ -127,6 +147,32 @@
     "correct": "Correct"
   },
   "settings": {
+    "title": "Settings",
+    "section": {
+      "learning": "Learning",
+      "practice": "Practice screen",
+      "keyboard": "Keyboard",
+      "appearance": "Appearance"
+    },
+    "layoutHint": "Each layout has its own progress and statistics.",
+    "strict": {
+      "label": "Strict mode",
+      "hint": "A new key opens only when every open key is fast and accurate right now. Without it, a key mastered once no longer holds you back."
+    },
+    "speedUnit": {
+      "label": "Speed unit",
+      "hint": "Automatic shows characters per minute for Russian and words per minute for English.",
+      "auto": "Automatic",
+      "wpm": "WPM",
+      "cpm": "Characters/min"
+    },
+    "inputMode": {
+      "label": "Input",
+      "emulate": "By key position",
+      "system": "System layout",
+      "emulateHint": "The letter is taken from the key you press, so a Russian lesson works even with the English layout on.",
+      "systemHint": "The letter comes from the system keyboard layout. Switch it to the lesson's layout before typing."
+    },
     "language": {
       "label": "Interface language",
       "ru": "Русский",

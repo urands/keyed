@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { englishContent, enUsQwertyCourse } from '../src/content';
+import {
+  englishContent,
+  enUsQwertyCourse,
+  ruJcukenCourse,
+  russianContent,
+  type LanguageContent,
+} from '../src/content';
 import { DEFAULT_PARAMS } from '../src/engine/params';
+import type { Course } from '../src/engine/progress/course';
 import { advanceStage, evaluateStage } from '../src/engine/progress/progress';
 import { createRandom } from '../src/engine/random';
 import { applySamples, type KeyStat } from '../src/engine/stats/keyStats';
@@ -11,9 +18,9 @@ import { createTypist, STEADY_LEARNER } from './syntheticTypist';
 const params = { ...DEFAULT_PARAMS };
 const MAX_LESSONS = 800;
 
-/** Runs the English letters stage with a synthetic learner until it is complete. */
-function runCourse(seed: number) {
-  const stage = enUsQwertyCourse.stages[0]!;
+/** Runs the letters stage with a synthetic learner until it is complete. */
+function runCourse(course: Course, content: LanguageContent, seed: number) {
+  const stage = course.stages[0]!;
   const random = createRandom(seed);
   const typist = createTypist(STEADY_LEARNER, random);
   let stats: Record<string, KeyStat> = {};
@@ -23,10 +30,10 @@ function runCourse(seed: number) {
 
   for (let lesson = 1; lesson <= MAX_LESSONS; lesson += 1) {
     const progress = evaluateStage(stage, opened, stats, params);
-    if (progress.complete) return { lessons: lesson - 1, openedAt, texts, complete: true };
+    if (progress.complete) return { lessons: lesson - 1, openedAt, texts, complete: true, stage };
 
     const text = buildLessonText({
-      ...englishContent,
+      ...content,
       letters: new Set(progress.open),
       focus: progress.focus,
       random,
@@ -40,15 +47,31 @@ function runCourse(seed: number) {
     if (next > opened) openedAt.push(lesson);
     opened = next;
   }
-  return { lessons: MAX_LESSONS, openedAt, texts, complete: false };
+  return { lessons: MAX_LESSONS, openedAt, texts, complete: false, stage };
 }
 
-describe('the English course with a synthetic learner', () => {
-  const run = runCourse(2026);
+describe.each([
+  {
+    name: 'English',
+    course: enUsQwertyCourse,
+    content: englishContent,
+    first: /^[fj]+( [fj]+)*$/,
+    wordsOnceOpen: 'a',
+  },
+  {
+    name: 'Russian',
+    course: ruJcukenCourse,
+    content: russianContent,
+    // Both start keys are vowels, so real words come from the first lesson.
+    first: /^[ао]+( [ао]+)*$/,
+    wordsOnceOpen: 'л',
+  },
+])('the $name course with a synthetic learner', ({ course, content, first, wordsOnceOpen }) => {
+  const run = runCourse(course, content, 2026);
 
   it('opens every letter and masters it without getting stuck', () => {
     expect(run.complete).toBe(true);
-    expect(run.openedAt).toHaveLength(enUsQwertyCourse.stages[0]!.order.length);
+    expect(run.openedAt).toHaveLength(run.stage.order.length);
   });
 
   it('never needs more than 40 lessons for one new key', () => {
@@ -66,6 +89,15 @@ describe('the English course with a synthetic learner', () => {
     }
   });
 
+  it('never puts three equal letters in a row', () => {
+    for (const { text } of run.texts) expect(text).not.toMatch(/(.)\1\1/u);
+  });
+
+  it('mixes the open keys in the first lessons instead of repeating one word pattern', () => {
+    const words = new Set(run.texts[0]?.text.split(' '));
+    expect(words.size).toBeGreaterThanOrEqual(8);
+  });
+
   it('puts the focus key into at least half of the words', () => {
     for (const { text, focus } of run.texts) {
       const words = text.split(' ');
@@ -74,11 +106,10 @@ describe('the English course with a synthetic learner', () => {
     }
   });
 
-  it('starts with letter drills and moves to words once "a" opens', () => {
-    expect(run.texts[0]?.text).toMatch(/^[fj]+( [fj]+)*$/);
-    const firstWithA = run.texts.find(({ open }) => open.includes('a'));
-    expect(firstWithA?.text.split(' ')).toEqual(
-      expect.arrayContaining([expect.stringMatching(/a/)]),
-    );
+  it('starts with the start keys and soon moves to words', () => {
+    expect(run.texts[0]?.text).toMatch(first);
+    const withWords = run.texts.find(({ open }) => open.includes(wordsOnceOpen));
+    const known = new Set(content.words);
+    expect(withWords?.text.split(' ').some((word) => known.has(word))).toBe(true);
   });
 });

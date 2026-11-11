@@ -72,7 +72,7 @@ export function NewKeyCard({ layout, geometry, keys, openKeys, onStart }: NewKey
 
       <p className="max-w-xl text-ink-muted">{t('newKey.hint')}</p>
       <Button variant="primary" onClick={onStart} className="px-6 py-3 text-lg">
-        {t('newKey.start')} <Kbd>Enter</Kbd>
+        {t('newKey.start')} <Kbd>{t('keyboard.enter')}</Kbd>
       </Button>
     </section>
   );

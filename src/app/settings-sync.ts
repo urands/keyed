@@ -1,7 +1,14 @@
 import i18n from '../i18n';
 import { applyTheme, resolveTheme } from '../ui/theme/theme';
-import { settingsValues, useSettings } from './settings';
+import { settingsValues, useSettings, type SettingsValues } from './settings';
 import { getStorage, saveInBackground } from './storage';
+
+function changed(a: SettingsValues, b: SettingsValues): boolean {
+  const before = settingsValues(b);
+  return Object.entries(settingsValues(a)).some(
+    ([key, value]) => before[key as keyof SettingsValues] !== value,
+  );
+}
 
 /**
  * Applies the language and theme to i18next and the document, keeps them in
@@ -21,7 +28,7 @@ export function startSettingsSync(): () => void {
   apply();
   const unsubscribe = useSettings.subscribe((state, previous) => {
     apply();
-    if (state.language !== previous.language || state.theme !== previous.theme) {
+    if (changed(state, previous)) {
       saveInBackground(getStorage().saveSettings({ ...settingsValues(state) }));
     }
   });

@@ -6,6 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { usePractice } from '../../app/practice';
 import { routes } from '../../app/routes';
+import { useSettings } from '../../app/settings';
+import type { LayoutId } from '../../engine/layout/layout';
 import i18n from '../../i18n';
 
 function renderPractice() {
@@ -16,16 +18,61 @@ function renderPractice() {
   return { ...view, router, states };
 }
 
+/** A lesson with the given text in the given layout, past the new key card. */
+function prepare(text: string, layout: LayoutId = 'en-us-qwerty') {
+  useSettings.setState({ layout });
+  usePractice.getState().restore(layout, { keyStats: {}, opened: {} });
+  usePractice.getState().dismissIntro();
+  usePractice.getState().startLesson(text);
+}
+
 describe('practice screen', () => {
   beforeEach(async () => {
     await i18n.changeLanguage('en');
-    usePractice.getState().restore({ keyStats: {}, opened: {} });
-    usePractice.getState().dismissIntro();
-    usePractice.getState().startLesson('ab ba');
+    useSettings.setState({ inputMode: 'emulate', speedUnit: 'auto' });
+    prepare('ab ba');
   });
 
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  it('types a Russian lesson by key position with any system layout', async () => {
+    prepare('ао во', 'ru-jcuken');
+    const user = userEvent.setup();
+    renderPractice();
+
+    // F, J, Space, D, J on the keyboard are а, о, space, в, о in ЙЦУКЕН.
+    await user.keyboard('[KeyF][KeyJ][Space][KeyD][KeyJ]');
+
+    expect(screen.getByRole('heading', { name: 'Lesson complete' })).toBeVisible();
+    expect(screen.getByText('Speed').nextElementSibling).toHaveTextContent('cpm');
+  });
+
+  it('asks to switch the system layout instead of counting a mistake', async () => {
+    useSettings.setState({ inputMode: 'system' });
+    prepare('ао', 'ru-jcuken');
+    const user = userEvent.setup();
+    const { states } = renderPractice();
+
+    await user.keyboard('f');
+    expect(screen.getByText('Switch the system keyboard layout to Russian')).toBeVisible();
+    expect(states()).toEqual(['current', 'pending']);
+
+    await user.keyboard('а');
+    expect(screen.queryByText(/Switch the system keyboard layout/)).not.toBeInTheDocument();
+    expect(states()).toEqual(['correct', 'current']);
+  });
+
+  it('warns when Caps Lock is on', async () => {
+    const user = userEvent.setup();
+    renderPractice();
+
+    await user.keyboard('{CapsLock}');
+    expect(screen.getByText('Caps Lock is on')).toBeVisible();
+    // The state is read from every key event, so the next press clears the warning.
+    await user.keyboard('{CapsLock}a');
+    expect(screen.queryByText('Caps Lock is on')).not.toBeInTheDocument();
   });
 
   it('waits for the first key, then shows the result when the text is typed', async () => {

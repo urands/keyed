@@ -77,7 +77,7 @@ export function MetricsBar({
         </Button>
       ) : (
         <Button disabled={!canPause} onClick={onPause}>
-          {t('practice.pause')} <Kbd>Esc</Kbd>
+          {t('practice.pause')} <Kbd>{t('keyboard.escape')}</Kbd>
         </Button>
       )}
     </div>

@@ -34,6 +34,8 @@ interface Candidate {
 const PSEUDO_ATTEMPTS = 40;
 /** Letter combinations made for the first lessons, when no words are possible. */
 const COMBINATION_COUNT = 24;
+/** With fewer different words than this, letter combinations are added for variety. */
+const MIN_VARIETY = 8;
 
 function hasTripleLetter(word: string): boolean {
   return /(.)\1\1/u.test(word);
@@ -55,6 +57,7 @@ export function buildLessonText(input: LessonTextInput): string {
   for (const [rank, word] of words.entries()) {
     if (word.length < params.wordMinLength || word.length > params.wordMaxLength) continue;
     if (![...word].every((char) => letters.has(char))) continue;
+    if (hasTripleLetter(word)) continue;
     if (isBlocked(word, input.blocklist)) continue;
     pool.push({ word, weight: 1 / Math.sqrt(rank + 1) });
     known.add(word);
@@ -84,7 +87,13 @@ export function buildLessonText(input: LessonTextInput): string {
     if (focusWords < params.minFocusWords) addPseudoWords(params.minFocusWords - focusWords, true);
   }
   if (pool.length < params.minFocusWords) addPseudoWords(params.minFocusWords - pool.length, false);
-  if (pool.length === 0) pool.push(...letterCombinations(letters, focus, random));
+  // The first keys may form only a couple of words ("оао"), or none at all.
+  if (pool.length < MIN_VARIETY) {
+    const weight = pool.length > 0 ? rareWeight : 1;
+    for (const { word } of letterCombinations(letters, focus, random)) {
+      if (!known.has(word) && !isBlocked(word, input.blocklist)) pool.push({ word, weight });
+    }
+  }
 
   const focusPool = pool.filter((c) => containsFocus(c.word));
   const picked: string[] = [];

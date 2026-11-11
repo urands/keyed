@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
-import { practiceGeometry, practiceLayout, practiceStage, usePractice } from '../../app/practice';
+import { practiceGeometry } from '../../app/layouts';
+import { useLayoutKit, usePractice } from '../../app/practice';
 import { getStorage } from '../../app/storage';
 import { DEFAULT_PARAMS } from '../../engine/params';
 import { stageKeys } from '../../engine/progress/course';
@@ -11,10 +12,10 @@ import { KeyHeatmap, type HeatKey } from '../charts/KeyHeatmap';
 import { LineChart } from '../charts/LineChart';
 import { niceCeil } from '../charts/scale';
 import { buttonClass } from '../components/buttonClass';
-import { defaultSpeedUnit, formatDuration, percentFloor, speedValue } from '../format';
+import { formatDuration, percentFloor, speedValue } from '../format';
 import { charLabel, codesFor } from '../practice/keyCodes';
+import { useSpeedUnit } from '../useSpeedUnit';
 
-const unit = defaultSpeedUnit(practiceLayout.language);
 /** Enough history for the charts; older lessons stay in the database. */
 const HISTORY_LIMIT = 500;
 const RECENT = 10;
@@ -53,6 +54,8 @@ function TableView({ summary, children }: { summary: string; children: ReactNode
 /** Statistics screen (docs/screens.md, section 7; task 2.15). */
 export function StatsScreen() {
   const { t, i18n } = useTranslation();
+  const { layout, stage } = useLayoutKit();
+  const unit = useSpeedUnit();
   const keyStats = usePractice((s) => s.keyStats);
   const progress = usePractice((s) => s.progress);
   const [lessons, setLessons] = useState<LessonSummary[] | null>(null);
@@ -60,7 +63,7 @@ export function StatsScreen() {
   useEffect(() => {
     let active = true;
     getStorage()
-      .listLessons(practiceLayout.id, HISTORY_LIMIT)
+      .listLessons(layout.id, HISTORY_LIMIT)
       .then((loaded) => {
         if (active) setLessons(loaded);
       })
@@ -71,7 +74,7 @@ export function StatsScreen() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [layout.id]);
 
   const dateFormat = useMemo(
     () =>
@@ -85,10 +88,10 @@ export function StatsScreen() {
   );
 
   const unitLabel = t(`units.${unit}`);
-  const label = (key: string) => charLabel(practiceLayout, key, t('keyboard.space'));
+  const label = (key: string) => charLabel(layout, key, t('keyboard.space'));
 
   const heatKeys = progress.open.flatMap((key): HeatKey[] => {
-    const code = codesFor(practiceLayout, [key]).values().next().value;
+    const code = codesFor(layout, [key]).values().next().value;
     if (code === undefined) return [];
     const stat = keyStats[key];
     const percent = percentFloor(progress.confidence[key] ?? 0);
@@ -135,7 +138,10 @@ export function StatsScreen() {
 
   return (
     <section className="mx-auto flex max-w-5xl flex-col gap-6 py-10">
-      <h1 className="text-3xl font-semibold">{t('stats.title')}</h1>
+      <div>
+        <h1 className="text-3xl font-semibold">{t('stats.title')}</h1>
+        <p className="text-ink-muted">{t(`layout.name.${layout.id}`)}</p>
+      </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatTile label={t('stats.lessons')} value={String(lessons.length)} />
@@ -204,10 +210,10 @@ export function StatsScreen() {
 
       <Panel title={t('stats.keys')}>
         <KeyHeatmap
-          layout={practiceLayout}
+          layout={layout}
           geometry={practiceGeometry}
           keys={heatKeys}
-          closedCodes={codesFor(practiceLayout, progress.closed)}
+          closedCodes={codesFor(layout, progress.closed)}
         />
         <TableView summary={t('stats.keyTable')}>
           <table className="w-full text-left tabular-nums">
@@ -221,7 +227,7 @@ export function StatsScreen() {
               </tr>
             </thead>
             <tbody>
-              {stageKeys(practiceStage)
+              {stageKeys(stage)
                 .filter((key) => progress.open.includes(key))
                 .map((key) => {
                   const stat = keyStats[key];

@@ -112,6 +112,11 @@ describe('buildLessonText', () => {
     }
   });
 
+  it('skips dictionary entries with three equal letters in a row', () => {
+    const text = buildLessonText(input({ words: ['aaa', 'sss', 'all', 'sad', 'ask'] }));
+    expect(text).not.toMatch(/(.)\1\1/u);
+  });
+
   it('skips blocked words', () => {
     const text = buildLessonText(input({ blocklist: new Set(['sad', 'dad']) }));
     expect(text.split(' ')).not.toContain('sad');

@@ -1,15 +1,16 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { practiceGeometry, practiceLayout } from '../../app/practice';
+import { practiceGeometry } from '../../app/layouts';
+import { enUsQwerty, ruJcuken } from '../../content';
 import { codesFor } from './keyCodes';
 import { Keyboard } from './Keyboard';
 
-const letters = codesFor(practiceLayout, 'abcdefghijklmnopqrstuvwxyz ');
+const letters = codesFor(enUsQwerty, 'abcdefghijklmnopqrstuvwxyz ');
 
 function renderKeyboard(props: Partial<Parameters<typeof Keyboard>[0]> = {}) {
   const { container } = render(
-    <Keyboard layout={practiceLayout} geometry={practiceGeometry} openCodes={letters} {...props} />,
+    <Keyboard layout={enUsQwerty} geometry={practiceGeometry} openCodes={letters} {...props} />,
   );
   return (code: string) => container.querySelector(`[data-code="${code}"]`);
 }
@@ -21,6 +22,13 @@ describe('Keyboard', () => {
     expect(key('Semicolon')).toHaveTextContent(';');
     expect(key('ShiftLeft')).toHaveTextContent('Shift');
     expect(key('Space')).toHaveTextContent('');
+  });
+
+  it('shows the letters of the Russian layout on the same keys', () => {
+    const key = renderKeyboard({ layout: ruJcuken });
+    expect(key('KeyQ')).toHaveTextContent('Й');
+    expect(key('KeyF')).toHaveTextContent('А');
+    expect(key('Slash')).toHaveTextContent('.');
   });
 
   it('colors the keys in use and mutes the others', () => {

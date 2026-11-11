@@ -2,8 +2,10 @@ import { useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
-import { practiceGeometry, practiceLayout, usePractice } from '../../app/practice';
+import { practiceGeometry } from '../../app/layouts';
+import { useLayoutKit, usePractice } from '../../app/practice';
 import { buttonClass } from '../components/buttonClass';
+import { LayoutSwitch } from '../components/LayoutSwitch';
 import { FINGER_BG } from '../practice/fingerColors';
 import { charLabel, codesFor } from '../practice/keyCodes';
 import { Keyboard } from '../practice/Keyboard';
@@ -20,17 +22,18 @@ function LegendItem({ swatch, label }: { swatch: ReactNode; label: string }) {
 /** Home screen (docs/screens.md, section 2). */
 export function HomeScreen() {
   const { t } = useTranslation();
+  const { layout, stage } = useLayoutKit();
   const progress = usePractice((s) => s.progress);
   const started = usePractice((s) => Object.keys(s.keyStats).length > 0);
-  const label = (key: string) => charLabel(practiceLayout, key, t('keyboard.space'));
+  const label = (key: string) => charLabel(layout, key, t('keyboard.space'));
 
   const codes = useMemo(
     () => ({
-      open: codesFor(practiceLayout, [...progress.open, ' ']),
-      mastered: codesFor(practiceLayout, progress.mastered),
-      next: codesFor(practiceLayout, progress.next ?? []),
+      open: codesFor(layout, [...progress.open, ' ']),
+      mastered: codesFor(layout, progress.mastered),
+      next: codesFor(layout, progress.next ?? []),
     }),
-    [progress],
+    [layout, progress],
   );
 
   if (!started) {
@@ -38,8 +41,12 @@ export function HomeScreen() {
       <section className="mx-auto flex max-w-xl flex-col items-center gap-6 py-16 text-center">
         <h1 className="text-3xl font-semibold">{t('home.title')}</h1>
         <p className="text-lg text-ink-muted">{t('home.intro')}</p>
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-sm text-ink-muted">{t('home.chooseLayout')}</span>
+          <LayoutSwitch name="home-layout" />
+        </div>
         <ol className="flex list-decimal flex-col gap-2 pl-6 text-left">
-          <li>{t('home.how.start')}</li>
+          <li>{t('home.how.start', { keys: stage.start.map(label).join(t('home.and')) })}</li>
           <li>{t('home.how.unlock')}</li>
           <li>{t('home.how.focus')}</li>
         </ol>
@@ -73,7 +80,7 @@ export function HomeScreen() {
       <div className="flex flex-col items-center gap-4">
         <h2 className="text-lg font-medium">{t('home.keyboard')}</h2>
         <Keyboard
-          layout={practiceLayout}
+          layout={layout}
           geometry={practiceGeometry}
           openCodes={codes.open}
           masteredCodes={codes.mastered}

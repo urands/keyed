@@ -113,7 +113,7 @@ export function LessonResultView({
 
       <div className="flex flex-wrap justify-center gap-3">
         <Button variant="primary" onClick={onNext}>
-          {t('result.next')} <Kbd>Enter</Kbd>
+          {t('result.next')} <Kbd>{t('keyboard.enter')}</Kbd>
         </Button>
         <Button onClick={onRepeat}>{t('result.repeat')}</Button>
         <Link to="/" className={buttonClass('secondary')}>

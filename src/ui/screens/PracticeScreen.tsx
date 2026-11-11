@@ -1,14 +1,15 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { practiceGeometry, practiceLayout, practiceStage, usePractice } from '../../app/practice';
+import { kitFor, practiceGeometry } from '../../app/layouts';
+import { useLayoutKit, usePractice } from '../../app/practice';
+import { useSettings } from '../../app/settings';
 import { toInput } from '../../engine/input/toInput';
 import { keyForChar } from '../../engine/layout/layout';
 import { DEFAULT_PARAMS } from '../../engine/params';
 import { stageKeys } from '../../engine/progress/course';
 import { liveMetrics } from '../../engine/stats/lessonResult';
-import { defaultSpeedUnit } from '../format';
 import { CourseStrip } from '../practice/CourseStrip';
 import { charLabel, codesFor } from '../practice/keyCodes';
 import { isActivatable, isTextEntry } from '../practice/keyTargets';
@@ -18,9 +19,7 @@ import { LessonText } from '../practice/LessonText';
 import { MetricsBar } from '../practice/MetricsBar';
 import { NewKeyCard } from '../practice/NewKeyCard';
 import { NextKeyHint } from '../practice/NextKeyHint';
-
-const unit = defaultSpeedUnit(practiceLayout.language);
-const courseKeys = stageKeys(practiceStage);
+import { useSpeedUnit } from '../useSpeedUnit';
 
 /** Keys that do not end a pause, so Tab still moves focus and Shift alone does nothing. */
 const NOT_RESUMING = new Set(['Shift', 'Control', 'Alt', 'AltGraph', 'Meta', 'CapsLock', 'Tab']);
@@ -32,23 +31,36 @@ const NOT_RESUMING = new Set(['Shift', 'Control', 'Alt', 'AltGraph', 'Meta', 'Ca
 export function PracticeScreen() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const kit = useLayoutKit();
+  const unit = useSpeedUnit();
   const lesson = usePractice((s) => s.lesson);
   const result = usePractice((s) => s.result);
   const feedback = usePractice((s) => s.feedback);
   const progress = usePractice((s) => s.progress);
   const unlocked = usePractice((s) => s.unlocked);
   const introduce = usePractice((s) => s.introduce);
+  const wrongLayout = usePractice((s) => s.wrongLayout);
   const startLesson = usePractice((s) => s.startLesson);
   const repeatLesson = usePractice((s) => s.repeatLesson);
   const pause = usePractice((s) => s.pause);
   const resume = usePractice((s) => s.resume);
   const dismissIntro = usePractice((s) => s.dismissIntro);
+  const [capsLock, setCapsLock] = useState(false);
   const { status, lastPressAt } = lesson;
   const showIntro = introduce.length > 0 && status !== 'finished';
-  const openCodes = useMemo(() => codesFor(practiceLayout, [...progress.open, ' ']), [progress]);
+  const courseKeys = useMemo(() => stageKeys(kit.stage), [kit]);
+  const openCodes = useMemo(() => codesFor(kit.layout, [...progress.open, ' ']), [kit, progress]);
 
   useEffect(() => {
+    const trackCapsLock = (event: KeyboardEvent) => {
+      // Not every synthetic event has getModifierState.
+      if (typeof event.getModifierState === 'function') {
+        setCapsLock(event.getModifierState('CapsLock'));
+      }
+    };
+
     const onKeyDown = (event: KeyboardEvent) => {
+      trackCapsLock(event);
       if (isTextEntry(event.target)) return;
       const store = usePractice.getState();
       const current = store.lesson.status;
@@ -102,14 +114,18 @@ export function PracticeScreen() {
         return;
       }
 
-      const input = toInput(event, practiceLayout, 'emulate');
+      const { layout } = kitFor(store.layoutId);
+      const input = toInput(event, layout, useSettings.getState().inputMode);
       if (!input) return;
       event.preventDefault();
       store.press(input);
     };
+
     window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', trackCapsLock);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', trackCapsLock);
     };
   }, [navigate]);
 
@@ -141,7 +157,7 @@ export function PracticeScreen() {
       <LessonResultView
         result={result}
         unit={unit}
-        unlocked={unlocked.map((key) => charLabel(practiceLayout, key, t('keyboard.space')))}
+        unlocked={unlocked.map((key) => charLabel(kit.layout, key, t('keyboard.space')))}
         onNext={() => {
           startLesson();
         }}
@@ -153,7 +169,7 @@ export function PracticeScreen() {
   if (showIntro) {
     return (
       <NewKeyCard
-        layout={practiceLayout}
+        layout={kit.layout}
         geometry={practiceGeometry}
         keys={introduce}
         openKeys={progress.open}
@@ -163,10 +179,13 @@ export function PracticeScreen() {
   }
 
   const nextChar = lesson.chars[lesson.position]?.char;
-  const nextCode =
-    nextChar === undefined ? null : (keyForChar(practiceLayout, nextChar)?.code ?? null);
+  const nextCode = nextChar === undefined ? null : (keyForChar(kit.layout, nextChar)?.code ?? null);
   const live = liveMetrics(lesson);
   const paused = status === 'paused';
+  const warnings = [
+    wrongLayout ? t(`practice.wrongLayout.${kit.layout.id}`) : null,
+    capsLock ? t('practice.capsLock') : null,
+  ].filter((warning): warning is string => warning !== null);
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-4 py-5">
@@ -181,13 +200,24 @@ export function PracticeScreen() {
         onResume={resume}
       />
 
-      <CourseStrip layout={practiceLayout} keys={courseKeys} progress={progress} />
+      <CourseStrip layout={kit.layout} keys={courseKeys} progress={progress} />
 
       <div className="relative rounded-lg border border-line bg-surface px-8 pt-5 pb-2">
         <h1 className="sr-only">{t('nav.practice')}</h1>
         <LessonText lesson={lesson} dimmed={paused} />
-        <p className="mt-1 h-6 text-sm text-ink-muted">
-          {status === 'ready' ? t('practice.readyHint') : ''}
+        <p className="mt-1 flex h-6 gap-4 text-sm" aria-live="polite">
+          {warnings.length > 0 ? (
+            warnings.map((warning) => (
+              <span key={warning} className="font-medium text-fixed">
+                <span aria-hidden="true">⚠ </span>
+                {warning}
+              </span>
+            ))
+          ) : (
+            <span className="text-ink-muted">
+              {status === 'ready' ? t('practice.readyHint') : ''}
+            </span>
+          )}
         </p>
         {paused && (
           <div
@@ -201,13 +231,13 @@ export function PracticeScreen() {
       </div>
 
       <Keyboard
-        layout={practiceLayout}
+        layout={kit.layout}
         geometry={practiceGeometry}
         openCodes={openCodes}
         nextCode={nextCode}
         flash={feedback}
       />
-      <NextKeyHint layout={practiceLayout} geometry={practiceGeometry} code={nextCode} />
+      <NextKeyHint layout={kit.layout} geometry={practiceGeometry} code={nextCode} />
     </div>
   );
 }
