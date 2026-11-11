@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/* Only token colors and fonts are available as utilities: no default palette. */
+@theme {
+  --color-*: initial;
+  --font-*: initial;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+@theme inline {
+  --color-canvas: var(--kd-canvas);
+  --color-surface: var(--kd-surface);
+  --color-line: var(--kd-line);
+  --color-ink: var(--kd-ink);
+  --color-ink-muted: var(--kd-ink-muted);
+  --color-accent: var(--kd-accent);
+  --color-on-accent: var(--kd-on-accent);
+
+  --font-sans: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+
+@layer base {
+  /* Until the app sets data-theme, the window background follows the system. */
+  :root {
+    color-scheme: light dark;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+  }
+}

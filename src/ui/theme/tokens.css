@@ -1,0 +1,30 @@
+/*
+ * Design tokens: one set of values per theme.
+ * The neutral palette below is a placeholder; the real design replaces these
+ * values (docs/screens.md, "Что нужно от дизайна"). Text colors meet WCAG AA
+ * on both `canvas` and `surface`.
+ */
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --kd-canvas: #f6f7f9;
+  --kd-surface: #ffffff;
+  --kd-line: #d5d9e0;
+  --kd-ink: #1a1d23;
+  --kd-ink-muted: #5b6472;
+  --kd-accent: #2f5fd0;
+  --kd-on-accent: #ffffff;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --kd-canvas: #14161a;
+  --kd-surface: #1d2026;
+  --kd-line: #343a45;
+  --kd-ink: #e8eaee;
+  --kd-ink-muted: #9aa3b2;
+  --kd-accent: #7da2ff;
+  --kd-on-accent: #0f1320;
+}

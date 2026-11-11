@@ -1,0 +1,23 @@
+{
+  "app": {
+    "name": "KeyEd"
+  },
+  "home": {
+    "title": "Learn to touch type",
+    "intro": "Short lessons adapt to you: new keys open once you have mastered the previous ones.",
+    "stub": "Lessons are not ready yet. This is the application skeleton."
+  },
+  "settings": {
+    "language": {
+      "label": "Interface language",
+      "ru": "Русский",
+      "en": "English"
+    },
+    "theme": {
+      "label": "Theme",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    }
+  }
+}

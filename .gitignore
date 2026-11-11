@@ -1,0 +1,23 @@
+# Зависимости и сборка
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# Локальные файлы
+*.local
+.env
+.env.*
+!.env.example
+*.log
+
+# Редакторы и ОС
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
