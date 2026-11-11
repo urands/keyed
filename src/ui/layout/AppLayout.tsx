@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router';
 
 import { usePractice } from '../../app/practice';
 import { useSettings } from '../../app/settings';
+import { useStorageStatus } from '../../app/storage';
 import { LANGUAGES } from '../../i18n';
 import { SegmentedControl } from '../components/SegmentedControl';
 import { THEME_PREFERENCES } from '../theme/theme';
@@ -21,9 +22,15 @@ export function AppLayout() {
   const setTheme = useSettings((state) => state.setTheme);
   // Navigation fades while the user types, so it does not distract.
   const typing = usePractice((state) => state.lesson.status === 'running');
+  const storageFailed = useStorageStatus((state) => state.failed);
 
   return (
     <div className="flex min-h-dvh flex-col">
+      {storageFailed && (
+        <p role="alert" className="bg-error-bg px-6 py-2 text-center text-sm text-error">
+          {t('app.storageError')}
+        </p>
+      )}
       <header
         className={`flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-6 py-3 transition-opacity motion-reduce:transition-none ${typing ? 'opacity-30' : ''}`}
       >
@@ -35,6 +42,9 @@ export function AppLayout() {
             </NavLink>
             <NavLink to="/practice" className={navClass}>
               {t('nav.practice')}
+            </NavLink>
+            <NavLink to="/stats" className={navClass}>
+              {t('nav.stats')}
             </NavLink>
           </nav>
         </div>

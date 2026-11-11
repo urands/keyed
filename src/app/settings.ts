@@ -1,25 +1,38 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-import { detectLanguage, type Language } from '../i18n';
-import type { ThemePreference } from '../ui/theme/theme';
+import { isOneOf } from '../engine/validate';
+import { detectLanguage, LANGUAGES, type Language } from '../i18n';
+import { THEME_PREFERENCES, type ThemePreference } from '../ui/theme/theme';
 
-interface SettingsState {
+export interface SettingsValues {
   language: Language;
   theme: ThemePreference;
+}
+
+interface SettingsState extends SettingsValues {
   setLanguage: (language: Language) => void;
   setTheme: (theme: ThemePreference) => void;
 }
 
-// Kept in localStorage until the SQLite storage arrives (task 2.10).
-export const useSettings = create<SettingsState>()(
-  persist(
-    (set) => ({
-      language: detectLanguage(navigator.language),
-      theme: 'system',
-      setLanguage: (language) => set({ language }),
-      setTheme: (theme) => set({ theme }),
-    }),
-    { name: 'keyed.settings', version: 1 },
-  ),
-);
+export const useSettings = create<SettingsState>()((set) => ({
+  language: detectLanguage(navigator.language),
+  theme: 'system',
+  setLanguage: (language) => {
+    set({ language });
+  },
+  setTheme: (theme) => {
+    set({ theme });
+  },
+}));
+
+export function settingsValues({ language, theme }: SettingsValues): SettingsValues {
+  return { language, theme };
+}
+
+/** Applies settings loaded from storage; unknown or outdated values keep their defaults. */
+export function restoreSettings(values: Readonly<Record<string, unknown>>): void {
+  const patch: Partial<SettingsValues> = {};
+  if (isOneOf(LANGUAGES, values.language)) patch.language = values.language;
+  if (isOneOf(THEME_PREFERENCES, values.theme)) patch.theme = values.theme;
+  useSettings.setState(patch);
+}

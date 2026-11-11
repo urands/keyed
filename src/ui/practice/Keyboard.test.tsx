@@ -1,19 +1,15 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { practiceGeometry, practiceKeys, practiceLayout } from '../../app/practice';
+import { practiceGeometry, practiceLayout } from '../../app/practice';
+import { codesFor } from './keyCodes';
 import { Keyboard } from './Keyboard';
+
+const letters = codesFor(practiceLayout, 'abcdefghijklmnopqrstuvwxyz ');
 
 function renderKeyboard(props: Partial<Parameters<typeof Keyboard>[0]> = {}) {
   const { container } = render(
-    <Keyboard
-      layout={practiceLayout}
-      geometry={practiceGeometry}
-      openCodes={practiceKeys}
-      nextCode={null}
-      flash={null}
-      {...props}
-    />,
+    <Keyboard layout={practiceLayout} geometry={practiceGeometry} openCodes={letters} {...props} />,
   );
   return (code: string) => container.querySelector(`[data-code="${code}"]`);
 }
@@ -39,6 +35,17 @@ describe('Keyboard', () => {
     const key = renderKeyboard({ nextCode: 'KeyF' });
     expect(key('KeyF')).toHaveAttribute('data-next');
     expect(key('KeyJ')).not.toHaveAttribute('data-next');
+  });
+
+  it('highlights several keys and marks mastered ones', () => {
+    const key = renderKeyboard({
+      highlightCodes: new Set(['KeyD', 'KeyK']),
+      masteredCodes: new Set(['KeyF']),
+    });
+    expect(key('KeyD')).toHaveAttribute('data-next');
+    expect(key('KeyK')).toHaveAttribute('data-next');
+    expect(key('KeyF')).toHaveAttribute('data-mastered');
+    expect(key('KeyJ')).not.toHaveAttribute('data-mastered');
   });
 
   it('flashes the last pressed key', () => {

@@ -11,7 +11,7 @@ function BigMetric({ label, value, unit }: { label: string; value: number; unit:
   return (
     <div>
       <div className="text-ink-muted">{label}</div>
-      <div className="text-6xl font-semibold tabular-nums">
+      <div className="text-6xl font-semibold">
         {value} <span className="text-2xl font-normal text-ink-muted">{unit}</span>
       </div>
     </div>
@@ -27,11 +27,19 @@ function compareKeys(a: string, b: string): number {
 interface LessonResultViewProps {
   result: LessonResult;
   unit: SpeedUnit;
+  /** Keys this lesson opened, already shown as labels. */
+  unlocked: readonly string[];
   onNext: () => void;
   onRepeat: () => void;
 }
 
-export function LessonResultView({ result, unit, onNext, onRepeat }: LessonResultViewProps) {
+export function LessonResultView({
+  result,
+  unit,
+  unlocked,
+  onNext,
+  onRepeat,
+}: LessonResultViewProps) {
   const { t } = useTranslation();
   const unitLabel = t(`units.${unit}`);
   const keys = Object.entries(result.keys).sort(([a], [b]) => compareKeys(a, b));
@@ -39,6 +47,29 @@ export function LessonResultView({ result, unit, onNext, onRepeat }: LessonResul
   return (
     <section className="mx-auto flex max-w-3xl flex-col items-center gap-8 py-12 text-center">
       <h1 className="text-3xl font-semibold">{t('result.title')}</h1>
+
+      {unlocked.length > 0 && (
+        <div
+          role="status"
+          className="flex flex-col items-center gap-3 rounded-lg border-2 border-ok bg-ok/10 px-8 py-5"
+        >
+          <p className="text-xl font-semibold">
+            <span aria-hidden="true">★ </span>
+            {t(unlocked.length === 1 ? 'result.unlockedOne' : 'result.unlockedMany')}
+          </p>
+          <p className="flex gap-2">
+            {unlocked.map((key) => (
+              <kbd
+                key={key}
+                className="min-w-12 rounded-md border border-line bg-surface px-3 py-1 font-mono text-3xl"
+              >
+                {key}
+              </kbd>
+            ))}
+          </p>
+          <p className="text-ink-muted">{t('result.unlockedHint')}</p>
+        </div>
+      )}
 
       <div className="flex flex-wrap justify-center gap-16">
         <BigMetric

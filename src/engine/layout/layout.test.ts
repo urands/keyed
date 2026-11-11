@@ -49,27 +49,57 @@ describe('keyForChar', () => {
 describe('parseGeometry', () => {
   const valid = {
     id: 'ansi',
-    rows: [[{ code: 'KeyA' }, { code: 'Enter', width: 2 }], [{ code: 'Space', gap: 1 }]],
-    homing: ['KeyA'],
-    fingers: { lPinky: ['KeyA'], rPinky: ['Enter'], thumb: ['Space'] },
+    rows: [
+      ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyJ', 'KeyK', 'KeyL'].map((code) => ({ code })),
+      [{ code: 'Enter', width: 2 }],
+      [{ code: 'Space', gap: 1 }],
+    ],
+    homing: ['KeyF'],
+    fingers: {
+      lPinky: ['KeyA'],
+      lRing: ['KeyS'],
+      lMiddle: ['KeyD'],
+      lIndex: ['KeyF'],
+      thumb: ['Space'],
+      rIndex: ['KeyJ'],
+      rMiddle: ['KeyK'],
+      rRing: ['KeyL'],
+      rPinky: ['Enter'],
+    },
+    home: {
+      lPinky: 'KeyA',
+      lRing: 'KeyS',
+      lMiddle: 'KeyD',
+      lIndex: 'KeyF',
+      thumb: 'Space',
+      rIndex: 'KeyJ',
+      rMiddle: 'KeyK',
+      rRing: 'KeyL',
+      rPinky: 'Enter',
+    },
   };
 
   it('fills in default width and gap and maps keys to fingers', () => {
     const geometry = parseGeometry(valid);
-    expect(geometry.rows).toEqual([
-      [
-        { code: 'KeyA', width: 1, gap: 0 },
-        { code: 'Enter', width: 2, gap: 0 },
-      ],
-      [{ code: 'Space', width: 1, gap: 1 }],
-    ]);
-    expect(geometry.fingers).toEqual({ KeyA: 'lPinky', Enter: 'rPinky', Space: 'thumb' });
+    expect(geometry.rows[0]?.[0]).toEqual({ code: 'KeyA', width: 1, gap: 0 });
+    expect(geometry.rows[1]).toEqual([{ code: 'Enter', width: 2, gap: 0 }]);
+    expect(geometry.rows[2]).toEqual([{ code: 'Space', width: 1, gap: 1 }]);
+    expect(geometry.fingers).toMatchObject({ KeyA: 'lPinky', Enter: 'rPinky', Space: 'thumb' });
+    expect(geometry.home.lIndex).toBe('KeyF');
   });
 
   it('requires a finger for every key', () => {
-    expect(() =>
-      parseGeometry({ ...valid, fingers: { lPinky: ['KeyA'], thumb: ['Space'] } }),
-    ).toThrow(/Enter has no finger/);
+    const fingers = { ...valid.fingers, rPinky: [] };
+    expect(() => parseGeometry({ ...valid, fingers })).toThrow(/Enter has no finger/);
+  });
+
+  it('requires a home key of the right finger for every finger', () => {
+    expect(() => parseGeometry({ ...valid, home: { ...valid.home, lIndex: 'KeyJ' } })).toThrow(
+      /lIndex/,
+    );
+    expect(() => parseGeometry({ ...valid, home: { ...valid.home, thumb: undefined } })).toThrow(
+      /thumb/,
+    );
   });
 
   it('rejects a key assigned to two fingers or to an unknown finger', () => {

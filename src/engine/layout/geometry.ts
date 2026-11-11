@@ -30,6 +30,8 @@ export interface Geometry {
   id: GeometryId;
   rows: readonly (readonly GeometryKey[])[];
   fingers: Readonly<Record<KeyCode, Finger>>;
+  /** Where each finger rests in the home position. */
+  home: Readonly<Record<Finger, KeyCode>>;
   /** Keys with a tactile bump for the index fingers. */
   homing: readonly KeyCode[];
 }
@@ -81,6 +83,16 @@ export function parseGeometry(data: unknown): Geometry {
     if (!Object.hasOwn(fingers, code)) throw new Error(`Geometry ${id}: key ${code} has no finger`);
   }
 
+  if (!isRecord(data.home)) throw new Error(`Geometry ${id}: "home" must be an object`);
+  const home = {} as Record<Finger, KeyCode>;
+  for (const finger of FINGERS) {
+    const code = data.home[finger];
+    if (typeof code !== 'string' || fingers[code] !== finger) {
+      throw new Error(`Geometry ${id}: home key of ${finger} must be one of its keys`);
+    }
+    home[finger] = code;
+  }
+
   if (!isArray(data.homing)) throw new Error(`Geometry ${id}: "homing" must be an array`);
   const homing: KeyCode[] = [];
   for (const code of data.homing) {
@@ -90,5 +102,5 @@ export function parseGeometry(data: unknown): Geometry {
     homing.push(code);
   }
 
-  return { id, rows, fingers, homing };
+  return { id, rows, fingers, home, homing };
 }

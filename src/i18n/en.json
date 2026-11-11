@@ -1,17 +1,59 @@
 {
   "app": {
-    "name": "KeyEd"
+    "name": "KeyEd",
+    "storageError": "Your progress could not be saved. Lessons still work, but results will be lost when you close the app."
   },
   "nav": {
     "label": "Sections",
     "home": "Home",
-    "practice": "Practice"
+    "practice": "Practice",
+    "stats": "Statistics"
   },
   "home": {
     "title": "Learn to touch type",
     "intro": "Short lessons adapt to you: new keys open once you have mastered the previous ones.",
+    "how": {
+      "start": "You start with two keys under your index fingers: F and J.",
+      "unlock": "A new key opens when you type the open ones fast and accurately.",
+      "focus": "Lessons give more practice to the keys that are hardest for you."
+    },
     "start": "Start practice",
-    "stub": "Early version: lessons use common English words and do not adapt to you yet."
+    "continue": "Continue",
+    "next": "{{key}} opens when you master {{keys}}.",
+    "nextSoon": "{{key}} opens after your next lesson.",
+    "allOpen": "All letters are open. Keep practising: {{keys}}.",
+    "complete": "All letters are mastered.",
+    "keyboard": "Your keyboard",
+    "legend": {
+      "open": "open",
+      "mastered": "mastered",
+      "next": "opens next",
+      "closed": "not open yet"
+    }
+  },
+  "course": {
+    "strip": "Course keys",
+    "closed": "{{key}}: not open yet",
+    "open": "{{key}}: confidence {{percent}}%",
+    "mastered": "{{key}}: mastered",
+    "focus": "Focus key"
+  },
+  "newKey": {
+    "titleOne": "New key: {{keys}}",
+    "titleMany": "New keys: {{keys}}",
+    "direction": {
+      "home": "home position",
+      "up": "up from {{key}}",
+      "down": "down from {{key}}",
+      "left": "left from {{key}}",
+      "right": "right from {{key}}",
+      "upLeft": "up and left from {{key}}",
+      "upRight": "up and right from {{key}}",
+      "downLeft": "down and left from {{key}}",
+      "downRight": "down and right from {{key}}"
+    },
+    "hint": "Keep your fingers on the home row and reach with one finger only. Return it to its place after each press.",
+    "start": "Start"
   },
   "practice": {
     "speed": "Speed",
@@ -49,6 +91,9 @@
   },
   "result": {
     "title": "Lesson complete",
+    "unlockedOne": "New key unlocked",
+    "unlockedMany": "New keys unlocked",
+    "unlockedHint": "The next lesson starts with a short introduction.",
     "speed": "Speed",
     "accuracy": "Accuracy",
     "time": "Time",
@@ -57,6 +102,29 @@
     "next": "Next lesson",
     "repeat": "Repeat",
     "home": "Home"
+  },
+  "stats": {
+    "title": "Statistics",
+    "empty": "Finish a lesson to see your statistics.",
+    "lessons": "Lessons",
+    "best": "Best speed",
+    "recentSpeed": "Speed, last {{count}}",
+    "recentAccuracy": "Accuracy, last {{count}}",
+    "speed": "Speed by lesson, {{unit}}",
+    "accuracy": "Accuracy by lesson",
+    "target": "target",
+    "lessonPoint": "Lesson {{n}} · {{date}}",
+    "lessonTable": "Show lessons as a table",
+    "date": "Date",
+    "keys": "Key confidence",
+    "keyDetail": "{{key}}: confidence {{percent}}%, {{hits}} correct, {{misses}} errors",
+    "heatHint": "Point at a key to see its details.",
+    "notOpen": "not open yet",
+    "mastered": "mastered",
+    "keyTable": "Show keys as a table",
+    "key": "Key",
+    "confidence": "Confidence",
+    "correct": "Correct"
   },
   "settings": {
     "language": {

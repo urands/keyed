@@ -1,0 +1,33 @@
+{
+  "layoutId": "en-us-qwerty",
+  "stages": [
+    {
+      "id": "letters",
+      "start": ["f", "j"],
+      "order": [
+        "dk",
+        "sl",
+        "a",
+        "e",
+        "i",
+        "t",
+        "n",
+        "o",
+        "r",
+        "h",
+        "u",
+        "c",
+        "m",
+        "g",
+        "w",
+        "y",
+        "p",
+        "b",
+        "v",
+        "x",
+        "q",
+        "z"
+      ]
+    }
+  ]
+}

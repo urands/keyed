@@ -35,6 +35,19 @@
   --color-finger-r-ring: var(--kd-finger-r-ring);
   --color-finger-r-pinky: var(--kd-finger-r-pinky);
 
+  --color-series-1: var(--kd-series-1);
+  --color-grid: var(--kd-grid);
+  --color-heat-1: var(--kd-heat-1);
+  --color-heat-2: var(--kd-heat-2);
+  --color-heat-3: var(--kd-heat-3);
+  --color-heat-4: var(--kd-heat-4);
+  --color-heat-5: var(--kd-heat-5);
+  --color-heat-ink-1: var(--kd-heat-ink-1);
+  --color-heat-ink-2: var(--kd-heat-ink-2);
+  --color-heat-ink-3: var(--kd-heat-ink-3);
+  --color-heat-ink-4: var(--kd-heat-ink-4);
+  --color-heat-ink-5: var(--kd-heat-ink-5);
+
   --font-sans: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', Consolas, monospace;
 }
@@ -56,7 +69,7 @@
    * and 5u high. It shrinks with the window so the practice screen fits without scrolling.
    */
   .kd-keyboard {
-    --u: clamp(2rem, min((100vw - 8rem) / 15, (100vh - 32rem) / 5), 3.1rem);
+    --u: clamp(2rem, min((100vw - 8rem) / 15, (100vh - 35rem) / 5), 3.1rem);
   }
 
   /* Short flash on a pressed key. Color and opacity only, no movement. */

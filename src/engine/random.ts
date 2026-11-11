@@ -18,3 +18,19 @@ export function pick<T>(items: readonly T[], random: Random): T {
   if (item === undefined) throw new Error('Cannot pick from an empty list');
   return item;
 }
+
+/** Picks an item with probability proportional to its weight. */
+export function pickWeighted<T>(
+  items: readonly T[],
+  weight: (item: T) => number,
+  random: Random,
+): T {
+  const total = items.reduce((sum, item) => sum + weight(item), 0);
+  if (items.length === 0 || total <= 0) throw new Error('Cannot pick from an empty list');
+  let threshold = random() * total;
+  for (const item of items) {
+    threshold -= weight(item);
+    if (threshold < 0) return item;
+  }
+  return items[items.length - 1] as T;
+}

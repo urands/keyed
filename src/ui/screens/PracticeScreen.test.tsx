@@ -19,6 +19,8 @@ function renderPractice() {
 describe('practice screen', () => {
   beforeEach(async () => {
     await i18n.changeLanguage('en');
+    usePractice.getState().restore({ keyStats: {}, opened: {} });
+    usePractice.getState().dismissIntro();
     usePractice.getState().startLesson('ab ba');
   });
 

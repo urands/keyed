@@ -1,27 +1,103 @@
+import { useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
+import { practiceGeometry, practiceLayout, usePractice } from '../../app/practice';
 import { buttonClass } from '../components/buttonClass';
+import { FINGER_BG } from '../practice/fingerColors';
+import { charLabel, codesFor } from '../practice/keyCodes';
+import { Keyboard } from '../practice/Keyboard';
 
-/** Placeholder for the home screen (docs/screens.md, section 2; task 2.14). */
+function LegendItem({ swatch, label }: { swatch: ReactNode; label: string }) {
+  return (
+    <li className="flex items-center gap-2">
+      {swatch}
+      <span>{label}</span>
+    </li>
+  );
+}
+
+/** Home screen (docs/screens.md, section 2). */
 export function HomeScreen() {
   const { t } = useTranslation();
+  const progress = usePractice((s) => s.progress);
+  const started = usePractice((s) => Object.keys(s.keyStats).length > 0);
+  const label = (key: string) => charLabel(practiceLayout, key, t('keyboard.space'));
+
+  const codes = useMemo(
+    () => ({
+      open: codesFor(practiceLayout, [...progress.open, ' ']),
+      mastered: codesFor(practiceLayout, progress.mastered),
+      next: codesFor(practiceLayout, progress.next ?? []),
+    }),
+    [progress],
+  );
+
+  if (!started) {
+    return (
+      <section className="mx-auto flex max-w-xl flex-col items-center gap-6 py-16 text-center">
+        <h1 className="text-3xl font-semibold">{t('home.title')}</h1>
+        <p className="text-lg text-ink-muted">{t('home.intro')}</p>
+        <ol className="flex list-decimal flex-col gap-2 pl-6 text-left">
+          <li>{t('home.how.start')}</li>
+          <li>{t('home.how.unlock')}</li>
+          <li>{t('home.how.focus')}</li>
+        </ol>
+        <Link to="/practice" className={`${buttonClass('primary')} px-6 py-3 text-lg`}>
+          {t('home.start')}
+        </Link>
+      </section>
+    );
+  }
+
+  const nextKeys = (progress.next ?? []).map(label).join(', ');
+  const blockers = progress.blockers.map(label).join(', ');
 
   return (
-    <section className="mx-auto flex max-w-xl flex-col items-center gap-6 py-20 text-center">
-      <h1 className="text-3xl font-semibold">{t('home.title')}</h1>
-      <p className="text-lg text-ink-muted">{t('home.intro')}</p>
-      {/* Home row of both layouts, set in the lesson font. */}
-      <p
-        aria-hidden="true"
-        className="rounded-lg border border-line bg-surface px-6 py-4 font-mono text-2xl"
-      >
-        asdf jkl; · фыва олдж
-      </p>
-      <Link to="/practice" className={`${buttonClass('primary')} px-6 py-3 text-lg`}>
-        {t('home.start')}
+    <section className="mx-auto flex max-w-4xl flex-col items-center gap-8 py-12">
+      <h1 className="sr-only">{t('nav.home')}</h1>
+      <Link to="/practice" className={`${buttonClass('primary')} px-10 py-4 text-xl`}>
+        {t('home.continue')}
       </Link>
-      <p className="text-sm text-ink-muted">{t('home.stub')}</p>
+
+      <p className="text-center text-lg">
+        {progress.complete
+          ? t('home.complete')
+          : progress.next === null
+            ? t('home.allOpen', { keys: blockers })
+            : blockers === ''
+              ? t('home.nextSoon', { key: nextKeys })
+              : t('home.next', { key: nextKeys, keys: blockers })}
+      </p>
+
+      <div className="flex flex-col items-center gap-4">
+        <h2 className="text-lg font-medium">{t('home.keyboard')}</h2>
+        <Keyboard
+          layout={practiceLayout}
+          geometry={practiceGeometry}
+          openCodes={codes.open}
+          masteredCodes={codes.mastered}
+          highlightCodes={codes.next}
+        />
+        <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-ink-muted">
+          <LegendItem
+            swatch={<span className={`h-4 w-4 rounded ${FINGER_BG.lIndex}`} />}
+            label={t('home.legend.open')}
+          />
+          <LegendItem
+            swatch={<span className="text-sm font-bold text-ok">✓</span>}
+            label={t('home.legend.mastered')}
+          />
+          <LegendItem
+            swatch={<span className="h-4 w-4 rounded border border-line ring-2 ring-accent" />}
+            label={t('home.legend.next')}
+          />
+          <LegendItem
+            swatch={<span className="h-4 w-4 rounded border border-line bg-surface" />}
+            label={t('home.legend.closed')}
+          />
+        </ul>
+      </div>
     </section>
   );
 }

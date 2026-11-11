@@ -1,4 +1,19 @@
 use tauri::Manager;
+use tauri_plugin_sql::{Migration, MigrationKind};
+
+/// The interface opens the database by this name (src/app/storage.ts).
+const DATABASE: &str = "sqlite:keyed.db";
+
+/// Schema migrations, run by the SQL plugin when the database is opened.
+/// Add new ones at the end; never change a migration that has been released.
+fn migrations() -> Vec<Migration> {
+    vec![Migration {
+        version: 1,
+        description: "create tables",
+        sql: include_str!("../migrations/0001_init.sql"),
+        kind: MigrationKind::Up,
+    }]
+}
 
 pub fn run() {
     tauri::Builder::default()
@@ -10,6 +25,11 @@ pub fn run() {
             }
         }))
         .plugin(tauri_plugin_window_state::Builder::default().build())
+        .plugin(
+            tauri_plugin_sql::Builder::default()
+                .add_migrations(DATABASE, migrations())
+                .build(),
+        )
         .run(tauri::generate_context!())
         .expect("error while running the KeyEd application");
 }

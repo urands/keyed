@@ -64,6 +64,17 @@
     ],
     [{ "code": "Space", "width": 6.25, "gap": 3.75 }]
   ],
+  "home": {
+    "lPinky": "KeyA",
+    "lRing": "KeyS",
+    "lMiddle": "KeyD",
+    "lIndex": "KeyF",
+    "thumb": "Space",
+    "rIndex": "KeyJ",
+    "rMiddle": "KeyK",
+    "rRing": "KeyL",
+    "rPinky": "Semicolon"
+  },
   "homing": ["KeyF", "KeyJ"],
   "fingers": {
     "lPinky": ["Backquote", "Digit1", "Tab", "KeyQ", "CapsLock", "KeyA", "ShiftLeft", "KeyZ"],

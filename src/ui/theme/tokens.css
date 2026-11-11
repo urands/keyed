@@ -32,6 +32,25 @@
   --kd-finger-r-middle: #fbe6b0;
   --kd-finger-r-ring: #fcd6ba;
   --kd-finger-r-pinky: #f9cbd6;
+
+  /*
+   * Charts. The series color and the heat ramp come from the dataviz reference
+   * palette and pass its validator against this surface (ordinal ramp: monotone,
+   * visible steps, light end ≥ 2:1). Ink on each heat step is the higher-contrast
+   * of white and near-black.
+   */
+  --kd-series-1: #2a78d6;
+  --kd-grid: #e8eaee;
+  --kd-heat-1: #86b6ef;
+  --kd-heat-2: #5598e7;
+  --kd-heat-3: #2a78d6;
+  --kd-heat-4: #1c5cab;
+  --kd-heat-5: #104281;
+  --kd-heat-ink-1: #0b0b0b;
+  --kd-heat-ink-2: #0b0b0b;
+  --kd-heat-ink-3: #0b0b0b;
+  --kd-heat-ink-4: #ffffff;
+  --kd-heat-ink-5: #ffffff;
 }
 
 [data-theme='dark'] {
@@ -59,4 +78,18 @@
   --kd-finger-r-middle: #5c4a1c;
   --kd-finger-r-ring: #5e3a24;
   --kd-finger-r-pinky: #5e2c3b;
+
+  /* Dark steps of the same ramp: low confidence stays near the surface. */
+  --kd-series-1: #3987e5;
+  --kd-grid: #2a2e36;
+  --kd-heat-1: #184f95;
+  --kd-heat-2: #256abf;
+  --kd-heat-3: #3987e5;
+  --kd-heat-4: #6da7ec;
+  --kd-heat-5: #9ec5f4;
+  --kd-heat-ink-1: #ffffff;
+  --kd-heat-ink-2: #ffffff;
+  --kd-heat-ink-3: #0b0b0b;
+  --kd-heat-ink-4: #0b0b0b;
+  --kd-heat-ink-5: #0b0b0b;
 }

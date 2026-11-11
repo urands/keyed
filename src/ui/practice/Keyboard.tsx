@@ -18,7 +18,9 @@ interface KeyProps {
   gap: number;
   finger: Finger;
   open: boolean;
-  next: boolean;
+  /** Drawn with a ring: the key to press now, or a key being introduced. */
+  highlighted: boolean;
+  mastered: boolean;
   homing: boolean;
   /** Changes with every press of this key; 0 when this key was not the last pressed. */
   flashSeq: number;
@@ -33,7 +35,8 @@ const Key = memo(function Key({
   gap,
   finger,
   open,
-  next,
+  highlighted,
+  mastered,
   homing,
   flashSeq,
   flashCorrect,
@@ -52,12 +55,18 @@ const Key = memo(function Key({
       <div
         data-code={code}
         data-open={open || undefined}
-        data-next={next || undefined}
-        className={`relative flex h-full items-center justify-center rounded-md border select-none ${look} ${label.length > 1 ? 'text-sm' : 'text-lg font-medium'} ${next ? 'z-10 font-bold ring-3 ring-accent ring-offset-2 ring-offset-canvas' : ''}`}
+        data-next={highlighted || undefined}
+        data-mastered={mastered || undefined}
+        className={`relative flex h-full items-center justify-center rounded-md border select-none ${look} ${label.length > 1 ? 'text-sm' : 'text-lg font-medium'} ${highlighted ? 'z-10 font-bold ring-3 ring-accent ring-offset-2 ring-offset-canvas' : ''}`}
       >
         {label}
         {homing && (
           <span className="absolute bottom-[14%] h-[3px] w-1/4 rounded-full bg-current opacity-50" />
+        )}
+        {mastered && (
+          <span className="absolute top-0.5 right-1 text-[0.6rem] leading-none font-bold text-ok">
+            ✓
+          </span>
         )}
         {flashSeq > 0 && (
           // A new element per press restarts the CSS animation.
@@ -71,18 +80,32 @@ const Key = memo(function Key({
   );
 });
 
+const NONE: ReadonlySet<KeyCode> = new Set();
+
 interface KeyboardProps {
   layout: Layout;
   geometry: Geometry;
-  /** Keys in use; the others are drawn muted. */
+  /** Keys in use, colored by finger; the others are drawn muted. */
   openCodes: ReadonlySet<KeyCode>;
   /** The key to press now. */
-  nextCode: KeyCode | null;
-  flash: KeyFlash | null;
+  nextCode?: KeyCode | null;
+  /** More keys to draw like the next key, such as keys being introduced. */
+  highlightCodes?: ReadonlySet<KeyCode>;
+  /** Keys that get a check mark. */
+  masteredCodes?: ReadonlySet<KeyCode>;
+  flash?: KeyFlash | null;
 }
 
 /** Virtual keyboard with finger zones. A visual hint only, hidden from screen readers. */
-export function Keyboard({ layout, geometry, openCodes, nextCode, flash }: KeyboardProps) {
+export function Keyboard({
+  layout,
+  geometry,
+  openCodes,
+  nextCode = null,
+  highlightCodes = NONE,
+  masteredCodes = NONE,
+  flash = null,
+}: KeyboardProps) {
   const label = useKeyLabel(layout);
   return (
     <div aria-hidden="true" className="kd-keyboard mx-auto flex w-max flex-col">
@@ -97,7 +120,8 @@ export function Keyboard({ layout, geometry, openCodes, nextCode, flash }: Keybo
               gap={gap}
               finger={geometry.fingers[code] ?? 'thumb'}
               open={openCodes.has(code)}
-              next={code === nextCode}
+              highlighted={code === nextCode || highlightCodes.has(code)}
+              mastered={masteredCodes.has(code)}
               homing={geometry.homing.includes(code)}
               flashSeq={flash?.code === code ? flash.seq : 0}
               flashCorrect={flash?.code === code && flash.correct}

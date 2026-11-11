@@ -1,12 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { routes } from './routes';
-import { useSettings } from './settings';
+import { restoreSettings, useSettings } from './settings';
 import { startSettingsSync } from './settings-sync';
+import { getStorage } from './storage';
 
 function renderApp(initialPath = '/') {
   const router = createMemoryRouter(routes, { initialEntries: [initialPath] });
@@ -26,7 +27,7 @@ describe('app skeleton', () => {
     stopSync();
   });
 
-  it('shows the home screen placeholder', () => {
+  it('welcomes a new learner on the home screen', () => {
     renderApp();
     expect(screen.getByRole('heading', { level: 1, name: 'Learn to touch type' })).toBeVisible();
   });
@@ -67,9 +68,13 @@ describe('app skeleton', () => {
 
     await user.click(screen.getByRole('radio', { name: 'Dark' }));
 
-    const stored = JSON.parse(localStorage.getItem('keyed.settings') ?? '{}') as {
-      state?: { theme?: string };
-    };
-    expect(stored.state?.theme).toBe('dark');
+    await waitFor(async () => {
+      expect(await getStorage().loadSettings()).toMatchObject({ theme: 'dark', language: 'en' });
+    });
+  });
+
+  it('restores saved settings and ignores outdated values', () => {
+    restoreSettings({ theme: 'dark', language: 'klingon' });
+    expect(useSettings.getState()).toMatchObject({ theme: 'dark', language: 'en' });
   });
 });

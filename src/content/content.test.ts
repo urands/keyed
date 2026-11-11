@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import type { Finger } from '../engine/layout/geometry';
 import { keyForChar } from '../engine/layout/layout';
-import { ansiGeometry, commonEnglishWords, enUsQwerty } from './index';
+import { stageKeys } from '../engine/progress/course';
+import { isBlocked } from '../engine/textgen/blocklist';
+import { ansiGeometry, englishContent, enUsQwerty, enUsQwertyCourse } from './index';
 
 /** The finger table from docs/learning-method.md, English QWERTY column. */
 const DOC_FINGER_ZONES: Record<Finger, string> = {
@@ -17,6 +19,7 @@ const DOC_FINGER_ZONES: Record<Finger, string> = {
   rPinky: "0-=p[]\\;'/",
 };
 
+const ENGLISH_LETTERS = 'abcdefghijklmnopqrstuvwxyz';
 const geometryCodes = new Set(ansiGeometry.rows.flat().map((key) => key.code));
 
 describe('en-us-qwerty layout', () => {
@@ -40,12 +43,6 @@ describe('en-us-qwerty layout', () => {
       }
     }
   });
-
-  it('has every letter of the alphabet', () => {
-    for (const letter of 'abcdefghijklmnopqrstuvwxyz') {
-      expect(keyForChar(enUsQwerty, letter)).not.toBeNull();
-    }
-  });
 });
 
 describe('ANSI geometry', () => {
@@ -61,13 +58,53 @@ describe('ANSI geometry', () => {
   });
 });
 
-describe('common English words', () => {
-  it('has 200 different words', () => {
-    expect(commonEnglishWords).toHaveLength(200);
-    expect(new Set(commonEnglishWords).size).toBe(200);
+describe('English course', () => {
+  const letters = enUsQwertyCourse.stages.find((stage) => stage.id === 'letters');
+
+  it('has a letters stage that teaches every letter once', () => {
+    expect(letters).toBeDefined();
+    if (!letters) return;
+    expect(stageKeys(letters).sort().join('')).toBe(ENGLISH_LETTERS);
   });
 
-  it('has only lowercase words of 2–8 letters', () => {
-    for (const word of commonEnglishWords) expect(word).toMatch(/^[a-z]{2,8}$/);
+  it('follows the order from the methodology', () => {
+    if (!letters) return;
+    expect(letters.start).toEqual(['f', 'j']);
+    expect(letters.order.map((group) => group.join('')).join(' ')).toBe(
+      'dk sl a e i t n o r h u c m g w y p b v x q z',
+    );
+  });
+
+  it('uses only keys of the layout', () => {
+    for (const stage of enUsQwertyCourse.stages) {
+      for (const key of stageKeys(stage)) expect(keyForChar(enUsQwerty, key)).not.toBeNull();
+    }
+  });
+});
+
+describe('English dictionary', () => {
+  const { words, blocklist } = englishContent;
+
+  it('has 10,000 different lowercase words of 2–10 letters', () => {
+    expect(words).toHaveLength(10_000);
+    expect(new Set(words).size).toBe(words.length);
+    for (const word of words) expect(word).toMatch(/^[a-z]{2,10}$/);
+  });
+
+  it('starts with the most frequent words', () => {
+    expect(words.slice(0, 10)).toEqual(expect.arrayContaining(['the', 'you', 'to', 'and']));
+  });
+
+  it('has no blocked words', () => {
+    expect(words.filter((word) => isBlocked(word, blocklist))).toEqual([]);
+  });
+
+  it('has words for every letter of the course', () => {
+    for (const letter of ENGLISH_LETTERS) {
+      expect(
+        words.some((word) => word.includes(letter)),
+        letter,
+      ).toBe(true);
+    }
   });
 });
