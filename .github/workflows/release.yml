@@ -66,6 +66,30 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Developer ID signing and notarization, once the Apple secrets are set.
+      # Without them the app stays ad-hoc signed (tauri.conf.json).
+      - name: Use Apple signing
+        if: runner.os == 'macOS'
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -z "$APPLE_CERTIFICATE" ]; then
+            echo "No Apple certificate: the app is ad-hoc signed."
+            exit 0
+          fi
+          for name in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID; do
+            {
+              echo "$name<<KEYED_EOF"
+              printenv "$name"
+              echo "KEYED_EOF"
+            } >> "$GITHUB_ENV"
+          done
+
       - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,7 +103,7 @@ jobs:
             Download the installer for your system below, or visit https://urands.github.io/keyed/.
 
             - Windows: `KeyEd_*_x64-setup.exe`. Windows may warn about an unknown publisher: choose "More info" → "Run anyway".
-            - macOS: `KeyEd_*_aarch64.dmg` (Apple Silicon) or `KeyEd_*_x64.dmg` (Intel). The first time, open the app with right click → Open.
+            - macOS: `KeyEd_*_aarch64.dmg` (Apple Silicon) or `KeyEd_*_x64.dmg` (Intel). The app is not notarized: the first time, allow it in System Settings → Privacy & Security → "Open Anyway". If macOS says it is damaged, run `xattr -cr /Applications/KeyEd.app` in Terminal.
             - Linux: `.AppImage` or `.deb`.
 
             KeyEd checks for updates at startup and installs them in one click.

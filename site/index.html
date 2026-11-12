@@ -344,13 +344,14 @@
             <div class="card">
               <h3>macOS</h3>
               <p
-                data-ru="Откройте .dmg (aarch64 — для Apple Silicon, x64 — для Intel) и перетащите KeyEd в «Программы». Приложение не подписано: при первом запуске нажмите на него правой кнопкой и выберите «Открыть», либо разрешите запуск в «Системные настройки → Конфиденциальность и безопасность»."
-                data-en="Open the .dmg (aarch64 for Apple Silicon, x64 for Intel) and drag KeyEd to Applications. The app is not signed: the first time, right-click it and choose Open, or allow it in System Settings → Privacy & Security."
+                data-ru="Откройте .dmg (aarch64 — для Apple Silicon, x64 — для Intel) и перетащите KeyEd в «Программы». Приложение не заверено Apple, поэтому при первом запуске macOS его остановит: откройте «Системные настройки → Конфиденциальность и безопасность» и нажмите «Всё равно открыть». Если macOS пишет, что приложение «повреждено», выполните в Терминале команду: xattr -cr /Applications/KeyEd.app"
+                data-en="Open the .dmg (aarch64 for Apple Silicon, x64 for Intel) and drag KeyEd to Applications. The app is not notarized by Apple, so macOS stops it the first time: open System Settings → Privacy & Security and click “Open Anyway”. If macOS says the app is “damaged”, run this in Terminal: xattr -cr /Applications/KeyEd.app"
               >
                 Откройте .dmg (aarch64 — для Apple Silicon, x64 — для Intel) и перетащите KeyEd в
-                «Программы». Приложение не подписано: при первом запуске нажмите на него правой
-                кнопкой и выберите «Открыть», либо разрешите запуск в «Системные настройки →
-                Конфиденциальность и безопасность».
+                «Программы». Приложение не заверено Apple, поэтому при первом запуске macOS его
+                остановит: откройте «Системные настройки → Конфиденциальность и безопасность» и
+                нажмите «Всё равно открыть». Если macOS пишет, что приложение «повреждено»,
+                выполните в Терминале команду: xattr -cr /Applications/KeyEd.app
               </p>
             </div>
             <div class="card">
