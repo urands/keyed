@@ -3,8 +3,14 @@ import type { DayRecord } from '../engine/motivation/daily';
 import type { LessonFacts } from '../engine/motivation/history';
 import type { KeyStat } from '../engine/stats/keyStats';
 import { isOneOf } from '../engine/validate';
-import { encodeSamples } from './samples';
-import { lessonKeys, type LessonSummary, type Storage } from './types';
+import { decodeSamples, encodeSamples } from './samples';
+import {
+  lessonKeys,
+  type LessonRecord,
+  type LessonSummary,
+  type Storage,
+  type StoredData,
+} from './types';
 
 /** The part of `@tauri-apps/plugin-sql` this storage uses; tests pass a Node SQLite database. */
 export interface SqlDatabase {
@@ -152,6 +158,16 @@ export function createSqliteStorage(db: SqlDatabase): Storage {
       );
     },
 
+    async saveOpened(layoutId, stage, opened) {
+      await db.execute(
+        `INSERT INTO course_progress (profile_id, layout_id, stage, opened, updated_at)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (profile_id, layout_id, stage) DO UPDATE SET
+           opened = excluded.opened, updated_at = excluded.updated_at`,
+        [PROFILE, layoutId, stage, opened, Date.now()],
+      );
+    },
+
     async listLessons(layoutId, limit) {
       const rows = await db.select<LessonRow>(
         `SELECT id, stage, started_at, duration_ms, length, errors, cpm, accuracy
@@ -241,5 +257,145 @@ export function createSqliteStorage(db: SqlDatabase): Storage {
         [PROFILE, id, achievement.level, Math.round(achievement.unlockedAt)],
       );
     },
+
+    async exportData() {
+      const lessonRows = await db.select<LessonRow & { layout_id: string; samples_json: string }>(
+        `SELECT id, layout_id, stage, started_at, duration_ms, length, errors, cpm, accuracy,
+           samples_json
+         FROM lesson WHERE profile_id = $1 ORDER BY started_at, id`,
+        [PROFILE],
+      );
+      const lessons = lessonRows.flatMap((row): LessonRecord[] =>
+        isOneOf(LAYOUT_IDS, row.layout_id)
+          ? [
+              {
+                layoutId: row.layout_id,
+                stage: row.stage,
+                startedAt: row.started_at,
+                durationMs: row.duration_ms,
+                length: row.length,
+                errors: row.errors,
+                cpm: row.cpm,
+                accuracy: row.accuracy,
+                samples: decodeSamples(row.samples_json),
+              },
+            ]
+          : [],
+      );
+      const progress: StoredData['progress'] = {};
+      for (const layoutId of LAYOUT_IDS) {
+        const saved = await this.loadProgress(layoutId);
+        if (Object.keys(saved.keyStats).length > 0 || Object.keys(saved.opened).length > 0) {
+          progress[layoutId] = saved;
+        }
+      }
+      return {
+        settings: await this.loadSettings(),
+        lessons,
+        progress,
+        days: await this.loadDays(),
+        achievements: await this.loadAchievements(),
+      };
+    },
+
+    async importData(data) {
+      await clear(db, [...PROGRESS_TABLES, 'settings']);
+      await this.saveSettings(data.settings);
+      const now = Date.now();
+      await insertRows(
+        db,
+        `lesson (profile_id, layout_id, stage, started_at, duration_ms, length, errors, cpm,
+           accuracy, samples_json)`,
+        data.lessons.map((lesson) => [
+          PROFILE,
+          lesson.layoutId,
+          lesson.stage,
+          Math.round(lesson.startedAt),
+          Math.round(lesson.durationMs),
+          lesson.length,
+          lesson.errors,
+          lesson.cpm,
+          lesson.accuracy,
+          encodeSamples(lesson.samples),
+        ]),
+      );
+      for (const [layoutId, { keyStats, opened }] of Object.entries(data.progress)) {
+        await insertRows(
+          db,
+          `key_stat (profile_id, layout_id, key, hits, misses, time_ema, acc_ema,
+             best_confidence, updated_at)`,
+          Object.entries(keyStats).map(([key, stat]) => [
+            PROFILE,
+            layoutId,
+            key,
+            stat.hits,
+            stat.misses,
+            stat.timeEma,
+            stat.accEma,
+            stat.bestConfidence,
+            now,
+          ]),
+        );
+        await insertRows(
+          db,
+          'course_progress (profile_id, layout_id, stage, opened, updated_at)',
+          Object.entries(opened).map(([stage, count]) => [PROFILE, layoutId, stage, count, now]),
+        );
+      }
+      await insertRows(
+        db,
+        'daily (profile_id, date, active_ms, lessons, chars, goal_met, freeze_used)',
+        data.days.map((day) => [
+          PROFILE,
+          day.date,
+          Math.round(day.activeMs),
+          day.lessons,
+          day.chars,
+          day.goalMet ? 1 : 0,
+          0,
+        ]),
+      );
+      await insertRows(
+        db,
+        'achievement (profile_id, id, level, unlocked_at)',
+        Object.entries(data.achievements).map(([id, achievement]) => [
+          PROFILE,
+          id,
+          achievement.level,
+          Math.round(achievement.unlockedAt),
+        ]),
+      );
+    },
+
+    async resetProgress() {
+      await clear(db, PROGRESS_TABLES);
+    },
   };
+}
+
+/** Tables with learning progress; `settings` is kept by a reset. */
+const PROGRESS_TABLES = ['lesson', 'key_stat', 'course_progress', 'daily', 'achievement'];
+
+async function clear(db: SqlDatabase, tables: readonly string[]): Promise<void> {
+  for (const table of tables) {
+    await db.execute(`DELETE FROM ${table} WHERE profile_id = $1`, [PROFILE]);
+  }
+}
+
+/** Rows per INSERT: the plugin sends every statement over IPC, so fewer statements are faster. */
+const INSERT_CHUNK = 50;
+
+async function insertRows(db: SqlDatabase, into: string, rows: unknown[][]): Promise<void> {
+  for (let start = 0; start < rows.length; start += INSERT_CHUNK) {
+    const chunk = rows.slice(start, start + INSERT_CHUNK);
+    const values: unknown[] = [];
+    const tuples = chunk.map((row) => {
+      const placeholders = row.map((value) => {
+        values.push(value);
+        return `$${values.length}`;
+      });
+      return `(${placeholders.join(', ')})`;
+    });
+    await db.execute(`INSERT INTO ${into} VALUES ${tuples.join(', ')}`, values);
+  }
 }

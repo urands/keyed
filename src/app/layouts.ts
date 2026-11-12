@@ -3,16 +3,19 @@ import {
   englishContent,
   enUsQwerty,
   enUsQwertyCourse,
+  isoGeometry,
   ruJcuken,
   ruJcukenCourse,
   russianContent,
   russianYoContent,
   type LanguageContent,
 } from '../content';
+import type { Geometry, GeometryId } from '../engine/layout/geometry';
 import { shiftAllowance, type Layout, type LayoutId } from '../engine/layout/layout';
 import { DEFAULT_PARAMS } from '../engine/params';
 import { withOptionalKeys, type Course, type CourseStage } from '../engine/progress/course';
 import type { TimeAllowance } from '../engine/stats/keyStats';
+import { useSettings } from './settings';
 
 /** Everything the app needs to teach one layout. */
 export interface LayoutKit {
@@ -61,5 +64,11 @@ export function kitFor(layoutId: LayoutId, options: KitOptions): LayoutKit {
 /** Layouts in the order the switch shows them. */
 export const PRACTICE_LAYOUTS: readonly LayoutId[] = ['en-us-qwerty', 'ru-jcuken'];
 
-/** One keyboard type until ISO arrives with the settings for it (task 6.3). */
-export const practiceGeometry = ansiGeometry;
+export function geometryFor(id: GeometryId): Geometry {
+  return id === 'iso' ? isoGeometry : ansiGeometry;
+}
+
+/** The keyboard type from the settings. */
+export function useGeometry(): Geometry {
+  return geometryFor(useSettings((s) => s.keyboardType));
+}

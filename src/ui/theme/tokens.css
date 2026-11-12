@@ -1,37 +1,45 @@
 /*
- * Design tokens: one set of values per theme.
- * The palette below is a placeholder; the real design replaces these values
- * (docs/screens.md, "Что нужно от дизайна"). Text colors meet WCAG AA on
- * `canvas` and `surface`; key labels (`ink`) meet it on every finger color.
+ * Design tokens: one set of values per theme (task 6.4). The dark theme follows
+ * the neon mock-ups in docs/design, the light one the pastel mock-up.
+ * Contrast is checked in theme.test.ts: text colors meet WCAG AA on the
+ * surfaces they are used on, key labels (`key-ink`) on every finger color.
  */
 
 [data-theme='light'] {
   color-scheme: light;
 
-  --kd-canvas: #f6f7f9;
+  --kd-canvas: #f2f4f9;
   --kd-surface: #ffffff;
-  --kd-line: #d5d9e0;
-  --kd-ink: #1a1d23;
-  --kd-ink-muted: #5b6472;
-  --kd-accent: #2f5fd0;
+  /* Raised parts inside a surface: closed keys, chips, tracks of progress bars. */
+  --kd-surface-2: #eef1f6;
+  --kd-line: #dfe3ec;
+  --kd-ink: #1b2233;
+  --kd-ink-muted: #5a6478;
+  --kd-accent: #2a63e0;
   --kd-on-accent: #ffffff;
+  /* The focus key and other "look here" marks that are not the next key. */
+  --kd-accent-2: #7c3aed;
 
   /* Typing feedback */
-  --kd-ok: #1d7a3a;
-  --kd-error: #c42b2b;
-  --kd-error-bg: #fde3e3;
-  --kd-fixed: #9a5300;
+  --kd-ok: #16794a;
+  --kd-error: #b4232f;
+  --kd-error-bg: #fde4e6;
+  --kd-fixed: #a35a00;
 
-  /* Finger zones, left to right across the keyboard */
-  --kd-finger-l-pinky: #e6d6f8;
-  --kd-finger-l-ring: #d2dafb;
-  --kd-finger-l-middle: #c8e7f7;
-  --kd-finger-l-index: #c8eedf;
-  --kd-finger-thumb: #e2e5ea;
-  --kd-finger-r-index: #e5f1b9;
-  --kd-finger-r-middle: #fbe6b0;
-  --kd-finger-r-ring: #fcd6ba;
-  --kd-finger-r-pinky: #f9cbd6;
+  --kd-shadow: 0 1px 2px rgb(16 24 40 / 0.04), 0 6px 20px rgb(16 24 40 / 0.06);
+  --kd-glow: 0 0 0 1px rgb(42 99 224 / 0.25), 0 4px 14px rgb(42 99 224 / 0.25);
+
+  /* Finger zones, left to right across the keyboard; key labels use key-ink. */
+  --kd-key-ink: #1b2233;
+  --kd-finger-l-pinky: #e7dcfb;
+  --kd-finger-l-ring: #d9e0fd;
+  --kd-finger-l-middle: #cfe9fb;
+  --kd-finger-l-index: #ccefe1;
+  --kd-finger-thumb: #e8ebf1;
+  --kd-finger-r-index: #d9f2c9;
+  --kd-finger-r-middle: #fbe9b0;
+  --kd-finger-r-ring: #fcd9c0;
+  --kd-finger-r-pinky: #fad1dc;
 
   /*
    * Charts. The series color and the heat ramp come from the dataviz reference
@@ -56,32 +64,39 @@
 [data-theme='dark'] {
   color-scheme: dark;
 
-  --kd-canvas: #14161a;
-  --kd-surface: #1d2026;
-  --kd-line: #343a45;
-  --kd-ink: #e8eaee;
-  --kd-ink-muted: #9aa3b2;
-  --kd-accent: #7da2ff;
-  --kd-on-accent: #0f1320;
+  --kd-canvas: #0f1424;
+  --kd-surface: #161c30;
+  --kd-surface-2: #1e2540;
+  --kd-line: #2a3352;
+  --kd-ink: #e9edf8;
+  --kd-ink-muted: #9ba5c4;
+  --kd-accent: #3ddcb0;
+  --kd-on-accent: #06281f;
+  --kd-accent-2: #a78bfa;
 
-  --kd-ok: #63d38c;
-  --kd-error: #ff8a8a;
-  --kd-error-bg: #4d2227;
-  --kd-fixed: #f2b35b;
+  --kd-ok: #4ade9f;
+  --kd-error: #ff7a8a;
+  --kd-error-bg: #3d1b2a;
+  --kd-fixed: #f5b84f;
 
-  --kd-finger-l-pinky: #4b3a6b;
-  --kd-finger-l-ring: #34426e;
-  --kd-finger-l-middle: #23506a;
-  --kd-finger-l-index: #1f5546;
-  --kd-finger-thumb: #343a45;
-  --kd-finger-r-index: #4a5320;
-  --kd-finger-r-middle: #5c4a1c;
-  --kd-finger-r-ring: #5e3a24;
-  --kd-finger-r-pinky: #5e2c3b;
+  --kd-shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 10px 30px rgb(0 0 0 / 0.25);
+  --kd-glow: 0 0 0 1px rgb(61 220 176 / 0.55), 0 0 18px rgb(61 220 176 / 0.35);
+
+  /* Bright keys with dark labels glow against the navy background. */
+  --kd-key-ink: #0f1424;
+  --kd-finger-l-pinky: #b49cf2;
+  --kd-finger-l-ring: #8fa3f5;
+  --kd-finger-l-middle: #6fb8f0;
+  --kd-finger-l-index: #5fd3c0;
+  --kd-finger-thumb: #8a93ad;
+  --kd-finger-r-index: #7fd88f;
+  --kd-finger-r-middle: #e8cf6a;
+  --kd-finger-r-ring: #f2a774;
+  --kd-finger-r-pinky: #f28fa6;
 
   /* Dark steps of the same ramp: low confidence stays near the surface. */
   --kd-series-1: #3987e5;
-  --kd-grid: #2a2e36;
+  --kd-grid: #252c45;
   --kd-heat-1: #184f95;
   --kd-heat-2: #256abf;
   --kd-heat-3: #3987e5;

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
@@ -26,7 +26,17 @@ beforeEach(async () => {
   localStorage.clear();
   await openStorage(); // a fresh, empty storage for each test
   await i18n.changeLanguage('en');
-  useSettings.setState({ layout: EN, speedUnit: 'auto', inputMode: 'emulate', strictMode: false });
+  useSettings.setState({
+    layout: EN,
+    speedUnit: 'auto',
+    inputMode: 'emulate',
+    strictMode: false,
+    keyboardType: 'ansi',
+    targetCpm: 175,
+    lessonLength: 120,
+    showKeyboard: true,
+    showHands: true,
+  });
   usePractice.setState({ cache: {} });
   usePractice.getState().restore(EN, { keyStats: {}, opened: {} });
 });
@@ -207,6 +217,100 @@ describe('settings screen', () => {
     await user.click(screen.getByRole('radio', { name: 'System layout' }));
     expect(useSettings.getState().inputMode).toBe('system');
     expect(screen.getByText(/Switch it to the lesson's layout before typing/)).toBeVisible();
+  });
+
+  it('sets the target speed, lesson length and keyboard type', async () => {
+    const user = userEvent.setup();
+    const { router, container } = renderAt('/settings');
+
+    fireEvent.change(screen.getByRole('slider', { name: 'Target speed' }), {
+      target: { value: '250' },
+    });
+    expect(useSettings.getState().targetCpm).toBe(250);
+    expect(screen.getByText('250 cpm · 50 WPM')).toBeVisible();
+
+    await user.click(screen.getByRole('radio', { name: '200' }));
+    expect(useSettings.getState().lessonLength).toBe(200);
+
+    await user.click(screen.getByRole('radio', { name: 'ISO' }));
+    usePractice.getState().dismissIntro();
+    await router.navigate('/practice');
+    expect(await screen.findByText(/Start typing/)).toBeVisible();
+    expect(container.querySelector('[data-code="IntlBackslash"]')).not.toBeNull();
+    expect(container.querySelector('[data-code="Enter"]')).toHaveAttribute('data-tall');
+  }, 20_000);
+
+  it('hides the keyboard and the hands on the practice screen', async () => {
+    const user = userEvent.setup();
+    usePractice.getState().dismissIntro();
+    const { container } = renderAt('/practice');
+    expect(container.querySelector('[data-hand="left"]')).not.toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Hands' }));
+    expect(container.querySelector('[data-hand]')).toBeNull();
+    expect(container.querySelector('[data-code="KeyF"]')).not.toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Keyboard' }));
+    expect(container.querySelector('[data-code="KeyF"]')).toBeNull();
+    expect(useSettings.getState()).toMatchObject({ showKeyboard: false, showHands: false });
+    // Only the text is left, and it still takes the keys.
+    await user.keyboard('j');
+    expect(usePractice.getState().lesson.status).toBe('running');
+  });
+
+  it('resets the progress after a confirmation', async () => {
+    const user = userEvent.setup();
+    await getStorage().saveLesson(
+      {
+        layoutId: EN,
+        stage: 'letters',
+        startedAt: 1,
+        durationMs: 1000,
+        length: 1,
+        errors: 0,
+        cpm: 60,
+        accuracy: 1,
+        samples: [{ char: 'f', typos: [], time: null }],
+      },
+      { f: mastered },
+      1,
+    );
+    renderAt('/settings');
+
+    await user.click(screen.getByRole('button', { name: 'Reset progress' }));
+    const dialog = screen.getByRole('alertdialog', { name: 'Reset all progress?' });
+    expect(dialog).toBeVisible();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(await getStorage().listHistory()).toHaveLength(1);
+
+    await user.click(screen.getByRole('button', { name: 'Reset progress' }));
+    await user.click(screen.getByRole('button', { name: 'Reset' }));
+    await waitFor(async () => {
+      expect(await getStorage().listHistory()).toEqual([]);
+    });
+  });
+
+  it('refuses a file that is not an export', async () => {
+    const user = userEvent.setup({ applyAccept: false });
+    const { container } = renderAt('/settings');
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]');
+    expect(input).not.toBeNull();
+    if (!input) return;
+
+    await user.upload(input, new File(['{not json'], 'notes.json', { type: 'application/json' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('This is not a KeyEd export file.');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('shows the version, licenses and sources in "About"', () => {
+    renderAt('/settings');
+    expect(screen.getByText(`Version ${__APP_VERSION__}`)).toBeVisible();
+    expect(screen.getByText(/FrequencyWords by Hermit Dave/)).toBeVisible();
+    expect(screen.getByText('KeyEd is open source under the MIT license.')).toBeVisible();
+    // A plain browser cannot update itself.
+    expect(screen.getByText('Updates are checked in the desktop app.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Check for updates' })).toBeDisabled();
   });
 });
 

@@ -1,12 +1,13 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
+import type { TextSize } from '../../app/settings';
 import type { LessonState } from '../../engine/session/lesson';
 import { charView, type CharView } from './charView';
 
 // Mistakes differ from correct text by more than color: underline style and background.
 const VIEW_CLASS: Record<CharView, string> = {
   pending: '',
-  current: 'rounded-sm bg-accent/15',
+  current: 'rounded-md bg-accent/20',
   correct: 'text-ok',
   corrected: 'text-fixed underline decoration-dotted decoration-2 underline-offset-[0.25em]',
   error:
@@ -54,12 +55,21 @@ function splitWords(text: string): Word[] {
   return words;
 }
 
+/** Text sizes of the "Размер текста" setting. */
+const SIZE_CLASS: Record<TextSize, string> = {
+  small: 'text-[1.5rem]',
+  medium: 'text-[2rem]',
+  large: 'text-[2.5rem]',
+  xlarge: 'text-[3rem]',
+};
+
 interface LessonTextProps {
   lesson: LessonState;
   dimmed?: boolean;
+  size?: TextSize;
 }
 
-export function LessonText({ lesson, dimmed = false }: LessonTextProps) {
+export function LessonText({ lesson, dimmed = false, size = 'medium' }: LessonTextProps) {
   const { text, position, status } = lesson;
   const words = useMemo(() => splitWords(text), [text]);
 
@@ -110,7 +120,8 @@ export function LessonText({ lesson, dimmed = false }: LessonTextProps) {
   return (
     <div
       ref={box}
-      className={`relative font-mono text-[2rem] leading-[1.7] transition-opacity motion-reduce:transition-none ${dimmed ? 'opacity-25' : ''}`}
+      data-size={size}
+      className={`relative font-mono ${SIZE_CLASS[size]} leading-[1.7] transition-opacity motion-reduce:transition-none ${dimmed ? 'opacity-25' : ''}`}
     >
       {words.map((word) => (
         <span key={word.start} className="inline-block whitespace-pre">

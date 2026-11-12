@@ -9,10 +9,15 @@ interface LayoutSwitchProps {
   short?: boolean;
   /** Radio group name; must be unique on the page. */
   name?: string;
+  vertical?: boolean;
 }
 
 /** Switches the layout being learned; each layout keeps its own progress. */
-export function LayoutSwitch({ short = false, name = 'layout' }: LayoutSwitchProps) {
+export function LayoutSwitch({
+  short = false,
+  name = 'layout',
+  vertical = false,
+}: LayoutSwitchProps) {
   const { t } = useTranslation();
   const layoutId = usePractice((s) => s.layoutId);
   const switchLayout = usePractice((s) => s.switchLayout);
@@ -21,6 +26,7 @@ export function LayoutSwitch({ short = false, name = 'layout' }: LayoutSwitchPro
     <SegmentedControl
       name={name}
       legend={t('layout.label')}
+      vertical={vertical}
       value={layoutId}
       options={PRACTICE_LAYOUTS.map((value) => ({
         value,

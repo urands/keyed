@@ -226,7 +226,7 @@ export function LineChart({
         <div
           id={tooltipId}
           role="status"
-          className="pointer-events-none absolute top-0 z-10 rounded-md border border-line bg-surface px-3 py-2 text-left shadow-md"
+          className="pointer-events-none absolute top-0 z-10 rounded-lg border border-line bg-surface px-3 py-2 text-left shadow-card"
           style={{
             left: tooltipLeft,
             transform: `translateX(${tooltipLeft > width / 2 ? 'calc(-100% - 12px)' : '12px'})`,

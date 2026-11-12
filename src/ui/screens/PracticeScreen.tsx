@@ -1,17 +1,20 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Hand as HandIcon, Keyboard as KeyboardIcon } from 'lucide-react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 
-import { kitFor, practiceGeometry } from '../../app/layouts';
+import { kitFor, useGeometry } from '../../app/layouts';
 import { useLayoutKit, usePractice } from '../../app/practice';
 import { useSettings } from '../../app/settings';
 import { toInput } from '../../engine/input/toInput';
+import type { Finger } from '../../engine/layout/geometry';
 import { keyForChar } from '../../engine/layout/layout';
 import { DEFAULT_PARAMS } from '../../engine/params';
 import { stageKeys } from '../../engine/progress/course';
 import { buttonClass } from '../components/buttonClass';
 import { liveMetrics } from '../../engine/stats/lessonResult';
 import { CourseStrip } from '../practice/CourseStrip';
+import { Hand } from '../practice/Hands';
 import { charLabel, codesWithShift, inlineLabel, shiftCodeFor } from '../practice/keyCodes';
 import { isActivatable, isTextEntry } from '../practice/keyTargets';
 import { Keyboard } from '../practice/Keyboard';
@@ -38,6 +41,7 @@ export function PracticeScreen() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const kit = useLayoutKit();
+  const geometry = useGeometry();
   const unit = useSpeedUnit();
   const lesson = usePractice((s) => s.lesson);
   const result = usePractice((s) => s.result);
@@ -56,6 +60,9 @@ export function PracticeScreen() {
   const pause = usePractice((s) => s.pause);
   const resume = usePractice((s) => s.resume);
   const dismissIntro = usePractice((s) => s.dismissIntro);
+  const showKeyboard = useSettings((s) => s.showKeyboard);
+  const showHands = useSettings((s) => s.showHands);
+  const textSize = useSettings((s) => s.textSize);
   const [capsLock, setCapsLock] = useState(false);
   const { status, lastPressAt } = lesson;
   // The lesson in progress counts toward today's goal; a finished one is already in the day.
@@ -73,8 +80,8 @@ export function PracticeScreen() {
     [course, progress],
   );
   const openCodes = useMemo(
-    () => codesWithShift(kit.layout, practiceGeometry, [...course.open, ' ']),
-    [kit, course],
+    () => codesWithShift(kit.layout, geometry, [...course.open, ' ']),
+    [kit, geometry, course],
   );
   const stageCount = kit.course.stages.length;
   const stageName = t(`stage.${course.stage.kind}`);
@@ -232,7 +239,7 @@ export function PracticeScreen() {
     return (
       <NewKeyCard
         layout={kit.layout}
-        geometry={practiceGeometry}
+        geometry={geometry}
         keys={introduce}
         openKeys={course.open}
         stage={introStage}
@@ -243,8 +250,7 @@ export function PracticeScreen() {
 
   const nextChar = lesson.chars[lesson.position]?.char;
   const nextCode = nextChar === undefined ? null : (keyForChar(kit.layout, nextChar)?.code ?? null);
-  const nextShift =
-    nextChar === undefined ? null : shiftCodeFor(kit.layout, practiceGeometry, nextChar);
+  const nextShift = nextChar === undefined ? null : shiftCodeFor(kit.layout, geometry, nextChar);
   const label = (key: string) =>
     inlineLabel(kit.layout, key, t('keyboard.space'), (mark) =>
       t('keyboard.quoted', { key: mark }),
@@ -256,8 +262,16 @@ export function PracticeScreen() {
     capsLock ? t('practice.capsLock') : null,
   ].filter((warning): warning is string => warning !== null);
 
+  // The fingers to light up on the hands: the next key's and the Shift's.
+  const activeFingers = new Set<Finger>();
+  const nextFinger = nextCode === null ? undefined : geometry.fingers[nextCode];
+  const shiftFinger = nextShift === null ? undefined : geometry.fingers[nextShift];
+  if (nextFinger) activeFingers.add(nextFinger);
+  if (shiftFinger) activeFingers.add(shiftFinger);
+  const handClass = 'w-[calc(var(--u)*3.4)] shrink-0';
+
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-4 py-5">
+    <div className="mx-auto flex max-w-6xl flex-col gap-3 py-4">
       <MetricsBar
         goal={daily}
         cpm={live.cpm}
@@ -272,30 +286,33 @@ export function PracticeScreen() {
 
       <CourseStrip layout={kit.layout} keys={courseKeys} progress={progress} />
 
-      <div className="relative rounded-lg border border-line bg-surface px-8 pt-7 pb-2">
+      <div className="kd-card relative px-10 pt-9 pb-2">
         <h1 className="sr-only">{t('nav.practice')}</h1>
-        <div className="absolute inset-x-3 top-1.5 flex items-center justify-between gap-3 text-xs text-ink-muted">
+        <div className="absolute inset-x-4 top-2.5 flex items-center justify-between gap-3 text-xs text-ink-muted">
           <Link to="/course" className="rounded hover:text-ink">
             {t('practice.stage', { n: course.stageIndex + 1, total: stageCount, name: stageName })}
           </Link>
-          {training !== null && (
-            <span className="flex items-center gap-2">
-              <span className="font-medium text-ink">
-                {t('training.label', { key: label(training) })}
+          <span className="flex items-center gap-3">
+            {training !== null && (
+              <span className="flex items-center gap-2">
+                <span className="font-medium text-ink">
+                  {t('training.label', { key: label(training) })}
+                </span>
+                <button
+                  type="button"
+                  className={`${buttonClass('secondary')} px-2 py-0.5 text-xs`}
+                  onClick={() => {
+                    train(null);
+                  }}
+                >
+                  {t('training.stop')}
+                </button>
               </span>
-              <button
-                type="button"
-                className={`${buttonClass('secondary')} px-2 py-0.5 text-xs`}
-                onClick={() => {
-                  train(null);
-                }}
-              >
-                {t('training.stop')}
-              </button>
-            </span>
-          )}
+            )}
+            <ViewToggles />
+          </span>
         </div>
-        <LessonText lesson={lesson} dimmed={paused} />
+        <LessonText lesson={lesson} dimmed={paused} size={textSize} />
         <p className="mt-1 flex h-6 gap-4 text-sm" aria-live="polite">
           {warnings.length > 0 ? (
             warnings.map((warning) => (
@@ -321,20 +338,66 @@ export function PracticeScreen() {
         )}
       </div>
 
-      <Keyboard
-        layout={kit.layout}
-        geometry={practiceGeometry}
-        openCodes={openCodes}
-        nextCode={nextCode}
-        nextShift={nextShift}
-        flash={feedback}
-      />
-      <NextKeyHint
-        layout={kit.layout}
-        geometry={practiceGeometry}
-        code={nextCode}
-        shift={nextShift}
-      />
+      {(showKeyboard || showHands) && (
+        <div
+          className="kd-card kd-keyboard flex flex-col items-center gap-1.5 px-6 pt-4 pb-2"
+          style={{ '--kd-cols': showKeyboard && showHands ? 22.6 : 15 } as CSSProperties}
+        >
+          <div className="flex items-end justify-center gap-[calc(var(--u)*0.4)]">
+            {showHands && <Hand side="left" active={activeFingers} className={handClass} />}
+            {showKeyboard && (
+              <Keyboard
+                layout={kit.layout}
+                geometry={geometry}
+                openCodes={openCodes}
+                nextCode={nextCode}
+                nextShift={nextShift}
+                flash={feedback}
+              />
+            )}
+            {showHands && <Hand side="right" active={activeFingers} className={handClass} />}
+          </div>
+          <NextKeyHint layout={kit.layout} geometry={geometry} code={nextCode} shift={nextShift} />
+        </div>
+      )}
     </div>
+  );
+}
+
+/** Show or hide the keyboard and the hands; with both hidden, only the text is left. */
+function ViewToggles() {
+  const { t } = useTranslation();
+  const showKeyboard = useSettings((s) => s.showKeyboard);
+  const showHands = useSettings((s) => s.showHands);
+  const update = useSettings((s) => s.update);
+  const toggle = (pressed: boolean) =>
+    `flex h-7 w-7 items-center justify-center rounded-lg ${pressed ? 'bg-accent/15 text-accent' : 'text-ink-muted hover:bg-surface-2 hover:text-ink'}`;
+  return (
+    <span className="flex items-center gap-1" role="group" aria-label={t('practice.view')}>
+      <button
+        type="button"
+        aria-pressed={showKeyboard}
+        title={t('practice.showKeyboard')}
+        aria-label={t('practice.showKeyboard')}
+        className={toggle(showKeyboard)}
+        onClick={() => {
+          update({ showKeyboard: !showKeyboard });
+        }}
+      >
+        <KeyboardIcon aria-hidden="true" size={17} />
+      </button>
+      <button
+        type="button"
+        aria-pressed={showHands}
+        title={t('practice.showHands')}
+        aria-label={t('practice.showHands')}
+        className={toggle(showHands)}
+        onClick={() => {
+          update({ showHands: !showHands });
+        }}
+      >
+        <HandIcon aria-hidden="true" size={17} />
+      </button>
+    </span>
   );
 }

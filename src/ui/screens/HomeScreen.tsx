@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { keyViews, weakestKeys } from '../../app/courseView';
-import { practiceGeometry } from '../../app/layouts';
+import { useGeometry } from '../../app/layouts';
 import { useLayoutKit, usePractice } from '../../app/practice';
 import { useSettings } from '../../app/settings';
 import { keyForChar, type KeyCode } from '../../engine/layout/layout';
@@ -40,6 +40,7 @@ export function HomeScreen() {
   const daily = useDailyProgress();
   const streak = useStreak();
   const unit = useSpeedUnit();
+  const geometry = useGeometry();
   const label = (key: string) =>
     inlineLabel(layout, key, t('keyboard.space'), (mark) => t('keyboard.quoted', { key: mark }));
 
@@ -57,11 +58,11 @@ export function HomeScreen() {
     }
     for (const code of learning) mastered.delete(code);
     return {
-      open: codesWithShift(layout, practiceGeometry, [...course.open, ' ']),
+      open: codesWithShift(layout, geometry, [...course.open, ' ']),
       mastered,
-      next: codesWithShift(layout, practiceGeometry, progress.next ?? []),
+      next: codesWithShift(layout, geometry, progress.next ?? []),
     };
-  }, [layout, views, course, progress]);
+  }, [layout, geometry, views, course, progress]);
 
   if (!started) {
     return (
@@ -90,7 +91,7 @@ export function HomeScreen() {
   return (
     <section className="mx-auto flex max-w-4xl flex-col items-center gap-8 py-10">
       <h1 className="sr-only">{t('nav.home')}</h1>
-      <div className="flex w-full flex-wrap items-center justify-between gap-6 rounded-lg border border-line bg-surface px-6 py-5">
+      <div className="kd-card flex w-full flex-wrap items-center justify-between gap-6 px-6 py-5">
         <div className="flex items-center gap-5">
           <GoalRing progress={daily} />
           <StreakInfo streak={streak} />
@@ -135,7 +136,7 @@ export function HomeScreen() {
         <h2 className="text-lg font-medium">{t('home.keyboard')}</h2>
         <Keyboard
           layout={layout}
-          geometry={practiceGeometry}
+          geometry={geometry}
           openCodes={codes.open}
           masteredCodes={codes.mastered}
           highlightCodes={codes.next}

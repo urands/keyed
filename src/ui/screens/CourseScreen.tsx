@@ -1,3 +1,4 @@
+import { Check, CircleCheck, CircleDot, Lock } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
@@ -26,10 +27,11 @@ function KeyChip({ label, view, training, onTrain }: KeyChipProps) {
     return (
       <li
         data-key-state="closed"
-        className="flex h-9 min-w-9 items-center justify-center rounded-md border border-dashed border-line px-1 font-mono text-ink-muted"
+        className="flex h-9 min-w-10 items-center justify-center gap-1 rounded-lg bg-surface-2/60 px-2 font-mono text-ink-muted"
       >
         <span className="sr-only">{t('course.closed', { key: label })}</span>
         <span aria-hidden="true">{label}</span>
+        <Lock aria-hidden="true" size={11} strokeWidth={2.25} className="opacity-70" />
       </li>
     );
   }
@@ -44,33 +46,28 @@ function KeyChip({ label, view, training, onTrain }: KeyChipProps) {
         onClick={onTrain}
         title={`${state}. ${t('courseScreen.train', { key: label })}`}
         aria-label={`${t('courseScreen.train', { key: label })}. ${state}`}
-        className={`relative flex h-9 min-w-9 items-center justify-center overflow-hidden rounded-md border border-line bg-surface px-1 font-mono font-medium outline-accent hover:border-accent focus-visible:outline-2 ${training ? 'ring-2 ring-accent ring-offset-1 ring-offset-canvas' : ''}`}
+        className={`relative flex h-9 min-w-10 items-center justify-center gap-1 overflow-hidden rounded-lg px-2 font-mono font-semibold transition-colors ${view.mastered ? 'bg-accent text-on-accent hover:brightness-110' : 'border border-line bg-surface-2 hover:border-accent'} ${training ? 'shadow-glow ring-2 ring-accent-2 ring-offset-2 ring-offset-surface' : ''}`}
       >
-        <span
-          aria-hidden="true"
-          className={`absolute inset-x-0 bottom-0 ${view.mastered ? 'bg-ok/25' : 'bg-accent/20'}`}
-          style={{ height: `${view.mastered ? 100 : percent}%` }}
-        />
+        {!view.mastered && (
+          <span
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 bg-accent/25"
+            style={{ height: `${percent}%` }}
+          />
+        )}
         <span aria-hidden="true" className="relative">
           {label}
         </span>
-        {view.mastered && (
-          <span
-            aria-hidden="true"
-            className="absolute top-0 right-0.5 text-[0.6rem] leading-none font-bold text-ok"
-          >
-            ✓
-          </span>
-        )}
+        {view.mastered && <Check aria-hidden="true" size={14} strokeWidth={3} />}
       </button>
     </li>
   );
 }
 
 const STATUS_LOOK = {
-  done: { icon: '✓', className: 'text-ok' },
-  current: { icon: '●', className: 'text-accent' },
-  locked: { icon: '○', className: 'text-ink-muted' },
+  done: { icon: CircleCheck, className: 'text-ok' },
+  current: { icon: CircleDot, className: 'text-accent' },
+  locked: { icon: Lock, className: 'text-ink-muted' },
 } as const;
 
 /**
@@ -128,7 +125,7 @@ export function CourseScreen() {
               key={stage.id}
               data-stage-status={status}
               aria-current={status === 'current' ? 'step' : undefined}
-              className={`flex flex-col gap-3 rounded-lg bg-surface px-5 py-4 ${status === 'current' ? 'border-2 border-accent' : 'border border-line'}`}
+              className={`kd-card flex flex-col gap-3 px-6 py-5 ${status === 'current' ? 'ring-2 ring-accent' : ''} ${status === 'locked' ? 'opacity-80' : ''}`}
             >
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h2 className="text-lg font-semibold">
@@ -137,8 +134,8 @@ export function CourseScreen() {
                   </span>{' '}
                   {t(`stage.${stage.kind}`)}
                 </h2>
-                <span className={`text-sm font-medium ${look.className}`}>
-                  <span aria-hidden="true">{look.icon} </span>
+                <span className={`flex items-center gap-1.5 text-sm font-medium ${look.className}`}>
+                  <look.icon aria-hidden="true" size={16} strokeWidth={2.25} />
                   {t(`courseScreen.status.${status}`)}
                 </span>
               </div>
@@ -148,7 +145,7 @@ export function CourseScreen() {
                   <p className="text-sm">
                     {t('courseScreen.mastered', { mastered, total: keys.length })}
                   </p>
-                  <ul aria-label={t('courseScreen.keys')} className="flex flex-wrap gap-1">
+                  <ul aria-label={t('courseScreen.keys')} className="flex flex-wrap gap-1.5">
                     {keys.map((key) => (
                       <KeyChip
                         key={key}
@@ -166,7 +163,7 @@ export function CourseScreen() {
               {weakest.length > 0 && (
                 <>
                   <p className="text-sm">{t('courseScreen.weakest')}</p>
-                  <ul aria-label={t('courseScreen.weakest')} className="flex flex-wrap gap-1">
+                  <ul aria-label={t('courseScreen.weakest')} className="flex flex-wrap gap-1.5">
                     {weakest.map((key) => (
                       <KeyChip
                         key={key}

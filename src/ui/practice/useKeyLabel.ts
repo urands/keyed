@@ -17,11 +17,19 @@ function isNamedKey(code: KeyCode): code is keyof typeof NAMED_KEYS {
 }
 
 /**
+ * The characters on a key. The extra ISO key by the left Shift types the same
+ * as the backslash key in both layouts; lessons never use it.
+ */
+function charsOf(layout: Layout, code: KeyCode) {
+  return layout.keys[code === 'IntlBackslash' ? 'Backslash' : code];
+}
+
+/**
  * The character a key types with Shift, when it is not just the capital of the
  * key's letter: "!" on 1, "," on the ЙЦУКЕН full stop key. Empty otherwise.
  */
 export function shiftLabel(layout: Layout, code: KeyCode): string {
-  const chars = layout.keys[code];
+  const chars = charsOf(layout, code);
   if (!chars || code === 'Space') return '';
   return chars.shift === chars.base.toLocaleUpperCase(layout.language) ? '' : chars.shift;
 }
@@ -35,7 +43,7 @@ export function useKeyLabel(layout: Layout): (code: KeyCode) => string {
   return useCallback(
     (code: KeyCode) => {
       if (isNamedKey(code)) return t(NAMED_KEYS[code]);
-      const chars = layout.keys[code];
+      const chars = charsOf(layout, code);
       if (!chars || code === 'Space') return '';
       return chars.base.toLocaleUpperCase(layout.language);
     },

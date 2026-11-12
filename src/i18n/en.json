@@ -98,7 +98,8 @@
         "quote": "Quotes are on the apostrophe key, with Shift.",
         "hyphen": "The hyphen is right of 0. There are no spaces around it: well-known, e-mail."
       }
-    }
+    },
+    "stageBadge": "New stage"
   },
   "practice": {
     "speed": "Speed",
@@ -126,7 +127,10 @@
       "rMiddle": "Right middle finger",
       "rRing": "Right ring finger",
       "rPinky": "Right little finger"
-    }
+    },
+    "view": "What to show",
+    "showKeyboard": "Keyboard",
+    "showHands": "Hands"
   },
   "keyboard": {
     "backspace": "⌫",
@@ -233,7 +237,9 @@
       "keyboard": "Keyboard",
       "appearance": "Appearance",
       "motivation": "Daily goal and reminders",
-      "sound": "Sound"
+      "sound": "Sound",
+      "data": "Data",
+      "about": "About"
     },
     "layoutHint": "Each layout has its own progress and statistics.",
     "strict": {
@@ -283,6 +289,84 @@
       "keys": "Key sound",
       "errors": "Error sound",
       "volume": "Volume"
+    },
+    "keyboardType": {
+      "label": "Keyboard type",
+      "hint": "ANSI has a long Enter in one row; ISO has a tall Enter and a short left Shift. The letters are in the same places.",
+      "ansi": "ANSI",
+      "iso": "ISO"
+    },
+    "targetSpeed": {
+      "label": "Target speed",
+      "hint": "A key counts as mastered when you type it this fast and accurately. Raise it if keys open too easily.",
+      "value": "{{cpm}} cpm · {{wpm}} WPM"
+    },
+    "lessonLength": {
+      "label": "Lesson length",
+      "hint": "Characters in one lesson. 120 is about a minute for a beginner."
+    },
+    "showKeyboard": {
+      "label": "Show the keyboard"
+    },
+    "showHands": {
+      "label": "Show the hands"
+    },
+    "textSize": {
+      "label": "Text size",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "xlarge": "Extra large"
+    },
+    "reduceMotion": {
+      "label": "Less motion",
+      "hint": "No animations: the cursor and bars jump instead of sliding. It is also on when the system asks for less motion."
+    },
+    "autoUpdate": {
+      "label": "Check for updates at startup",
+      "hint": "The only thing KeyEd sends over the network: a request to GitHub for the latest version."
+    },
+    "data": {
+      "export": "Export data",
+      "exportHint": "All lessons, progress, achievements and settings in one JSON file.",
+      "exported": "Data saved.",
+      "import": "Import data",
+      "importHint": "Replaces everything in KeyEd with the data from an export file.",
+      "importTitle": "Replace all data?",
+      "importConfirm": "Lessons, progress, achievements and settings will be replaced with the ones from the file. The current data cannot be restored unless you export it first.",
+      "importButton": "Replace",
+      "reset": "Reset progress",
+      "resetHint": "Deletes lessons, key statistics, course progress, days and achievements of both layouts. Settings stay.",
+      "resetTitle": "Reset all progress?",
+      "resetConfirm": "This cannot be undone. Export your data first if you may want it back.",
+      "resetButton": "Reset",
+      "cancel": "Cancel",
+      "error": {
+        "notBackup": "This is not a KeyEd export file.",
+        "newerVersion": "The file is from a newer version of KeyEd. Update the app and try again.",
+        "damaged": "The file is damaged and cannot be imported.",
+        "failed": "Could not complete the operation."
+      }
+    },
+    "about": {
+      "version": "Version {{version}}",
+      "description": "A free touch typing tutor. Works without the internet and without an account; all data stays on this computer.",
+      "check": "Check for updates",
+      "checking": "Checking…",
+      "upToDate": "You have the latest version.",
+      "available": "Version {{version}} is available.",
+      "install": "Install",
+      "error": "Could not check for updates. Check the internet connection.",
+      "unsupported": "Updates are checked in the desktop app.",
+      "codeLicense": "KeyEd is open source under the MIT license.",
+      "credits": "Dictionaries, fonts and icons",
+      "words": "Word lists: FrequencyWords by Hermit Dave, from OpenSubtitles 2018, CC BY-SA 4.0. The lesson dictionaries are derived from them and use the same license.",
+      "blocklist": "Filter of unwanted words: List of Dirty, Naughty, Obscene and Otherwise Bad Words (LDNOOBW), CC BY 4.0.",
+      "fonts": "Fonts: JetBrains Mono and Inter, SIL Open Font License 1.1.",
+      "icons": "Icons: Lucide, ISC license.",
+      "libraries": "Built with Tauri, React and other open source libraries under MIT, Apache 2.0 and similar licenses.",
+      "repository": "Source code on GitHub",
+      "website": "Website"
     }
   },
   "goal": {
@@ -293,7 +377,8 @@
     "minutes": "{{count}} min",
     "done": "Daily goal reached",
     "left_one": "{{count}} minute left to the daily goal",
-    "left_other": "{{count}} minutes left to the daily goal"
+    "left_other": "{{count}} minutes left to the daily goal",
+    "ofMinutes": "{{done}} of {{total}} min"
   },
   "streak": {
     "days_one": "Streak: {{count}} day",
@@ -394,5 +479,59 @@
     "title": "KeyEd",
     "body_one": "{{count}} minute left to today’s goal.",
     "body_other": "{{count}} minutes left to today’s goal."
+  },
+  "updates": {
+    "available": "Update available: version {{version}}",
+    "description": "The update downloads from GitHub, installs and restarts KeyEd. Your data stays.",
+    "install": "Update and restart",
+    "installing": "Installing… {{percent}}%",
+    "later": "Later"
+  },
+  "welcome": {
+    "step": "Step {{n}} of {{total}}",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Start learning",
+    "language": {
+      "title": "Welcome to KeyEd",
+      "text": "KeyEd teaches you to type with all ten fingers without looking at the keyboard. First, choose the interface language."
+    },
+    "layout": {
+      "title": "Which layout do you want to learn?",
+      "text": "You can add the other one later: each layout keeps its own progress."
+    },
+    "keyboard": {
+      "title": "What does your keyboard look like?",
+      "text": "Look at the Enter key and the left Shift.",
+      "ansiHint": "Long Enter in one row and a long left Shift.",
+      "isoHint": "Tall Enter over two rows and a short left Shift with an extra key next to it.",
+      "unsure": "Not sure? Choose ANSI: the letters are in the same places on both."
+    },
+    "level": {
+      "title": "How do you type now?",
+      "text": "This sets where the course starts. You can change the speed later in the settings.",
+      "beginner": "I am learning from scratch",
+      "beginnerHint": "The course starts with two keys under your index fingers and opens new keys as you master them.",
+      "looking": "I type, but look at the keyboard",
+      "lookingHint": "The same course from the home position: it teaches which finger presses each key. Familiar keys open quickly.",
+      "blind": "I touch type and want to be faster",
+      "blindHint": "All letters open at once, the target speed is {{cpm}} characters per minute, and the hand hint is hidden."
+    },
+    "hands": {
+      "title": "Put your hands in the home position",
+      "text": "Find the bumps on {{left}} and {{right}} with your index fingers. The other fingers rest on the keys next to them, thumbs on the space bar.",
+      "check": "Now press {{left}} and {{right}} without looking at the keyboard.",
+      "done": "Great, your hands are in place."
+    },
+    "goal": {
+      "title": "How much will you practise a day?",
+      "text": "Only typing time counts. 10–15 minutes every day work better than an hour once a week."
+    },
+    "reminders": {
+      "title": "Remind you to practise?",
+      "text": "A notification at the chosen time if today’s goal is not reached yet. KeyEd must be running, for example minimised.",
+      "on": "Remind me",
+      "off": "No reminders"
+    }
   }
 }

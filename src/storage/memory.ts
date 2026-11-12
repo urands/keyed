@@ -1,8 +1,15 @@
+import { LAYOUT_IDS } from '../engine/layout/layout';
 import type { UnlockedAchievement } from '../engine/motivation/achievements';
 import type { DayRecord } from '../engine/motivation/daily';
 import type { KeyStat } from '../engine/stats/keyStats';
-import { isRecord } from '../engine/validate';
-import { lessonKeys, type LessonRecord, type LessonSummary, type Storage } from './types';
+import { isOneOf, isRecord } from '../engine/validate';
+import {
+  lessonKeys,
+  type LessonRecord,
+  type LessonSummary,
+  type Storage,
+  type StoredData,
+} from './types';
 
 interface MemoryData {
   settings: Record<string, unknown>;
@@ -79,6 +86,12 @@ export function createMemoryStorage(persistence?: Persistence): Storage {
       return Promise.resolve();
     },
 
+    saveOpened(layoutId, stage, opened) {
+      (data.opened[layoutId] ??= {})[stage] = opened;
+      save();
+      return Promise.resolve();
+    },
+
     listLessons(layoutId, limit) {
       const lessons = data.lessons
         .filter((lesson) => lesson.layoutId === layoutId)
@@ -136,6 +149,64 @@ export function createMemoryStorage(persistence?: Persistence): Storage {
         data.achievements[id] = { ...achievement };
         save();
       }
+      return Promise.resolve();
+    },
+
+    exportData() {
+      const layouts = new Set([...Object.keys(data.keyStats), ...Object.keys(data.opened)]);
+      const progress: StoredData['progress'] = {};
+      for (const layoutId of layouts) {
+        if (!isOneOf(LAYOUT_IDS, layoutId)) continue;
+        progress[layoutId] = {
+          keyStats: structuredClone(data.keyStats[layoutId] ?? {}),
+          opened: { ...data.opened[layoutId] },
+        };
+      }
+      return Promise.resolve({
+        settings: structuredClone(data.settings),
+        lessons: [...data.lessons]
+          .sort((a, b) => a.startedAt - b.startedAt || a.id - b.id)
+          .map(
+            ({ layoutId, stage, startedAt, durationMs, length, errors, cpm, accuracy, samples }) =>
+              structuredClone({
+                layoutId,
+                stage,
+                startedAt,
+                durationMs,
+                length,
+                errors,
+                cpm,
+                accuracy,
+                samples,
+              }),
+          ),
+        progress,
+        days: Object.values(data.days)
+          .map((day) => ({ ...day }))
+          .sort((a, b) => a.date.localeCompare(b.date)),
+        achievements: structuredClone(data.achievements),
+      });
+    },
+
+    importData(imported) {
+      const copy = structuredClone(imported);
+      data.settings = copy.settings;
+      data.lessons = copy.lessons.map((lesson, index) => ({ ...lesson, id: index + 1 }));
+      data.keyStats = {};
+      data.opened = {};
+      for (const [layoutId, progress] of Object.entries(copy.progress)) {
+        data.keyStats[layoutId] = progress.keyStats;
+        data.opened[layoutId] = progress.opened;
+      }
+      data.days = Object.fromEntries(copy.days.map((day) => [day.date, day]));
+      data.achievements = copy.achievements;
+      save();
+      return Promise.resolve();
+    },
+
+    resetProgress() {
+      Object.assign(data, { ...emptyData(), settings: data.settings });
+      save();
       return Promise.resolve();
     },
   };

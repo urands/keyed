@@ -2,7 +2,6 @@ import { create } from 'zustand';
 
 import type { KeyInput } from '../engine/input/toInput';
 import { keyForChar, type KeyCode, type LayoutId } from '../engine/layout/layout';
-import { DEFAULT_PARAMS } from '../engine/params';
 import { stageKeys, startSetKeys, type StageKind } from '../engine/progress/course';
 import { courseState, type CourseState } from '../engine/progress/courseState';
 import { advanceStage, type StageProgress } from '../engine/progress/progress';
@@ -20,10 +19,9 @@ import { buildCourseText } from '../engine/textgen/courseText';
 import type { LayoutProgress } from '../storage/types';
 import { kitFor, PRACTICE_LAYOUTS, type LayoutKit } from './layouts';
 import { useMotivation, type LayoutFacts, type LessonOutcome } from './motivation';
-import { useSettings } from './settings';
+import { learningParams, useSettings } from './settings';
 import { getStorage, saveInBackground, useStorageStatus } from './storage';
 
-const params = DEFAULT_PARAMS;
 const random = createRandom(crypto.getRandomValues(new Uint32Array(1))[0] ?? Date.now());
 
 function kitOf(layoutId: LayoutId): LayoutKit {
@@ -36,7 +34,7 @@ function courseOf(
   opened: Readonly<Record<string, number>>,
 ): CourseState {
   const { strictMode } = useSettings.getState();
-  return courseState(kit.course, opened, keyStats, params, strictMode, kit.allowance);
+  return courseState(kit.course, opened, keyStats, learningParams(), strictMode, kit.allowance);
 }
 
 /** The kind of stage a key belongs to; a key outside the course counts as a letter. */
@@ -56,7 +54,7 @@ function lessonFor(kit: LayoutKit, course: CourseState, training: string | null)
       open: course.open,
       focus: training ?? course.progress.focus,
       random,
-      params,
+      params: learningParams(),
       locale: kit.layout.language,
     }),
   );
@@ -123,6 +121,8 @@ interface PracticeState {
   refreshProgress: (newLesson?: boolean) => void;
   /** Trains one open key until `train(null)`; the lesson starts again. */
   train: (key: string | null) => void;
+  /** Opens every key of the letters stage at once, for a learner who already types blind. */
+  openAllLetters: () => void;
   /** Starts a new lesson with the given text, or with text built for the current progress. */
   startLesson: (text?: string) => void;
   /** Starts the current text again from the beginning. */
@@ -139,8 +139,12 @@ function viewOf(layoutId: LayoutId, saved: SavedProgress) {
   const course = courseOf(kit, saved.keyStats, saved.opened);
   // A stage whose start keys were never typed begins with their introduction:
   // the first lesson of a learner, or a stage reached before the app was closed.
+  // A stage opened in full at once (the first-run "I type blind" level) has no introduction.
   const { stage } = course;
-  const fresh = stage.kind !== 'free' && stage.start.every((key) => !saved.keyStats[key]);
+  const fresh =
+    stage.kind !== 'free' &&
+    (saved.opened[stage.id] ?? 0) === 0 &&
+    stage.start.every((key) => !saved.keyStats[key]);
   return {
     layoutId,
     keyStats: saved.keyStats,
@@ -222,6 +226,16 @@ export const usePractice = create<PracticeState>()((set, get) => ({
     get().startLesson();
   },
 
+  openAllLetters: () => {
+    const { layoutId, keyStats, opened, cache } = get();
+    const { letters } = kitOf(layoutId);
+    const all = letters.order.length;
+    if ((opened[letters.id] ?? 0) >= all) return;
+    const progress = { keyStats, opened: { ...opened, [letters.id]: all } };
+    saveInBackground(getStorage().saveOpened(layoutId, letters.id, all));
+    set({ ...viewOf(layoutId, progress), cache: { ...cache, [layoutId]: progress } });
+  },
+
   startLesson: (text) => {
     set(({ layoutId, course, training }) => ({
       lesson:
@@ -267,6 +281,7 @@ export const usePractice = create<PracticeState>()((set, get) => ({
     }
 
     // The end of a lesson: update key statistics, maybe open the next keys, save.
+    const params = learningParams();
     const result = summarizeLesson(next);
     const keyStats = applySamples(state.keyStats, next.chars, params, kit.allowance);
     const strict = useSettings.getState().strictMode;
@@ -344,6 +359,7 @@ export const usePractice = create<PracticeState>()((set, get) => ({
  */
 function factsOf(layoutId: LayoutId, saved: SavedProgress): LayoutFacts {
   const { letters } = kitOf(layoutId);
+  const params = learningParams();
   const mastered = (key: string) => isKeyMastered(saved.keyStats[key], params);
   const keys = stageKeys(letters);
   const opened = saved.opened[letters.id] ?? 0;
@@ -379,10 +395,14 @@ export function currentLayoutFacts(): LayoutFacts[] {
 }
 
 useSettings.subscribe((state, previous) => {
-  // Strict mode changes which keys count as mastered.
-  if (state.strictMode !== previous.strictMode) usePractice.getState().refreshProgress();
-  // "ё" changes the Russian course and its words.
-  if (state.yoLetter !== previous.yoLetter) usePractice.getState().refreshProgress(true);
+  // Strict mode and the target speed change which keys count as mastered.
+  if (state.strictMode !== previous.strictMode || state.targetCpm !== previous.targetCpm) {
+    usePractice.getState().refreshProgress();
+  }
+  // "ё" changes the Russian course and its words; the length changes the next text.
+  if (state.yoLetter !== previous.yoLetter || state.lessonLength !== previous.lessonLength) {
+    usePractice.getState().refreshProgress(true);
+  }
 });
 
 /** The layout, course and content of the layout being practised. */

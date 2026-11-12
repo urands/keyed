@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KeyEd — бесплатный тренажёр слепой печати</title>
+    <meta
+      name="description"
+      content="KeyEd — бесплатное приложение для обучения слепой десятипальцевой печати на английской и русской раскладках. Windows, macOS, Linux."
+    />
+    <link rel="icon" type="image/svg+xml" href="icon.svg" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --canvas: #0f1424;
+        --surface: #161c30;
+        --surface-2: #1e2540;
+        --line: #2a3352;
+        --ink: #e9edf8;
+        --muted: #9ba5c4;
+        --accent: #3ddcb0;
+        --on-accent: #06281f;
+        --accent-2: #a78bfa;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(60rem 30rem at 10% 110%, rgb(61 220 176 / 0.1), transparent 70%),
+          radial-gradient(50rem 28rem at 95% 105%, rgb(167 139 250 / 0.12), transparent 70%),
+          var(--canvas);
+        background-attachment: fixed;
+        color: var(--ink);
+        font:
+          17px/1.6 system-ui,
+          'Segoe UI',
+          Roboto,
+          'Helvetica Neue',
+          Arial,
+          sans-serif;
+      }
+      a {
+        color: var(--accent);
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .wrap {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 20px 0;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 650;
+        font-size: 20px;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .brand img {
+        width: 40px;
+        height: 40px;
+      }
+      .tools {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .lang {
+        display: inline-flex;
+        gap: 4px;
+        padding: 4px;
+        border-radius: 12px;
+        background: var(--surface-2);
+      }
+      .lang button {
+        border: 0;
+        border-radius: 8px;
+        padding: 4px 10px;
+        background: none;
+        color: var(--muted);
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .lang button[aria-pressed='true'] {
+        background: var(--accent);
+        color: var(--on-accent);
+        font-weight: 600;
+      }
+      .hero {
+        padding: 48px 0 32px;
+        text-align: center;
+      }
+      .hero img {
+        width: 112px;
+        height: 112px;
+      }
+      h1 {
+        margin: 16px 0 8px;
+        font-size: clamp(32px, 6vw, 52px);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+      .lead {
+        max-width: 640px;
+        margin: 0 auto;
+        color: var(--muted);
+        font-size: 19px;
+      }
+      .download {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin: 32px 0 8px;
+      }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 22px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+        color: var(--ink);
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .button.primary {
+        border-color: transparent;
+        background: var(--accent);
+        color: var(--on-accent);
+        box-shadow:
+          0 0 0 1px rgb(61 220 176 / 0.55),
+          0 0 18px rgb(61 220 176 / 0.35);
+      }
+      .note {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--surface);
+        padding: 24px;
+      }
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 16px;
+        margin: 32px 0;
+      }
+      .features h2 {
+        margin: 0 0 6px;
+        font-size: 18px;
+      }
+      .features p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+      }
+      .keys {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin: 28px 0 0;
+        font:
+          600 18px/1 ui-monospace,
+          'Cascadia Mono',
+          Consolas,
+          monospace;
+      }
+      .keys span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        color: #0f1424;
+      }
+      section h2.title {
+        font-size: 26px;
+        margin: 40px 0 12px;
+      }
+      .install {
+        display: grid;
+        gap: 16px;
+      }
+      .install h3 {
+        margin: 0 0 4px;
+        font-size: 17px;
+      }
+      .install p {
+        margin: 0;
+        color: var(--muted);
+      }
+      footer {
+        margin: 48px 0 32px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <a class="brand" href="./"><img src="icon.svg" alt="" />KeyEd</a>
+        <div class="tools">
+          <span class="lang" role="group" aria-label="Language">
+            <button type="button" data-set-lang="ru" aria-pressed="true">RU</button>
+            <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+          </span>
+          <a href="https://github.com/urands/keyed">GitHub</a>
+        </div>
+      </header>
+
+      <main>
+        <div class="hero">
+          <img src="icon.svg" alt="" />
+          <h1
+            data-ru="Печатайте вслепую всеми десятью пальцами"
+            data-en="Touch type with all ten fingers"
+          >
+            Печатайте вслепую всеми десятью пальцами
+          </h1>
+          <p
+            class="lead"
+            data-ru="KeyEd — бесплатный тренажёр слепой печати для английской QWERTY и русской ЙЦУКЕН. Короткие уроки подстраиваются под вас: новые клавиши открываются, когда освоены предыдущие."
+            data-en="KeyEd is a free touch typing tutor for the English QWERTY and Russian ЙЦУКЕН layouts. Short lessons adapt to you: new keys open once you have mastered the previous ones."
+          >
+            KeyEd — бесплатный тренажёр слепой печати для английской QWERTY и русской ЙЦУКЕН.
+            Короткие уроки подстраиваются под вас: новые клавиши открываются, когда освоены
+            предыдущие.
+          </p>
+
+          <div class="download" id="download">
+            <a
+              class="button primary"
+              id="primary"
+              href="https://github.com/urands/keyed/releases/latest"
+            ></a>
+          </div>
+          <p class="note" id="version"></p>
+          <p class="note" id="others"></p>
+
+          <div class="keys" aria-hidden="true">
+            <span style="background: #b49cf2">A</span><span style="background: #8fa3f5">S</span
+            ><span style="background: #6fb8f0">D</span
+            ><span
+              style="
+                background: #5fd3c0;
+                box-shadow:
+                  0 0 0 2px #3ddcb0,
+                  0 0 16px #3ddcb0;
+              "
+              >F</span
+            ><span
+              style="
+                background: #7fd88f;
+                box-shadow:
+                  0 0 0 2px #3ddcb0,
+                  0 0 16px #3ddcb0;
+              "
+              >J</span
+            ><span style="background: #e8cf6a">K</span><span style="background: #f2a774">L</span
+            ><span style="background: #f28fa6">;</span>
+          </div>
+        </div>
+
+        <div class="features">
+          <div class="card">
+            <h2 data-ru="Уроки под вас" data-en="Lessons that adapt">Уроки под вас</h2>
+            <p
+              data-ru="Текст собирается из настоящих слов и только из открытых клавиш. Слабые клавиши встречаются чаще."
+              data-en="Lessons use real words with the open keys only. The weakest keys come up more often."
+            >
+              Текст собирается из настоящих слов и только из открытых клавиш. Слабые клавиши
+              встречаются чаще.
+            </p>
+          </div>
+          <div class="card">
+            <h2 data-ru="Полный курс" data-en="The whole course">Полный курс</h2>
+            <p
+              data-ru="Буквы, заглавные с Shift другой рукой, знаки препинания, цифры и свободная практика предложениями."
+              data-en="Letters, capitals with Shift of the other hand, punctuation, digits and free practice with sentences."
+            >
+              Буквы, заглавные с Shift другой рукой, знаки препинания, цифры и свободная практика
+              предложениями.
+            </p>
+          </div>
+          <div class="card">
+            <h2 data-ru="Цель и серия" data-en="Goal and streak">Цель и серия</h2>
+            <p
+              data-ru="Дневная цель в минутах, серия дней с заморозками, достижения, личные рекорды и напоминания."
+              data-en="A daily goal in minutes, a streak with freezes, achievements, personal records and reminders."
+            >
+              Дневная цель в минутах, серия дней с заморозками, достижения, личные рекорды и
+              напоминания.
+            </p>
+          </div>
+          <div class="card">
+            <h2 data-ru="Без интернета" data-en="Works offline">Без интернета</h2>
+            <p
+              data-ru="Без регистрации и рекламы. Все данные хранятся на вашем компьютере; в сеть уходит только проверка обновлений."
+              data-en="No account and no ads. All data stays on your computer; only the update check goes online."
+            >
+              Без регистрации и рекламы. Все данные хранятся на вашем компьютере; в сеть уходит
+              только проверка обновлений.
+            </p>
+          </div>
+        </div>
+
+        <section>
+          <h2 class="title" data-ru="Как установить" data-en="How to install">Как установить</h2>
+          <div class="install">
+            <div class="card">
+              <h3>Windows</h3>
+              <p
+                data-ru="Запустите KeyEd_…_x64-setup.exe. Установщик не подписан, поэтому Windows может показать «Система Windows защитила ваш компьютер»: нажмите «Подробнее», затем «Выполнить в любом случае»."
+                data-en="Run KeyEd_…_x64-setup.exe. The installer is not signed, so Windows may say “Windows protected your PC”: choose “More info”, then “Run anyway”."
+              >
+                Запустите KeyEd_…_x64-setup.exe. Установщик не подписан, поэтому Windows может
+                показать «Система Windows защитила ваш компьютер»: нажмите «Подробнее», затем
+                «Выполнить в любом случае».
+              </p>
+            </div>
+            <div class="card">
+              <h3>macOS</h3>
+              <p
+                data-ru="Откройте .dmg (aarch64 — для Apple Silicon, x64 — для Intel) и перетащите KeyEd в «Программы». Приложение не подписано: при первом запуске нажмите на него правой кнопкой и выберите «Открыть», либо разрешите запуск в «Системные настройки → Конфиденциальность и безопасность»."
+                data-en="Open the .dmg (aarch64 for Apple Silicon, x64 for Intel) and drag KeyEd to Applications. The app is not signed: the first time, right-click it and choose Open, or allow it in System Settings → Privacy & Security."
+              >
+                Откройте .dmg (aarch64 — для Apple Silicon, x64 — для Intel) и перетащите KeyEd в
+                «Программы». Приложение не подписано: при первом запуске нажмите на него правой
+                кнопкой и выберите «Открыть», либо разрешите запуск в «Системные настройки →
+                Конфиденциальность и безопасность».
+              </p>
+            </div>
+            <div class="card">
+              <h3>Linux</h3>
+              <p
+                data-ru="AppImage: сделайте файл исполняемым (chmod +x) и запустите. Для Debian и Ubuntu есть пакет .deb."
+                data-en="AppImage: make the file executable (chmod +x) and run it. Debian and Ubuntu can use the .deb package."
+              >
+                AppImage: сделайте файл исполняемым (chmod +x) и запустите. Для Debian и Ubuntu есть
+                пакет .deb.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <p
+          data-ru="Код KeyEd открыт по лицензии MIT. Словари уроков сделаны на основе FrequencyWords (Hermit Dave, OpenSubtitles 2018) и распространяются под CC BY-SA 4.0."
+          data-en="KeyEd is open source under the MIT license. The lesson dictionaries are derived from FrequencyWords (Hermit Dave, OpenSubtitles 2018) and use CC BY-SA 4.0."
+        >
+          Код KeyEd открыт по лицензии MIT. Словари уроков сделаны на основе FrequencyWords (Hermit
+          Dave, OpenSubtitles 2018) и распространяются под CC BY-SA 4.0.
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      const RELEASES = 'https://github.com/urands/keyed/releases/latest';
+      const TEXT = {
+        ru: {
+          download: 'Скачать для {os}',
+          downloadAny: 'Скачать KeyEd',
+          version: 'Версия {version} · бесплатно',
+          soon: 'Первый выпуск готовится. Следите за страницей релизов на GitHub.',
+          others: 'Другие системы:',
+          all: 'все файлы',
+        },
+        en: {
+          download: 'Download for {os}',
+          downloadAny: 'Download KeyEd',
+          version: 'Version {version} · free',
+          soon: 'The first release is on its way. Watch the releases page on GitHub.',
+          others: 'Other systems:',
+          all: 'all files',
+        },
+      };
+      const SYSTEMS = [
+        { id: 'windows', name: 'Windows', test: (n) => /-setup\.exe$/i.test(n) },
+        { id: 'mac-arm', name: 'macOS (Apple Silicon)', test: (n) => /_aarch64\.dmg$/i.test(n) },
+        { id: 'mac-intel', name: 'macOS (Intel)', test: (n) => /_x64\.dmg$/i.test(n) },
+        { id: 'linux', name: 'Linux (AppImage)', test: (n) => /\.AppImage$/i.test(n) },
+        { id: 'deb', name: 'Linux (.deb)', test: (n) => /\.deb$/i.test(n) },
+      ];
+
+      function detectSystem() {
+        const platform = (
+          navigator.userAgentData?.platform ||
+          navigator.platform ||
+          ''
+        ).toLowerCase();
+        const agent = navigator.userAgent.toLowerCase();
+        if (platform.includes('win') || agent.includes('windows')) return 'windows';
+        if (platform.includes('mac') || agent.includes('mac os')) return 'mac-arm';
+        if (platform.includes('linux') || agent.includes('linux')) return 'linux';
+        return null;
+      }
+
+      let lang = (navigator.language || 'ru').toLowerCase().startsWith('ru') ? 'ru' : 'en';
+      try {
+        lang = localStorage.getItem('keyed-site-lang') || lang;
+      } catch {
+        // Storage may be blocked; the browser language is enough.
+      }
+      let release = null;
+
+      function fill(template, values) {
+        return template.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? '');
+      }
+
+      function render() {
+        const t = TEXT[lang];
+        document.documentElement.lang = lang;
+        document.title =
+          lang === 'ru'
+            ? 'KeyEd — бесплатный тренажёр слепой печати'
+            : 'KeyEd — a free touch typing tutor';
+        for (const el of document.querySelectorAll('[data-ru]')) el.textContent = el.dataset[lang];
+        for (const button of document.querySelectorAll('[data-set-lang]')) {
+          button.setAttribute('aria-pressed', String(button.dataset.setLang === lang));
+        }
+
+        const primary = document.getElementById('primary');
+        const version = document.getElementById('version');
+        const others = document.getElementById('others');
+        others.replaceChildren();
+        if (!release) {
+          primary.textContent = t.downloadAny;
+          primary.href = RELEASES;
+          version.textContent = release === false ? t.soon : '';
+          return;
+        }
+        const assets = SYSTEMS.map((system) => ({
+          ...system,
+          asset: release.assets.find((asset) => system.test(asset.name)),
+        })).filter((system) => system.asset);
+        const mine = assets.find((system) => system.id === detectSystem()) ?? null;
+        primary.textContent = mine ? fill(t.download, { os: mine.name }) : t.downloadAny;
+        primary.href = mine ? mine.asset.browser_download_url : RELEASES;
+        version.textContent = fill(t.version, { version: release.tag_name.replace(/^v/, '') });
+        others.append(`${t.others} `);
+        for (const system of assets.filter((system) => system !== mine)) {
+          const link = document.createElement('a');
+          link.href = system.asset.browser_download_url;
+          link.textContent = system.name;
+          others.append(link, ' · ');
+        }
+        const all = document.createElement('a');
+        all.href = RELEASES;
+        all.textContent = t.all;
+        others.append(all);
+      }
+
+      for (const button of document.querySelectorAll('[data-set-lang]')) {
+        button.addEventListener('click', () => {
+          lang = button.dataset.setLang;
+          try {
+            localStorage.setItem('keyed-site-lang', lang);
+          } catch {
+            // Not remembered; nothing else changes.
+          }
+          render();
+        });
+      }
+
+      render();
+      fetch('https://api.github.com/repos/urands/keyed/releases/latest', {
+        headers: { Accept: 'application/vnd.github+json' },
+      })
+        .then((response) => (response.ok ? response.json() : false))
+        .then((data) => {
+          release = data;
+          render();
+        })
+        .catch(() => {
+          release = false;
+          render();
+        });
+    </script>
+  </body>
+</html>

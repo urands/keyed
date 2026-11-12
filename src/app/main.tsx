@@ -1,3 +1,4 @@
+import '@fontsource-variable/inter/wght.css';
 import '@fontsource-variable/jetbrains-mono/wght.css';
 import '../ui/theme/index.css';
 
@@ -12,6 +13,7 @@ import { startReminders } from './reminders';
 import { restoreSettings, useSettings } from './settings';
 import { startSettingsSync } from './settings-sync';
 import { openStorage } from './storage';
+import { startUpdateCheck } from './updates';
 
 /** Loads saved data before the first render, so the theme and progress do not flicker. */
 async function boot() {
@@ -36,7 +38,12 @@ async function boot() {
   useMotivation.getState().awardSilently(currentLayoutFacts());
 
   startSettingsSync();
+  // Users who had lessons before the first-run wizard existed do not see it.
+  if (!useSettings.getState().onboarded && history.length > 0) {
+    useSettings.getState().update({ onboarded: true });
+  }
   startReminders();
+  startUpdateCheck();
 
   const container = document.getElementById('root');
   if (!container) throw new Error('Root element #root is missing from index.html');

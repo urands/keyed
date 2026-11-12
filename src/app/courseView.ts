@@ -1,10 +1,8 @@
-import { DEFAULT_PARAMS } from '../engine/params';
 import { stageKeys, type CourseStage } from '../engine/progress/course';
 import type { CourseState } from '../engine/progress/courseState';
 import { isKeyMastered, keyConfidence, type KeyStat } from '../engine/stats/keyStats';
 import type { LayoutKit } from './layouts';
-
-const params = DEFAULT_PARAMS;
+import { learningParams } from './settings';
 
 /** How one key of the course looks on the screens. */
 export interface KeyView {
@@ -35,6 +33,8 @@ export function keyViews(
   strict: boolean,
 ): Map<string, KeyView> {
   const views = new Map<string, KeyView>();
+  // The course state was evaluated with the same settings; it changes when they do.
+  const params = learningParams();
   for (const [index, stage] of kit.course.stages.entries()) {
     if (stage.kind === 'free') continue;
     for (const key of stageKeys(stage)) {

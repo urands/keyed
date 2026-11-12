@@ -1,0 +1,89 @@
+# Installers for Windows, macOS and Linux (task 6.7) and the update manifest
+# latest.json for the in-app updater (task 6.8). Runs when a version tag such as
+# v0.2.0 is pushed (it must match the version in package.json), or by hand; the
+# release is created as a draft to check before publishing.
+# Updates are signed with TAURI_SIGNING_PRIVATE_KEY (repository secret); the
+# installers themselves are not code-signed (docs/implementation-plan.md, 6.9).
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+            args: ''
+          - name: macOS (Apple Silicon)
+            os: macos-latest
+            args: --target aarch64-apple-darwin
+          - name: macOS (Intel)
+            os: macos-latest
+            args: --target x86_64-apple-darwin
+          - name: Linux
+            os: ubuntu-22.04
+            args: ''
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      # The Rust version comes from src-tauri/rust-toolchain.toml.
+      - name: Install Rust
+        working-directory: src-tauri
+        run: rustup toolchain install
+
+      - name: Add macOS targets
+        if: runner.os == 'macOS'
+        working-directory: src-tauri
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          # The version from package.json, the same as the pushed tag.
+          tagName: v__VERSION__
+          releaseName: KeyEd v__VERSION__
+          releaseBody: |
+            Download the installer for your system below, or visit https://urands.github.io/keyed/.
+
+            - Windows: `KeyEd_*_x64-setup.exe`. Windows may warn about an unknown publisher: choose "More info" → "Run anyway".
+            - macOS: `KeyEd_*_aarch64.dmg` (Apple Silicon) or `KeyEd_*_x64.dmg` (Intel). The first time, open the app with right click → Open.
+            - Linux: `.AppImage` or `.deb`.
+
+            KeyEd checks for updates at startup and installs them in one click.
+          releaseDraft: true
+          prerelease: false
+          updaterJsonPreferNsis: true
+          args: ${{ matrix.args }}

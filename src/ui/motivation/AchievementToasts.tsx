@@ -31,7 +31,7 @@ export function AchievementToasts() {
   return (
     <div
       role="status"
-      className="fixed right-6 bottom-6 z-50 flex max-w-sm items-start gap-3 rounded-lg border-2 border-ok bg-surface px-5 py-4 shadow-lg"
+      className="fixed right-6 bottom-6 z-50 flex max-w-sm items-start gap-3 rounded-2xl border-2 border-ok bg-surface px-5 py-4 shadow-card"
     >
       <span aria-hidden="true" className="text-2xl text-ok">
         ★

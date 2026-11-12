@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type CSSProperties } from 'react';
 
 import type { Finger, Geometry } from '../../engine/layout/geometry';
 import type { KeyCode, Layout } from '../../engine/layout/layout';
@@ -18,6 +18,8 @@ interface KeyProps {
   shifted: string;
   width: number;
   gap: number;
+  /** The width of the lower part of a key two rows high (ISO Enter). */
+  tall: number | undefined;
   finger: Finger;
   open: boolean;
   /** Drawn with a ring: the key to press now, or a key being introduced. */
@@ -36,6 +38,7 @@ const Key = memo(function Key({
   shifted,
   width,
   gap,
+  tall,
   finger,
   open,
   highlighted,
@@ -45,8 +48,8 @@ const Key = memo(function Key({
   flashCorrect,
 }: KeyProps) {
   const look = open
-    ? `${FINGER_BG[finger]} border-transparent text-ink`
-    : 'border-line bg-surface text-ink-muted';
+    ? `${FINGER_BG[finger]} border-transparent text-key-ink`
+    : 'border-line/70 bg-surface-2 text-ink-muted';
   return (
     <div
       className="h-(--u) p-[3px]"
@@ -60,8 +63,16 @@ const Key = memo(function Key({
         data-open={open || undefined}
         data-next={highlighted || undefined}
         data-mastered={mastered || undefined}
-        className={`relative flex h-full items-center justify-center rounded-md border select-none ${look} ${label.length > 1 ? 'text-sm' : 'text-lg font-medium'} ${highlighted ? 'z-10 font-bold ring-3 ring-accent ring-offset-2 ring-offset-canvas' : ''}`}
+        data-tall={tall === undefined ? undefined : true}
+        className={`relative flex h-full items-center justify-center rounded-lg border select-none ${look} ${label.length > 1 ? 'text-[0.8em]' : 'text-[1.15em] font-semibold'} ${highlighted ? 'z-10 font-bold shadow-glow ring-2 ring-accent ring-offset-2 ring-offset-surface' : ''} ${tall === undefined ? '' : 'rounded-br-none'}`}
       >
+        {tall !== undefined && (
+          // The lower part reaches into the empty end of the next row.
+          <span
+            className={`absolute top-full -right-px rounded-b-lg border border-t-0 ${look}`}
+            style={{ width: `calc(var(--u) * ${tall} - 6px)`, height: 'calc(var(--u) + 1px)' }}
+          />
+        )}
         {shifted === '' ? (
           label
         ) : (
@@ -74,9 +85,7 @@ const Key = memo(function Key({
           <span className="absolute bottom-[14%] h-[3px] w-1/4 rounded-full bg-current opacity-50" />
         )}
         {mastered && (
-          <span className="absolute top-0.5 right-1 text-[0.6rem] leading-none font-bold text-ok">
-            ✓
-          </span>
+          <span className="absolute top-0.5 right-1 text-[0.6rem] leading-none font-bold">✓</span>
         )}
         {flashSeq > 0 && (
           // A new element per press restarts the CSS animation.
@@ -105,6 +114,8 @@ interface KeyboardProps {
   /** Keys that get a check mark. */
   masteredCodes?: ReadonlySet<KeyCode>;
   flash?: KeyFlash | null;
+  /** A fixed key size (CSS length) instead of one that follows the window. */
+  keySize?: string;
 }
 
 /** Virtual keyboard with finger zones. A visual hint only, hidden from screen readers. */
@@ -117,13 +128,18 @@ export function Keyboard({
   highlightCodes = NONE,
   masteredCodes = NONE,
   flash = null,
+  keySize,
 }: KeyboardProps) {
   const label = useKeyLabel(layout);
   return (
-    <div aria-hidden="true" className="kd-keyboard mx-auto flex w-max flex-col">
+    <div
+      aria-hidden="true"
+      className="kd-keyboard mx-auto flex w-max flex-col text-[calc(var(--u)*0.36)]"
+      style={keySize === undefined ? undefined : ({ '--u': keySize } as CSSProperties)}
+    >
       {geometry.rows.map((row, r) => (
         <div key={r} className="flex">
-          {row.map(({ code, width, gap }) => (
+          {row.map(({ code, width, gap, tall }) => (
             <Key
               key={code}
               code={code}
@@ -131,6 +147,7 @@ export function Keyboard({
               shifted={shiftLabel(layout, code)}
               width={width}
               gap={gap}
+              tall={tall}
               finger={geometry.fingers[code] ?? 'thumb'}
               open={openCodes.has(code)}
               highlighted={code === nextCode || code === nextShift || highlightCodes.has(code)}

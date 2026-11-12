@@ -6,6 +6,7 @@ import { DatabaseSync, type SQLInputValue } from 'node:sqlite';
 import { describe, expect, it } from 'vitest';
 
 import type { KeyStat } from '../engine/stats/keyStats';
+import { BackupError, makeBackup, parseBackup } from './backup';
 import { createMemoryStorage } from './memory';
 import { decodeSamples, encodeSamples } from './samples';
 import { createSqliteStorage, type SqlDatabase } from './sqlite';
@@ -164,6 +165,133 @@ describe.each([
     });
     await storage.saveAchievement('speed', { level: 3, unlockedAt: 300 });
     expect((await storage.loadAchievements()).speed).toEqual({ level: 3, unlockedAt: 300 });
+  });
+
+  it('saves opened groups without a lesson', async () => {
+    const storage = create();
+    await storage.saveOpened('ru-jcuken', 'letters', 16);
+    await storage.saveOpened('ru-jcuken', 'letters', 17);
+    expect(await storage.loadProgress('ru-jcuken')).toEqual({
+      keyStats: {},
+      opened: { letters: 17 },
+    });
+  });
+
+  async function fill(storage: Storage): Promise<void> {
+    await storage.saveSettings({ theme: 'dark', onboarded: true });
+    await storage.saveLesson(lesson({ startedAt: 5 }), stats, 2);
+    await storage.saveLesson(
+      lesson({ layoutId: 'ru-jcuken', stage: 'capitals', startedAt: 3 }),
+      stats,
+      1,
+    );
+    await storage.saveDay({
+      date: '2026-11-11',
+      activeMs: 60_000,
+      lessons: 2,
+      chars: 6,
+      goalMet: true,
+    });
+    await storage.saveAchievement('first-step', { level: 1, unlockedAt: 5 });
+  }
+
+  it('exports everything, lessons with their keystrokes', async () => {
+    const storage = create();
+    await fill(storage);
+    const data = await storage.exportData();
+    expect(data.settings).toEqual({ theme: 'dark', onboarded: true });
+    expect(data.lessons.map((l) => [l.layoutId, l.startedAt])).toEqual([
+      ['ru-jcuken', 3],
+      ['en-us-qwerty', 5],
+    ]);
+    expect(data.lessons[1]).toEqual(lesson({ startedAt: 5 }));
+    expect(data.progress).toEqual({
+      'en-us-qwerty': { keyStats: { f: stats.f, j: stats.j }, opened: { letters: 2 } },
+      'ru-jcuken': { keyStats: { f: stats.f, j: stats.j }, opened: { capitals: 1 } },
+    });
+    expect(data.days).toHaveLength(1);
+    expect(data.achievements).toEqual({ 'first-step': { level: 1, unlockedAt: 5 } });
+  });
+
+  it('imports an export into another storage, replacing what was there', async () => {
+    const source = create();
+    await fill(source);
+    const exported = await source.exportData();
+
+    const target = create();
+    await target.saveSettings({ language: 'en' });
+    await target.saveLesson(lesson({ cpm: 1 }), stats, 9);
+    await target.importData(exported);
+
+    expect(await target.exportData()).toEqual(exported);
+    expect(await target.listLessons('en-us-qwerty', 10)).toHaveLength(1);
+    expect(await target.listHistory()).toHaveLength(2);
+  });
+
+  it('imports many lessons', async () => {
+    const source = create();
+    for (let i = 0; i < 120; i += 1) await source.saveLesson(lesson({ startedAt: i }), stats, 1);
+    const target = create();
+    await target.importData(await source.exportData());
+    expect(await target.listHistory()).toHaveLength(120);
+  });
+
+  it('resets progress but keeps the settings', async () => {
+    const storage = create();
+    await fill(storage);
+    await storage.resetProgress();
+    expect(await storage.exportData()).toEqual({
+      settings: { theme: 'dark', onboarded: true },
+      lessons: [],
+      progress: {},
+      days: [],
+      achievements: {},
+    });
+  });
+});
+
+describe('backup file', () => {
+  it('survives writing and reading', async () => {
+    const storage = createMemoryStorage();
+    await storage.saveLesson(lesson(), stats, 2);
+    await storage.saveDay({
+      date: '2026-11-11',
+      activeMs: 1,
+      lessons: 1,
+      chars: 3,
+      goalMet: false,
+    });
+    const backup = makeBackup(await storage.exportData(), 42);
+    expect(parseBackup(JSON.stringify(backup))).toEqual(backup);
+  });
+
+  it('tells what is wrong with a file it cannot read', () => {
+    const reason = (json: string) => {
+      try {
+        parseBackup(json);
+        return null;
+      } catch (error) {
+        return error instanceof BackupError ? error.reason : 'other';
+      }
+    };
+    const valid = makeBackup(
+      { settings: {}, lessons: [], progress: {}, days: [], achievements: {} },
+      0,
+    );
+    expect(reason(JSON.stringify(valid))).toBeNull();
+    expect(reason('{oops')).toBe('notBackup');
+    expect(reason('{"format":"other"}')).toBe('notBackup');
+    expect(reason(JSON.stringify({ ...valid, version: 2 }))).toBe('newerVersion');
+    expect(reason(JSON.stringify({ ...valid, lessons: [{ layoutId: 'dvorak' }] }))).toBe('damaged');
+    expect(
+      reason(
+        JSON.stringify({
+          ...valid,
+          progress: { 'en-us-qwerty': { keyStats: { a: 1 }, opened: {} } },
+        }),
+      ),
+    ).toBe('damaged');
+    expect(reason(JSON.stringify({ ...valid, days: [{ date: 'today' }] }))).toBe('damaged');
   });
 });
 

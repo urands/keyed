@@ -9,6 +9,7 @@ import {
   englishContent,
   enUsQwerty,
   enUsQwertyCourse,
+  isoGeometry,
   ruJcuken,
   ruJcukenCourse,
   russianContent,
@@ -197,18 +198,38 @@ describe.each(CASES)('$name', (c) => {
   });
 });
 
-describe('ANSI geometry', () => {
+describe.each([
+  ['ANSI', ansiGeometry],
+  ['ISO', isoGeometry],
+])('%s geometry', (_name, geometry) => {
   it('marks F and J (А and О) as homing keys', () => {
-    expect(ansiGeometry.homing).toEqual(['KeyF', 'KeyJ']);
+    expect(geometry.homing).toEqual(['KeyF', 'KeyJ']);
     expect(keyForChar(ruJcuken, 'а')?.code).toBe('KeyF');
     expect(keyForChar(ruJcuken, 'о')?.code).toBe('KeyJ');
   });
 
-  it('has rows of equal width', () => {
-    const widths = ansiGeometry.rows
-      .slice(0, 4)
-      .map((row) => row.reduce((sum, key) => sum + key.gap + key.width, 0));
+  it('has rows of equal width, counting the lower part of a tall key', () => {
+    const widths = geometry.rows.slice(0, 4).map((row, r) => {
+      const above = geometry.rows[r - 1] ?? [];
+      const lower = above.reduce((sum, key) => sum + (key.tall ?? 0), 0);
+      return row.reduce((sum, key) => sum + key.gap + key.width, 0) + lower;
+    });
     expect(new Set(widths)).toEqual(new Set([15]));
+  });
+
+  it('gives every key of both layouts the same finger as ANSI', () => {
+    for (const [code, finger] of Object.entries(ansiGeometry.fingers)) {
+      expect(geometry.fingers[code], code).toBe(finger);
+    }
+  });
+});
+
+describe('ISO geometry', () => {
+  it('has a tall Enter, a short left Shift and an extra key for the left pinky', () => {
+    const enter = isoGeometry.rows[1]?.find((key) => key.code === 'Enter');
+    expect(enter).toMatchObject({ width: 1.5, tall: 1.25 });
+    expect(isoGeometry.rows[3]?.[0]).toMatchObject({ code: 'ShiftLeft', width: 1.25 });
+    expect(isoGeometry.fingers.IntlBackslash).toBe('lPinky');
   });
 });
 

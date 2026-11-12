@@ -23,6 +23,11 @@ export interface GeometryKey {
   width: number;
   /** Empty space before the key, in key units. */
   gap: number;
+  /**
+   * A key two rows high, such as the ISO Enter: the width of its lower part,
+   * aligned to the right edge. The row below leaves that space empty.
+   */
+  tall?: number;
 }
 
 /** Where each physical key is and which finger presses it. Shared by all layouts. */
@@ -53,13 +58,17 @@ export function parseGeometry(data: unknown): Geometry {
       if (!isRecord(key) || typeof key.code !== 'string') {
         throw new Error(`Geometry ${id}: row ${r} has a key without a code`);
       }
-      const { code, width = 1, gap = 0 } = key;
+      const { code, width = 1, gap = 0, tall } = key;
       if (typeof width !== 'number' || width <= 0 || typeof gap !== 'number' || gap < 0) {
         throw new Error(`Geometry ${id}: key ${code} has a bad width or gap`);
       }
       if (codes.has(code)) throw new Error(`Geometry ${id}: key ${code} appears twice`);
       codes.add(code);
-      return { code, width, gap };
+      if (tall === undefined) return { code, width, gap };
+      if (typeof tall !== 'number' || tall <= 0 || tall > width) {
+        throw new Error(`Geometry ${id}: key ${code} has a bad lower part`);
+      }
+      return { code, width, gap, tall };
     });
   });
 

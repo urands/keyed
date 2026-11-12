@@ -24,9 +24,47 @@ function typeText(text: string) {
 beforeEach(async () => {
   localStorage.clear();
   await openStorage(); // fresh storage for each test
-  useSettings.setState({ layout: EN, strictMode: false, yoLetter: false });
+  useSettings.setState({
+    layout: EN,
+    strictMode: false,
+    yoLetter: false,
+    targetCpm: 175,
+    lessonLength: 120,
+  });
   usePractice.setState({ cache: {} });
   usePractice.getState().restore(EN, { keyStats: {}, opened: {} });
+});
+
+describe('learning settings', () => {
+  it('opens every letter at once for a learner who types blind', async () => {
+    usePractice.getState().openAllLetters();
+    const state = usePractice.getState();
+    const { letters } = kitFor(EN, { yoLetter: false });
+    expect(state.progress.open).toEqual(stageKeys(letters));
+    expect(state.introduce).toEqual([]);
+    expect((await getStorage().loadProgress(EN)).opened).toEqual({
+      letters: letters.order.length,
+    });
+  });
+
+  it('judges keys by the target speed', () => {
+    const fast: KeyStat = { ...mastered, timeEma: 300 };
+    useSettings.setState({ strictMode: true });
+    usePractice.getState().restore(EN, { keyStats: { f: fast, j: fast }, opened: {} });
+    expect(usePractice.getState().progress.mastered.has('f')).toBe(true);
+
+    // 250 characters a minute leave 240 ms a key: 300 ms is too slow now.
+    useSettings.getState().update({ targetCpm: 250 });
+    expect(usePractice.getState().progress.mastered.has('f')).toBe(false);
+  });
+
+  it('builds the next lesson with the chosen length', () => {
+    usePractice.getState().dismissIntro();
+    useSettings.getState().update({ lessonLength: 60 });
+    const { text } = usePractice.getState().lesson;
+    expect(text.length).toBeGreaterThanOrEqual(55);
+    expect(text.length).toBeLessThanOrEqual(70);
+  });
 });
 
 describe('practice store', () => {

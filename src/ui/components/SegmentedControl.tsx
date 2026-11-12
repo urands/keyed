@@ -11,6 +11,8 @@ interface SegmentedControlProps<T extends string> {
   value: T;
   options: readonly Option<T>[];
   onChange: (value: T) => void;
+  /** Options one under another, for narrow places such as the sidebar. */
+  vertical?: boolean;
 }
 
 /** A single-choice switch built on native radio buttons, so arrow keys work. */
@@ -20,14 +22,17 @@ export function SegmentedControl<T extends string>({
   value,
   options,
   onChange,
+  vertical = false,
 }: SegmentedControlProps<T>) {
   return (
-    <fieldset className="inline-flex gap-0.5 rounded-md border border-line bg-surface p-0.5">
+    <fieldset
+      className={`inline-flex gap-1 rounded-xl bg-surface-2 p-1 ${vertical ? 'flex-col' : 'flex-wrap'}`}
+    >
       <legend className="sr-only">{legend}</legend>
       {options.map((option) => (
         <label
           key={option.value}
-          className="cursor-pointer rounded-sm px-3 py-1 text-sm text-ink-muted outline-accent hover:text-ink has-checked:bg-accent has-checked:text-on-accent has-focus-visible:outline-2 has-focus-visible:outline-offset-2"
+          className="cursor-pointer rounded-lg px-3 py-1.5 text-center text-sm text-ink-muted transition-colors hover:text-ink has-checked:bg-accent has-checked:font-medium has-checked:text-on-accent has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent"
         >
           <input
             type="radio"

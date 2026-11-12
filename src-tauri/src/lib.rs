@@ -27,6 +27,15 @@ pub fn run() {
         .plugin(tauri_plugin_window_state::Builder::default().build())
         // Daily goal reminders (src/app/reminders.ts).
         .plugin(tauri_plugin_notification::init())
+        // Export and import of all data (src/app/backup.ts): a file chosen in a
+        // system dialog is the only file the interface may read or write.
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
+        // Updates from GitHub Releases and a restart after installing one (src/app/updates.ts).
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
+        // Links in "About" open in the system browser.
+        .plugin(tauri_plugin_opener::init())
         .plugin(
             tauri_plugin_sql::Builder::default()
                 .add_migrations(DATABASE, migrations())

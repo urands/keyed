@@ -3,14 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { keyViews } from '../../app/courseView';
-import { practiceGeometry } from '../../app/layouts';
+import { useGeometry } from '../../app/layouts';
 import { useMotivation } from '../../app/motivation';
 import { useLayoutKit, usePractice } from '../../app/practice';
 import { useSettings } from '../../app/settings';
 import { getStorage } from '../../app/storage';
 import { keyForChar } from '../../engine/layout/layout';
 import { mostProductiveDay } from '../../engine/motivation/history';
-import { DEFAULT_PARAMS } from '../../engine/params';
 import type { LessonSummary } from '../../storage/types';
 import { KeyHeatmap, type HeatKey } from '../charts/KeyHeatmap';
 import { LineChart } from '../charts/LineChart';
@@ -33,7 +32,7 @@ function average(values: readonly number[]): number {
 
 function StatTile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-line bg-surface px-5 py-4">
+    <div className="kd-card px-5 py-4">
       <div className="text-sm text-ink-muted">{label}</div>
       <div className="text-3xl font-semibold">{value}</div>
     </div>
@@ -42,7 +41,7 @@ function StatTile({ label, value }: { label: string; value: string }) {
 
 function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="flex flex-col gap-4 rounded-lg border border-line bg-surface p-6">
+    <section className="kd-card flex flex-col gap-4 p-6">
       <h2 className="text-lg font-medium">{title}</h2>
       {children}
     </section>
@@ -67,6 +66,8 @@ export function StatsScreen() {
   const keyStats = usePractice((s) => s.keyStats);
   const course = usePractice((s) => s.course);
   const strict = useSettings((s) => s.strictMode);
+  const targetCpm = useSettings((s) => s.targetCpm);
+  const geometry = useGeometry();
   const views = useMemo(
     () => keyViews(kit, keyStats, course, strict),
     [kit, keyStats, course, strict],
@@ -163,7 +164,7 @@ export function StatsScreen() {
   };
   const accuracies = lessons.map((lesson) => percentFloor(lesson.accuracy));
   const recent = lessons.slice(-RECENT);
-  const target = speedValue(DEFAULT_PARAMS.targetCpm, unit);
+  const target = speedValue(targetCpm, unit);
   const lowestAccuracy = Math.min(...accuracies);
   const accuracyFloor = Math.max(0, Math.floor((lowestAccuracy - 5) / 10) * 10);
   const describe = (index: number) =>
@@ -281,7 +282,7 @@ export function StatsScreen() {
       <Panel title={t('stats.keys')}>
         <KeyHeatmap
           layout={layout}
-          geometry={practiceGeometry}
+          geometry={geometry}
           keys={heatKeys}
           closedCodes={codesFor(
             layout,

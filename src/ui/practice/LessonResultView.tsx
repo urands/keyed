@@ -82,13 +82,13 @@ export function LessonResultView({
     outcome?.previousAverageCpm == null ? null : speedValue(outcome.previousAverageCpm, unit);
 
   return (
-    <section className="mx-auto flex max-w-3xl flex-col items-center gap-7 py-10 text-center">
+    <section className="mx-auto flex max-w-3xl flex-col items-center gap-7 py-8 text-center">
       <h1 className="text-3xl font-semibold">{t('result.title')}</h1>
 
       {(unlocked.length > 0 || stageDone !== null) && (
         <div
           role="status"
-          className="flex flex-col items-center gap-3 rounded-lg border-2 border-ok bg-ok/10 px-8 py-5"
+          className="flex flex-col items-center gap-3 rounded-2xl border-2 border-ok bg-ok/10 px-8 py-5"
         >
           {stageDone !== null && (
             <>
@@ -111,7 +111,7 @@ export function LessonResultView({
                 {unlocked.map((key) => (
                   <kbd
                     key={key}
-                    className="min-w-12 rounded-md border border-line bg-surface px-3 py-1 font-mono text-3xl"
+                    className="min-w-12 rounded-lg border border-line bg-surface px-3 py-1 font-mono text-3xl"
                   >
                     {key}
                   </kbd>
@@ -146,7 +146,7 @@ export function LessonResultView({
       </p>
 
       {insight && (
-        <p className="rounded-lg border border-line bg-surface px-5 py-3 text-lg">
+        <p className="kd-card px-5 py-3 text-lg">
           <span aria-hidden="true">💡 </span>
           {insight.kind === 'confusion'
             ? t('result.insight.confusion', {
@@ -179,7 +179,7 @@ export function LessonResultView({
       </div>
 
       {outcome && outcome.unlocks.length > 0 && (
-        <div className="w-full rounded-lg border-2 border-ok bg-surface px-6 py-4 text-left">
+        <div className="w-full rounded-2xl border-2 border-ok bg-surface px-6 py-4 text-left shadow-card">
           <h2 className="mb-2 font-semibold">
             <span aria-hidden="true">★ </span>
             {t('result.achievements')}
@@ -204,7 +204,7 @@ export function LessonResultView({
           {keys.map(([char, key]) => {
             const cpm = keyCpm(key);
             return (
-              <li key={char} className="rounded-md border border-line bg-surface px-2 py-2">
+              <li key={char} className="rounded-xl border border-line bg-surface px-2 py-2">
                 <span className="block font-mono text-xl">
                   {char === ' ' ? t('keyboard.space') : char}
                 </span>

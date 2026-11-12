@@ -29,6 +29,17 @@ export interface LayoutProgress {
   opened: Record<string, number>;
 }
 
+/** Everything the app keeps, for a backup file. */
+export interface StoredData {
+  settings: Record<string, unknown>;
+  /** Every lesson of every layout with its keystrokes, oldest first. */
+  lessons: LessonRecord[];
+  progress: Partial<Record<LayoutId, LayoutProgress>>;
+  /** Oldest first. */
+  days: DayRecord[];
+  achievements: Record<string, UnlockedAchievement>;
+}
+
 /**
  * Where the app keeps its data (docs/architecture.md, "Хранилище"). Version 1
  * stores everything in SQLite on the computer; a web version will add another
@@ -48,6 +59,8 @@ export interface Storage {
     keyStats: Readonly<Record<string, KeyStat>>,
     opened: number,
   ): Promise<void>;
+  /** Opened key groups of a stage, saved without a lesson (the first-run wizard). */
+  saveOpened(layoutId: LayoutId, stage: string, opened: number): Promise<void>;
   /** The latest lessons of a layout, oldest first. */
   listLessons(layoutId: LayoutId, limit: number): Promise<LessonSummary[]>;
   /** Every lesson of every layout without keystrokes, oldest first: for totals and records. */
@@ -57,6 +70,12 @@ export interface Storage {
   saveDay(day: DayRecord): Promise<void>;
   loadAchievements(): Promise<Record<string, UnlockedAchievement>>;
   saveAchievement(id: string, achievement: UnlockedAchievement): Promise<void>;
+  /** Everything, for export. */
+  exportData(): Promise<StoredData>;
+  /** Replaces everything with imported data. */
+  importData(data: StoredData): Promise<void>;
+  /** Deletes lessons, key statistics, course progress, days and achievements; settings stay. */
+  resetProgress(): Promise<void>;
 }
 
 /** Keys whose statistics a lesson changed. */

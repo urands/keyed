@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- The KeyEd mark (src/ui/components/Logo.tsx) on a navy tile: a keycap with a K and a home-key bump. -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c2442"/>
+      <stop offset="1" stop-color="#0b0f1d"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3ddcb0"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <rect x="64" y="64" width="896" height="896" rx="200" fill="url(#tile)"/>
+  <rect x="208" y="262" width="608" height="580" rx="150" fill="#3ddcb0" fill-opacity="0.3"/>
+  <rect x="208" y="196" width="608" height="580" rx="150" fill="#1e2540" stroke="url(#rim)" stroke-width="40"/>
+  <g stroke="#3ddcb0" stroke-width="72" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M400 330v316"/>
+    <path d="M612 330 446 488 612 646"/>
+  </g>
+  <path d="M452 712h120" stroke="#a78bfa" stroke-width="40" stroke-linecap="round"/>
+</svg>

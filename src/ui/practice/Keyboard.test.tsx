@@ -1,8 +1,7 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { practiceGeometry } from '../../app/layouts';
-import { enUsQwerty, ruJcuken } from '../../content';
+import { ansiGeometry, enUsQwerty, isoGeometry, ruJcuken } from '../../content';
 import { codesFor } from './keyCodes';
 import { Keyboard } from './Keyboard';
 
@@ -10,7 +9,7 @@ const letters = codesFor(enUsQwerty, 'abcdefghijklmnopqrstuvwxyz ');
 
 function renderKeyboard(props: Partial<Parameters<typeof Keyboard>[0]> = {}) {
   const { container } = render(
-    <Keyboard layout={enUsQwerty} geometry={practiceGeometry} openCodes={letters} {...props} />,
+    <Keyboard layout={enUsQwerty} geometry={ansiGeometry} openCodes={letters} {...props} />,
   );
   return (code: string) => container.querySelector(`[data-code="${code}"]`);
 }
@@ -54,6 +53,13 @@ describe('Keyboard', () => {
     expect(key('KeyK')).toHaveAttribute('data-next');
     expect(key('KeyF')).toHaveAttribute('data-mastered');
     expect(key('KeyJ')).not.toHaveAttribute('data-mastered');
+  });
+
+  it('draws the ISO keyboard with a tall Enter and the extra key by the left Shift', () => {
+    const key = renderKeyboard({ geometry: isoGeometry });
+    expect(key('IntlBackslash')).toHaveTextContent('\\');
+    expect(key('Enter')).toHaveAttribute('data-tall');
+    expect(key('Backslash')).toBeInTheDocument();
   });
 
   it('flashes the last pressed key', () => {

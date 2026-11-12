@@ -1,16 +1,52 @@
+import { Flame, Gauge, Layers, Pause, Play, Target, type LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '../components/Button';
-import { Kbd } from '../components/Kbd';
 import { percentFloor, speedValue, type SpeedUnit } from '../format';
 
-function Metric({ label, value, unit }: { label: string; value: string; unit: string }) {
+function Metric({
+  icon: Icon,
+  label,
+  children,
+}: {
+  icon: LucideIcon;
+  label: string;
+  children: ReactNode;
+}) {
   return (
-    <div>
-      <div className="text-sm text-ink-muted">{label}</div>
-      <div className="text-2xl font-semibold tabular-nums">
-        {value} <span className="text-base font-normal text-ink-muted">{unit}</span>
+    <div className="flex min-w-0 items-center gap-3">
+      <Icon aria-hidden="true" size={26} strokeWidth={1.75} className="shrink-0 text-ink-muted" />
+      <div className="min-w-0">
+        <div className="text-sm text-ink-muted">{label}</div>
+        {children}
       </div>
+    </div>
+  );
+}
+
+function Value({ value, unit }: { value: string; unit: string }) {
+  return (
+    <div className="text-2xl leading-tight font-semibold tabular-nums">
+      {value} <span className="text-sm font-normal text-ink-muted">{unit}</span>
+    </div>
+  );
+}
+
+function Bar({ label, value, tone }: { label: string; value: number; tone: 'accent' | 'warm' }) {
+  const percent = Math.round(value * 100);
+  return (
+    <div
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={percent}
+      className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-surface-2"
+    >
+      <div
+        className={`h-full rounded-full transition-[width] duration-100 ${tone === 'accent' ? 'bg-accent' : 'bg-fixed'}`}
+        style={{ width: `${value * 100}%` }}
+      />
     </div>
   );
 }
@@ -36,6 +72,7 @@ interface MetricsBarProps {
   onResume: () => void;
 }
 
+/** The top of the practice screen: speed, accuracy, lesson progress, today's goal, pause. */
 export function MetricsBar({
   goal,
   cpm,
@@ -49,50 +86,55 @@ export function MetricsBar({
 }: MetricsBarProps) {
   const { t } = useTranslation();
   const percent = Math.round(progress * 100);
+  const goalMinutes = Math.round(goal.goalMs / 60_000);
   return (
-    <div className="flex flex-wrap items-center gap-x-10 gap-y-4 rounded-lg border border-line bg-surface px-6 py-4">
-      <Metric
-        label={t('practice.speed')}
-        value={cpm === null ? '—' : String(speedValue(cpm, unit))}
-        unit={t(`units.${unit}`)}
-      />
-      <Metric
-        label={t('practice.accuracy')}
-        value={accuracy === null ? '—' : String(percentFloor(accuracy))}
-        unit="%"
-      />
-      <Metric
-        label={t('goal.label')}
-        value={`${goal.met ? '✓ ' : ''}${Math.floor(goal.activeMs / 60_000)}/${Math.round(goal.goalMs / 60_000)}`}
-        unit={t('goal.unit')}
-      />
-      <div className="min-w-48 flex-1">
-        <div className="mb-1.5 flex justify-between text-sm text-ink-muted">
-          <span>{t('practice.progress')}</span>
-          <span className="tabular-nums">{percent}%</span>
+    <div className="kd-card grid grid-cols-[repeat(4,minmax(0,1fr))_auto] items-center gap-x-6 gap-y-3 px-6 py-3 max-md:grid-cols-[repeat(2,minmax(0,1fr))_auto]">
+      <Metric icon={Gauge} label={t('practice.speed')}>
+        <Value
+          value={cpm === null ? '—' : String(speedValue(cpm, unit))}
+          unit={t(`units.${unit}`)}
+        />
+      </Metric>
+      <Metric icon={Target} label={t('practice.accuracy')}>
+        <Value value={accuracy === null ? '—' : String(percentFloor(accuracy))} unit="%" />
+      </Metric>
+      <Metric icon={Layers} label={t('practice.progress')}>
+        <div className="flex items-center gap-2">
+          <Bar label={t('practice.progress')} value={progress} tone="accent" />
+          <span className="text-sm tabular-nums">{percent}%</span>
         </div>
-        <div
-          role="progressbar"
-          aria-label={t('practice.progress')}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={percent}
-          className="h-2 overflow-hidden rounded-full bg-line"
-        >
-          <div
-            className="h-full rounded-full bg-accent transition-[width] duration-100 motion-reduce:transition-none"
-            style={{ width: `${progress * 100}%` }}
-          />
+      </Metric>
+      <Metric icon={Flame} label={t('goal.label')}>
+        <div className="text-sm tabular-nums">
+          {goal.met ? '✓ ' : ''}
+          {t('goal.ofMinutes', {
+            done: Math.floor(goal.activeMs / 60_000),
+            total: goalMinutes,
+          })}
         </div>
-      </div>
+        <Bar label={t('goal.label')} value={Math.min(1, goal.activeMs / goal.goalMs)} tone="warm" />
+      </Metric>
       {paused ? (
-        <Button variant="primary" onClick={onResume}>
-          {t('practice.resume')}
-        </Button>
+        <button
+          type="button"
+          onClick={onResume}
+          aria-label={t('practice.resume')}
+          title={t('practice.resume')}
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-on-accent shadow-glow"
+        >
+          <Play aria-hidden="true" size={22} />
+        </button>
       ) : (
-        <Button disabled={!canPause} onClick={onPause}>
-          {t('practice.pause')} <Kbd>{t('keyboard.escape')}</Kbd>
-        </Button>
+        <button
+          type="button"
+          disabled={!canPause}
+          onClick={onPause}
+          aria-label={t('practice.pause')}
+          title={`${t('practice.pause')} (${t('keyboard.escape')})`}
+          className="flex h-12 w-12 items-center justify-center rounded-full border border-line bg-surface-2 text-ink disabled:opacity-50"
+        >
+          <Pause aria-hidden="true" size={22} />
+        </button>
       )}
     </div>
   );
