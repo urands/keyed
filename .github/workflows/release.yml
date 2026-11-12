@@ -2,8 +2,10 @@
 # latest.json for the in-app updater (task 6.8). Runs when a version tag such as
 # v0.2.0 is pushed (it must match the version in package.json), or by hand; the
 # release is created as a draft to check before publishing.
-# Updates are signed with TAURI_SIGNING_PRIVATE_KEY (repository secret); the
-# installers themselves are not code-signed (docs/implementation-plan.md, 6.9).
+# Updates are signed with TAURI_SIGNING_PRIVATE_KEY (repository secret). The
+# macOS builds are signed with a Developer ID certificate and notarized by Apple
+# (the APPLE_* secrets, set with tools/set-apple-secrets.sh); the Windows
+# installer is not code-signed (docs/implementation-plan.md, 6.9).
 name: Release
 
 on:
@@ -66,8 +68,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Developer ID signing and notarization, once the Apple secrets are set.
-      # Without them the app stays ad-hoc signed (tauri.conf.json).
+      # Developer ID signing and notarization with the Apple secrets. Without
+      # them, in a fork for example, the app stays ad-hoc signed (tauri.conf.json).
       - name: Use Apple signing
         if: runner.os == 'macOS'
         env:
@@ -103,7 +105,7 @@ jobs:
             Download the installer for your system below, or visit https://urands.github.io/keyed/.
 
             - Windows: `KeyEd_*_x64-setup.exe`. Windows may warn about an unknown publisher: choose "More info" → "Run anyway".
-            - macOS: `KeyEd_*_aarch64.dmg` (Apple Silicon) or `KeyEd_*_x64.dmg` (Intel). The app is not notarized: the first time, allow it in System Settings → Privacy & Security → "Open Anyway". If macOS says it is damaged, run `xattr -cr /Applications/KeyEd.app` in Terminal.
+            - macOS: `KeyEd_*_aarch64.dmg` (Apple Silicon) or `KeyEd_*_x64.dmg` (Intel). The app is signed and notarized by Apple: open the .dmg and drag KeyEd to Applications.
             - Linux: `.AppImage` or `.deb`.
 
             KeyEd checks for updates at startup and installs them in one click.
