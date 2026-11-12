@@ -28,6 +28,16 @@ function keyCenters(geometry: Geometry): Map<KeyCode, { row: number; x: number }
   return centers;
 }
 
+/**
+ * The Shift for a key: always on the other hand (docs/learning-method.md,
+ * "Положение рук"). Null for keys pressed by the thumb.
+ */
+export function shiftFor(geometry: Geometry, code: KeyCode): KeyCode | null {
+  const finger = geometry.fingers[code];
+  if (!finger || finger === 'thumb') return null;
+  return finger.startsWith('l') ? 'ShiftRight' : 'ShiftLeft';
+}
+
 /** For the new key card: which finger presses the key and which way it moves. */
 export function reachFromHome(geometry: Geometry, code: KeyCode): Reach | null {
   const finger = geometry.fingers[code];

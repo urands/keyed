@@ -94,7 +94,19 @@ function writeJson(path: string, data: unknown): void {
   writeFileSync(path, `${JSON.stringify(data)}\n`);
 }
 
-function build(config: LanguageConfig): void {
+/**
+ * Builds one dictionary. With `keep` the given letters are not replaced: the
+ * Russian "ё" variant (words-yo.json) keeps "ё" for the "Буква ё" setting.
+ */
+function build(base: LanguageConfig, keep = ''): void {
+  const config: LanguageConfig = {
+    ...base,
+    alphabet: base.alphabet + keep,
+    replace: Object.fromEntries(
+      Object.entries(base.replace).filter(([from]) => !keep.includes(from)),
+    ),
+  };
+  const suffix = keep === '' ? '' : '-yo';
   const letters = new RegExp(`^[${config.alphabet}]{${MIN_LENGTH},${MAX_LENGTH}}$`, 'u');
   const isWord = (word: string) => letters.test(word);
   const blocklistWords = readBlocklist(config, isWord);
@@ -124,25 +136,35 @@ function build(config: LanguageConfig): void {
   }
 
   const out = join(ROOT, 'src', 'content', config.language);
-  writeJson(join(out, 'words.json'), {
+  writeJson(join(out, `words${suffix}.json`), {
     source: SOURCE_NOTE,
     license: SOURCE_LICENSE,
     words,
   });
-  writeJson(join(out, 'ngrams.json'), {
+  writeJson(join(out, `ngrams${suffix}.json`), {
     source: SOURCE_NOTE,
     license: SOURCE_LICENSE,
     counts: buildLetterModel(words),
   });
-  writeJson(join(out, 'blocklist.json'), {
-    source: BLOCKLIST_NOTE,
-    license: 'CC BY 4.0, https://creativecommons.org/licenses/by/4.0/',
-    words: blocklistWords,
-  });
+  if (suffix === '') {
+    writeJson(join(out, 'blocklist.json'), {
+      source: BLOCKLIST_NOTE,
+      license: 'CC BY 4.0, https://creativecommons.org/licenses/by/4.0/',
+      words: blocklistWords,
+    });
+  }
 
+  const withKept =
+    keep === ''
+      ? ''
+      : `, ${words.filter((w) => [...keep].some((k) => w.includes(k))).length} with ${keep}`;
   console.log(
-    `${config.language}: ${words.length} words, ${blocked} blocked, ${blocklistWords.length} blocklist entries`,
+    `${config.language}${suffix}: ${words.length} words${withKept}, ${blocked} blocked, ${blocklistWords.length} blocklist entries`,
   );
 }
 
-for (const config of LANGUAGES) build(config);
+for (const config of LANGUAGES) {
+  build(config);
+  // Russian also gets a dictionary that keeps "ё".
+  if (config.language === 'ru') build(config, 'ё');
+}

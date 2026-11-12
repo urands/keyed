@@ -12,6 +12,8 @@ export interface LearningParams {
   accuracyThreshold: number;
   /** Correct first-try presses needed before a key counts as mastered. */
   minHitsToMaster: number;
+  /** A key typed with Shift may take this many times the target time: Shift is pressed too. */
+  shiftAllowance: number;
   /** Lesson length, characters. */
   lessonLength: number;
   /** Minimum share of lesson words that contain the focus key. */
@@ -42,6 +44,7 @@ export const DEFAULT_PARAMS: Readonly<LearningParams> = {
   accuracyAlpha: 0.1,
   accuracyThreshold: 0.95,
   minHitsToMaster: 30,
+  shiftAllowance: 1.25,
   lessonLength: 120,
   focusWordShare: 0.5,
   minFocusWords: 20,

@@ -1,14 +1,30 @@
 import { useTranslation } from 'react-i18next';
 
 import type { Geometry } from '../../engine/layout/geometry';
-import type { Layout } from '../../engine/layout/layout';
-import { reachFromHome } from '../../engine/layout/reach';
+import { keyForChar, type Layout } from '../../engine/layout/layout';
+import { reachFromHome, shiftFor } from '../../engine/layout/reach';
+import type { StageKind } from '../../engine/progress/course';
 import { Button } from '../components/Button';
 import { Kbd } from '../components/Kbd';
 import { FINGER_BG } from './fingerColors';
 import { Keyboard } from './Keyboard';
-import { charLabel, codesFor } from './keyCodes';
+import { charLabel, codesWithShift, inlineLabel } from './keyCodes';
 import { useKeyLabel } from './useKeyLabel';
+
+/** Names of marks in translation keys ("newKey.notes.<layout>.<name>"). */
+const MARK_NAMES: Record<string, string> = {
+  '.': 'period',
+  ',': 'comma',
+  '!': 'exclamation',
+  '?': 'question',
+  ':': 'colon',
+  ';': 'semicolon',
+  '"': 'quote',
+  "'": 'apostrophe',
+  '-': 'hyphen',
+  '(': 'parenLeft',
+  ')': 'parenRight',
+};
 
 interface NewKeyCardProps {
   layout: Layout;
@@ -16,48 +32,92 @@ interface NewKeyCardProps {
   /** Keys being introduced. */
   keys: readonly string[];
   /** Keys already open, drawn in finger colors. */
-  openKeys: readonly string[];
+  openKeys: Iterable<string>;
+  /** Set when these keys start a new stage of the course. */
+  stage?: StageKind | null;
   onStart: () => void;
 }
 
 /**
  * Shown before the first lesson with new keys (docs/screens.md, section 4):
  * where the key is, which finger presses it and where that finger moves from.
+ * A key with Shift also says which Shift: always the one of the other hand.
  */
-export function NewKeyCard({ layout, geometry, keys, openKeys, onStart }: NewKeyCardProps) {
+export function NewKeyCard({
+  layout,
+  geometry,
+  keys,
+  openKeys,
+  stage = null,
+  onStart,
+}: NewKeyCardProps) {
   const { t } = useTranslation();
   const keyLabel = useKeyLabel(layout);
-  const labels = keys.map((key) => charLabel(layout, key, t('keyboard.space')));
-  const newCodes = codesFor(layout, keys);
+  // Notes on marks that are not obvious on this layout, such as "," on ЙЦУКЕН.
+  const notes = t(`newKey.notes.${layout.id}`, { returnObjects: true }) as Partial<
+    Record<string, string>
+  >;
+  const labels = keys.map((key) =>
+    inlineLabel(layout, key, t('keyboard.space'), (mark) => t('keyboard.quoted', { key: mark })),
+  );
+  const newCodes = codesWithShift(layout, geometry, keys);
   // The space bar is in every lesson, so it is drawn as open too.
-  const openCodes = codesFor(layout, [...openKeys, ...keys, ' ']);
+  const openCodes = codesWithShift(layout, geometry, [...openKeys, ...keys, ' ']);
+  const title = t(keys.length === 1 ? 'newKey.titleOne' : 'newKey.titleMany', {
+    keys: labels.join(', '),
+  });
 
   return (
     <section className="mx-auto flex max-w-4xl flex-col items-center gap-6 py-10 text-center">
-      <h1 className="text-3xl font-semibold">
-        {t(keys.length === 1 ? 'newKey.titleOne' : 'newKey.titleMany', {
-          keys: labels.join(', '),
-        })}
-      </h1>
+      {stage === null ? (
+        <h1 className="text-3xl font-semibold">{title}</h1>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-semibold">
+            {t('newKey.stageTitle', { name: t(`stage.${stage}`) })}
+          </h1>
+          <p className="max-w-xl text-lg text-ink-muted">{t(`newKey.stage.${stage}`)}</p>
+          <h2 className="text-xl font-medium">{title}</h2>
+        </div>
+      )}
 
       <ul className="flex flex-col gap-2">
-        {[...newCodes].map((code) => {
-          const reach = reachFromHome(geometry, code);
-          if (!reach) return null;
+        {keys.map((char) => {
+          const stroke = keyForChar(layout, char);
+          const reach = stroke ? reachFromHome(geometry, stroke.code) : null;
+          if (!stroke || !reach) return null;
+          const shift = stroke.shift ? shiftFor(geometry, stroke.code) : null;
           const finger = t(`practice.finger.${reach.finger}`);
           const direction = t(`newKey.direction.${reach.direction}`, {
             key: keyLabel(reach.home) || t('keyboard.space'),
           });
+          const markName = MARK_NAMES[char];
+          const note = markName === undefined ? undefined : notes[markName];
           return (
-            <li key={code} className="flex items-center justify-center gap-3 text-lg">
-              <kbd
-                className={`min-w-10 rounded-md px-2 py-1 font-mono text-xl text-ink ${FINGER_BG[reach.finger]}`}
-              >
-                {keyLabel(code) || t('keyboard.space')}
-              </kbd>
-              <span>
-                {finger}, {direction}
+            <li key={char} className="flex flex-col items-center gap-1">
+              <span className="flex items-center justify-center gap-3 text-lg">
+                <kbd
+                  className={`min-w-10 rounded-md px-2 py-1 font-mono text-xl text-ink ${FINGER_BG[reach.finger]}`}
+                >
+                  {charLabel(layout, char, t('keyboard.space'))}
+                </kbd>
+                <span>
+                  {finger}, {direction}
+                </span>
               </span>
+              {shift !== null && (
+                <span className="max-w-xl">
+                  {t(
+                    shift === 'ShiftLeft'
+                      ? 'newKey.holdShift.ShiftLeft'
+                      : 'newKey.holdShift.ShiftRight',
+                    {
+                      key: keyLabel(stroke.code),
+                    },
+                  )}
+                </span>
+              )}
+              {note !== undefined && <span className="max-w-xl text-ink-muted">{note}</span>}
             </li>
           );
         })}
@@ -70,7 +130,11 @@ export function NewKeyCard({ layout, geometry, keys, openKeys, onStart }: NewKey
         highlightCodes={newCodes}
       />
 
-      <p className="max-w-xl text-ink-muted">{t('newKey.hint')}</p>
+      <p className="max-w-xl text-ink-muted">
+        {keys.some((key) => keyForChar(layout, key)?.shift)
+          ? t('newKey.shiftHint')
+          : t('newKey.hint')}
+      </p>
       <Button variant="primary" onClick={onStart} className="px-6 py-3 text-lg">
         {t('newKey.start')} <Kbd>{t('keyboard.enter')}</Kbd>
       </Button>

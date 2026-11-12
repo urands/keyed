@@ -17,6 +17,16 @@ function isNamedKey(code: KeyCode): code is keyof typeof NAMED_KEYS {
 }
 
 /**
+ * The character a key types with Shift, when it is not just the capital of the
+ * key's letter: "!" on 1, "," on the ЙЦУКЕН full stop key. Empty otherwise.
+ */
+export function shiftLabel(layout: Layout, code: KeyCode): string {
+  const chars = layout.keys[code];
+  if (!chars || code === 'Space') return '';
+  return chars.shift === chars.base.toLocaleUpperCase(layout.language) ? '' : chars.shift;
+}
+
+/**
  * Returns a function that gives the label of a key: its character in upper case,
  * or a name for keys such as Shift. The space bar has no label.
  */

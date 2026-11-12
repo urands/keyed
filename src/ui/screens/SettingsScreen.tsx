@@ -64,6 +64,17 @@ export function SettingsScreen() {
             className="h-5 w-5 accent-accent"
           />
         </Row>
+        <Row label={t('settings.yo.label')} hint={t('settings.yo.hint')}>
+          <input
+            type="checkbox"
+            aria-label={t('settings.yo.label')}
+            checked={settings.yoLetter}
+            onChange={(event) => {
+              settings.update({ yoLetter: event.target.checked });
+            }}
+            className="h-5 w-5 accent-accent"
+          />
+        </Row>
       </Section>
 
       <Section title={t('settings.section.motivation')}>

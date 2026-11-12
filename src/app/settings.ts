@@ -26,6 +26,8 @@ export interface SettingsValues {
   inputMode: InputMode;
   /** Only current confidence counts for opening keys (docs/learning-method.md). */
   strictMode: boolean;
+  /** The Russian course teaches "ё" and its texts keep it (docs/learning-method.md, "Буква ё"). */
+  yoLetter: boolean;
   dailyGoal: DailyGoal;
   remindersEnabled: boolean;
   /** Local time of the reminder, "HH:MM". */
@@ -57,6 +59,7 @@ export const useSettings = create<SettingsState>()((set) => ({
   speedUnit: 'auto',
   inputMode: 'emulate',
   strictMode: false,
+  yoLetter: false,
   dailyGoal: defaultGoal,
   // Reminders and sounds are off until the user turns them on (docs/product.md).
   remindersEnabled: false,
@@ -82,6 +85,7 @@ const SETTING_KEYS = [
   'speedUnit',
   'inputMode',
   'strictMode',
+  'yoLetter',
   'dailyGoal',
   'remindersEnabled',
   'reminderTime',
@@ -120,6 +124,7 @@ export function restoreSettings(values: Readonly<Record<string, unknown>>): void
   if (isOneOf(SPEED_UNIT_PREFERENCES, values.speedUnit)) patch.speedUnit = values.speedUnit;
   if (isOneOf(INPUT_MODES, values.inputMode)) patch.inputMode = values.inputMode;
   if (typeof values.strictMode === 'boolean') patch.strictMode = values.strictMode;
+  if (typeof values.yoLetter === 'boolean') patch.yoLetter = values.yoLetter;
   if ((DAILY_GOALS as readonly unknown[]).includes(values.dailyGoal)) {
     patch.dailyGoal = values.dailyGoal as DailyGoal;
   }

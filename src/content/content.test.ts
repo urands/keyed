@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { Finger } from '../engine/layout/geometry';
 import { keyForChar, type Layout } from '../engine/layout/layout';
-import { stageKeys, startSetKeys, type Course } from '../engine/progress/course';
+import { stageKeys, startSetKeys, withOptionalKeys, type Course } from '../engine/progress/course';
 import { isBlocked } from '../engine/textgen/blocklist';
 import {
   ansiGeometry,
@@ -24,6 +24,8 @@ interface LanguageCase {
   content: LanguageContent;
   /** Letters the course teaches; "ё" is a separate setting (task 5.6). */
   letters: string;
+  /** Letters whose capitals the course does not teach. */
+  noCapitals: string;
   /** The finger table from docs/learning-method.md for this layout. */
   zones: Record<Finger, string>;
   startKeys: string;
@@ -40,6 +42,7 @@ const CASES: LanguageCase[] = [
     course: enUsQwertyCourse,
     content: englishContent,
     letters: 'abcdefghijklmnopqrstuvwxyz',
+    noCapitals: '',
     zones: {
       lPinky: '`1qaz',
       lRing: '2wsx',
@@ -62,6 +65,7 @@ const CASES: LanguageCase[] = [
     course: ruJcukenCourse,
     content: russianContent,
     letters: 'абвгдежзийклмнопрстуфхцчшщъыьэюя',
+    noCapitals: 'ъыь',
     zones: {
       lPinky: 'ё1йфя',
       lRing: '2цыч',
@@ -105,7 +109,37 @@ describe.each(CASES)('$name', (c) => {
   });
 
   describe('course', () => {
-    const letters = c.course.stages.find((stage) => stage.id === 'letters');
+    // The default course: optional keys such as "ё" are switched off.
+    const course = withOptionalKeys(c.course, new Set());
+    const letters = course.stages.find((stage) => stage.id === 'letters');
+
+    it('has the stages of the methodology in order', () => {
+      expect(c.course.stages.map((stage) => stage.kind)).toEqual([
+        'letters',
+        'capitals',
+        'punctuation',
+        'digits',
+        'free',
+      ]);
+    });
+
+    it('teaches the capital of every letter that has one in the capitals stage', () => {
+      const capitals = course.stages.find((stage) => stage.kind === 'capitals');
+      expect(capitals).toBeDefined();
+      if (!capitals) return;
+      const keys = new Set(stageKeys(capitals));
+      for (const key of keys) expect(key).toMatch(/^\p{Lu}$/u);
+      for (const letter of c.letters) {
+        const capital = letter.toLocaleUpperCase(c.layout.language);
+        // Words never start with "ъ", "ь" and "ы": their capitals are not taught.
+        if (!c.noCapitals.includes(letter)) expect(keys, capital).toContain(capital);
+      }
+    });
+
+    it('teaches every digit in the digits stage', () => {
+      const digits = course.stages.find((stage) => stage.kind === 'digits');
+      expect(digits && stageKeys(digits).sort().join('')).toBe('0123456789');
+    });
 
     it('teaches every letter once in the letters stage', () => {
       expect(letters).toBeDefined();
@@ -122,6 +156,13 @@ describe.each(CASES)('$name', (c) => {
     it('has the starting set of the methodology', () => {
       if (!letters) return;
       expect(startSetKeys(letters).join('')).toBe(c.startSet);
+    });
+
+    it('makes only "ё" optional', () => {
+      const optional = c.course.stages.flatMap((stage) => stage.optional);
+      expect(optional).toEqual(c.layout.id === 'ru-jcuken' ? ['ё'] : []);
+      const withYo = withOptionalKeys(c.course, new Set(optional));
+      expect(withYo).toEqual(c.course);
     });
 
     it('uses only keys of the layout', () => {

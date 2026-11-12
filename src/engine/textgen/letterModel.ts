@@ -49,6 +49,8 @@ export interface PseudoWordOptions {
   minLength: number;
   maxLength: number;
   random: Random;
+  /** Letters the word starts with. */
+  start?: string;
 }
 
 function allowedNext(
@@ -68,9 +70,9 @@ function allowedNext(
  * model cannot finish a word with these letters; the caller simply tries again.
  */
 export function generatePseudoWord(model: LetterModel, options: PseudoWordOptions): string | null {
-  const { letters, minLength, maxLength, random } = options;
-  let word = '';
-  let context = `${WORD_START}${WORD_START}`;
+  const { letters, minLength, maxLength, random, start = '' } = options;
+  let word = start;
+  let context = `${WORD_START}${WORD_START}${start}`.slice(-2);
   while (word.length <= maxLength) {
     const canEnd = word.length >= minLength;
     const mustEnd = word.length === maxLength;

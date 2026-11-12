@@ -47,6 +47,8 @@ interface LessonResultViewProps {
   unit: SpeedUnit;
   /** Keys this lesson opened, already shown as labels. */
   unlocked: readonly string[];
+  /** Names of the stage this lesson completed and of the next one. */
+  stageDone?: { done: string; next: string } | null;
   /** Records and achievements of this lesson. */
   outcome: LessonOutcome | null;
   daily: DailyProgress;
@@ -62,6 +64,7 @@ export function LessonResultView({
   result,
   unit,
   unlocked,
+  stageDone = null,
   outcome,
   daily,
   streak,
@@ -82,26 +85,41 @@ export function LessonResultView({
     <section className="mx-auto flex max-w-3xl flex-col items-center gap-7 py-10 text-center">
       <h1 className="text-3xl font-semibold">{t('result.title')}</h1>
 
-      {unlocked.length > 0 && (
+      {(unlocked.length > 0 || stageDone !== null) && (
         <div
           role="status"
           className="flex flex-col items-center gap-3 rounded-lg border-2 border-ok bg-ok/10 px-8 py-5"
         >
-          <p className="text-xl font-semibold">
-            <span aria-hidden="true">★ </span>
-            {t(unlocked.length === 1 ? 'result.unlockedOne' : 'result.unlockedMany')}
-          </p>
-          <p className="flex gap-2">
-            {unlocked.map((key) => (
-              <kbd
-                key={key}
-                className="min-w-12 rounded-md border border-line bg-surface px-3 py-1 font-mono text-3xl"
-              >
-                {key}
-              </kbd>
-            ))}
-          </p>
-          <p className="text-ink-muted">{t('result.unlockedHint')}</p>
+          {stageDone !== null && (
+            <>
+              <p className="text-2xl font-semibold">
+                <span aria-hidden="true">🎉 </span>
+                {t('result.stageDone', { stage: stageDone.done })}
+              </p>
+              <p className="text-lg">{t('result.stageNext', { stage: stageDone.next })}</p>
+            </>
+          )}
+          {unlocked.length > 0 && (
+            <p className="text-xl font-semibold">
+              <span aria-hidden="true">★ </span>
+              {t(unlocked.length === 1 ? 'result.unlockedOne' : 'result.unlockedMany')}
+            </p>
+          )}
+          {unlocked.length > 0 && (
+            <>
+              <p className="flex gap-2">
+                {unlocked.map((key) => (
+                  <kbd
+                    key={key}
+                    className="min-w-12 rounded-md border border-line bg-surface px-3 py-1 font-mono text-3xl"
+                  >
+                    {key}
+                  </kbd>
+                ))}
+              </p>
+              <p className="text-ink-muted">{t('result.unlockedHint')}</p>
+            </>
+          )}
         </div>
       )}
 

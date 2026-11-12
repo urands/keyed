@@ -3,7 +3,7 @@ import { memo } from 'react';
 import type { Finger, Geometry } from '../../engine/layout/geometry';
 import type { KeyCode, Layout } from '../../engine/layout/layout';
 import { FINGER_BG } from './fingerColors';
-import { useKeyLabel } from './useKeyLabel';
+import { shiftLabel, useKeyLabel } from './useKeyLabel';
 
 export interface KeyFlash {
   code: KeyCode;
@@ -14,6 +14,8 @@ export interface KeyFlash {
 interface KeyProps {
   code: KeyCode;
   label: string;
+  /** The character with Shift, drawn above the main one; empty when it is the capital. */
+  shifted: string;
   width: number;
   gap: number;
   finger: Finger;
@@ -31,6 +33,7 @@ interface KeyProps {
 const Key = memo(function Key({
   code,
   label,
+  shifted,
   width,
   gap,
   finger,
@@ -59,7 +62,14 @@ const Key = memo(function Key({
         data-mastered={mastered || undefined}
         className={`relative flex h-full items-center justify-center rounded-md border select-none ${look} ${label.length > 1 ? 'text-sm' : 'text-lg font-medium'} ${highlighted ? 'z-10 font-bold ring-3 ring-accent ring-offset-2 ring-offset-canvas' : ''}`}
       >
-        {label}
+        {shifted === '' ? (
+          label
+        ) : (
+          <span className="flex flex-col items-center leading-none">
+            <span className="text-[0.7em] opacity-70">{shifted}</span>
+            <span>{label}</span>
+          </span>
+        )}
         {homing && (
           <span className="absolute bottom-[14%] h-[3px] w-1/4 rounded-full bg-current opacity-50" />
         )}
@@ -87,8 +97,9 @@ interface KeyboardProps {
   geometry: Geometry;
   /** Keys in use, colored by finger; the others are drawn muted. */
   openCodes: ReadonlySet<KeyCode>;
-  /** The key to press now. */
+  /** The key to press now, and the Shift to hold with it. */
   nextCode?: KeyCode | null;
+  nextShift?: KeyCode | null;
   /** More keys to draw like the next key, such as keys being introduced. */
   highlightCodes?: ReadonlySet<KeyCode>;
   /** Keys that get a check mark. */
@@ -102,6 +113,7 @@ export function Keyboard({
   geometry,
   openCodes,
   nextCode = null,
+  nextShift = null,
   highlightCodes = NONE,
   masteredCodes = NONE,
   flash = null,
@@ -116,11 +128,12 @@ export function Keyboard({
               key={code}
               code={code}
               label={label(code)}
+              shifted={shiftLabel(layout, code)}
               width={width}
               gap={gap}
               finger={geometry.fingers[code] ?? 'thumb'}
               open={openCodes.has(code)}
-              highlighted={code === nextCode || highlightCodes.has(code)}
+              highlighted={code === nextCode || code === nextShift || highlightCodes.has(code)}
               mastered={masteredCodes.has(code)}
               homing={geometry.homing.includes(code)}
               flashSeq={flash?.code === code ? flash.seq : 0}

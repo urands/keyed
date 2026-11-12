@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { stageKeys } from '../engine/progress/course';
 import type { KeyStat } from '../engine/stats/keyStats';
 import { kitFor } from './layouts';
 import { usePractice } from './practice';
@@ -23,7 +24,7 @@ function typeText(text: string) {
 beforeEach(async () => {
   localStorage.clear();
   await openStorage(); // fresh storage for each test
-  useSettings.setState({ layout: EN, strictMode: false });
+  useSettings.setState({ layout: EN, strictMode: false, yoLetter: false });
   usePractice.setState({ cache: {} });
   usePractice.getState().restore(EN, { keyStats: {}, opened: {} });
 });
@@ -79,7 +80,63 @@ describe('practice store', () => {
     usePractice.getState().startLesson('fj');
     typeText('fj');
     expect(usePractice.getState().unlocked).toEqual([]);
-    expect(usePractice.getState().opened).toBe(0);
+    expect(usePractice.getState().opened).toEqual({ letters: 0 });
+  });
+
+  it('moves to the capitals stage when every letter is mastered, and introduces its keys', () => {
+    const letters = kitFor(EN, { yoLetter: false }).letters;
+    const keyStats = Object.fromEntries(stageKeys(letters).map((key) => [key, mastered]));
+    // Every letter is open; "z" is one correct press short of mastered.
+    keyStats.z = { ...mastered, hits: 29, bestConfidence: 0 };
+    usePractice.getState().restore(EN, { keyStats, opened: { letters: letters.order.length } });
+    expect(usePractice.getState().course.stage.id).toBe('letters');
+    usePractice.getState().startLesson('z');
+    typeText('z');
+    let state = usePractice.getState();
+    expect(state.course.stage.id).toBe('capitals');
+    expect(state.stageDone).toBe('letters');
+    expect(state.unlocked).toEqual(['F', 'J']);
+    expect(state.introduce).toEqual(['F', 'J']);
+
+    usePractice.getState().startLesson();
+    state = usePractice.getState();
+    expect(state.lesson.text).toMatch(/[FJ]/);
+    expect(state.lesson.text).not.toMatch(/[A-EG-IK-Z]/);
+  });
+
+  it('trains a chosen open key and goes back to the course', () => {
+    usePractice.getState().restore(EN, { keyStats: { f: mastered }, opened: { letters: 2 } });
+    usePractice.getState().train('d');
+    let state = usePractice.getState();
+    expect(state.training).toBe('d');
+    const words = state.lesson.text.split(' ');
+    expect(words.filter((word) => word.includes('d')).length / words.length).toBeGreaterThanOrEqual(
+      0.5,
+    );
+
+    // A closed key cannot be trained.
+    usePractice.getState().train('z');
+    expect(usePractice.getState().training).toBeNull();
+
+    usePractice.getState().train('d');
+    usePractice.getState().train(null);
+    state = usePractice.getState();
+    expect(state.training).toBeNull();
+  });
+
+  it('adds "ё" to the Russian letters stage when the setting is on', () => {
+    const plain = kitFor(RU, { yoLetter: false }).letters;
+    const keyStats = Object.fromEntries(stageKeys(plain).map((key) => [key, mastered]));
+    usePractice.getState().restore(RU, { keyStats, opened: { letters: plain.order.length } });
+    expect(usePractice.getState().course.stage.id).toBe('capitals');
+
+    useSettings.getState().update({ yoLetter: true });
+    const state = usePractice.getState();
+    expect(state.course.stage.id).toBe('letters');
+    expect(state.progress.next).toEqual(['ё']);
+    expect(state.progress.blockers).toEqual([]);
+    useSettings.getState().update({ yoLetter: false });
+    expect(usePractice.getState().course.stage.id).toBe('capitals');
   });
 
   it('re-evaluates progress when strict mode changes', () => {
@@ -101,7 +158,7 @@ describe('layouts', () => {
     expect(state.layoutId).toBe(RU);
     expect(useSettings.getState().layout).toBe(RU);
     expect(state.keyStats).toEqual({});
-    expect(state.introduce).toEqual(kitFor(RU).stage.start);
+    expect(state.introduce).toEqual(kitFor(RU, { yoLetter: false }).letters.start);
     expect(state.lesson.text).toMatch(/^[ао]+( [ао]+)*$/);
 
     usePractice.getState().startLesson('ао');

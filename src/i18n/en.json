@@ -7,6 +7,7 @@
     "label": "Sections",
     "home": "Home",
     "practice": "Practice",
+    "course": "Course",
     "stats": "Statistics",
     "settings": "Settings",
     "achievements": "Achievements"
@@ -36,8 +37,11 @@
     "continue": "Continue",
     "next": "{{key}} opens when you master {{keys}}.",
     "nextSoon": "{{key}} opens after your next lesson.",
-    "allOpen": "All letters are open. Keep practising: {{keys}}.",
-    "complete": "All letters are mastered.",
+    "allOpen": "All keys of this stage are open. Keep practising: {{keys}}.",
+    "complete": "Every key of the course is mastered.",
+    "stage": "Stage {{n}} of {{total}}: {{name}}",
+    "courseLink": "the whole course",
+    "free": "Course complete, now free practice. Most practice goes to: {{keys}}.",
     "keyboard": "Your keyboard",
     "legend": {
       "open": "open",
@@ -68,7 +72,33 @@
       "downRight": "down and right from {{key}}"
     },
     "hint": "Keep your fingers on the home row and reach with one finger only. Return it to its place after each press.",
-    "start": "Start"
+    "shiftHint": "First hold Shift with the little finger of the other hand, then press the key and release both. The other fingers stay on the home row.",
+    "start": "Start",
+    "stageTitle": "New stage: {{name}}",
+    "stage": {
+      "letters": "The letters of the layout, starting from the home position.",
+      "capitals": "Capital letters are typed with Shift. Press Shift with the little finger of the other hand: the right Shift for letters of the left hand, the left Shift for letters of the right hand.",
+      "punctuation": "Full stop, comma and other marks. After a full stop, an exclamation mark or a question mark, a sentence starts with a capital letter.",
+      "digits": "Digits are on the top row. Reach for a digit with the same finger as for the letter below it, and bring the finger back to the home row.",
+      "free": "Ordinary sentences with everything you have learned."
+    },
+    "holdShift": {
+      "ShiftLeft": "Key {{key}} together with the left Shift, pressed by the left little finger.",
+      "ShiftRight": "Key {{key}} together with the right Shift, pressed by the right little finger."
+    },
+    "notes": {
+      "ru-jcuken": {
+        "period": "On the Russian layout the full stop is at the right of the bottom row, on the key that types \"/\" on the English layout.",
+        "comma": "The comma is on the same key as the full stop, with Shift.",
+        "hyphen": "The hyphen is right of 0. There are no spaces around it: «кто-то», «по-моему».",
+        "quote": "Quotes are Shift and 2. Opening and closing quotes are typed the same way."
+      },
+      "en-us-qwerty": {
+        "apostrophe": "The apostrophe is right of \";\". It is used in contractions: don't, it's, I'm.",
+        "quote": "Quotes are on the apostrophe key, with Shift.",
+        "hyphen": "The hyphen is right of 0. There are no spaces around it: well-known, e-mail."
+      }
+    }
   },
   "practice": {
     "speed": "Speed",
@@ -85,6 +115,7 @@
       "ru-jcuken": "Switch the system keyboard layout to Russian"
     },
     "nextKey": "Next key",
+    "stage": "Stage {{n}} of {{total}}: {{name}}",
     "finger": {
       "lPinky": "Left little finger",
       "lRing": "Left ring finger",
@@ -104,7 +135,44 @@
     "enter": "Enter",
     "escape": "Esc",
     "shift": "Shift",
+    "shiftLeft": "Left Shift",
+    "quoted": "“{{key}}”",
+    "shiftRight": "Right Shift",
     "space": "Space"
+  },
+  "stage": {
+    "letters": "Letters",
+    "capitals": "Capital letters",
+    "punctuation": "Punctuation",
+    "digits": "Digits",
+    "free": "Free practice"
+  },
+  "stageAbout": {
+    "letters": "Every letter of the layout, from the home position to the edges of the keyboard.",
+    "capitals": "Capital letters: Shift is pressed by the little finger of the other hand.",
+    "punctuation": "Full stop, comma, quotes and other marks, where they stand in ordinary text.",
+    "digits": "Numbers on the top row of the keyboard.",
+    "free": "Ordinary sentences with everything you have learned, the weakest keys most often. Opens after all stages."
+  },
+  "courseScreen": {
+    "title": "Course",
+    "intro": "Stages go in order: the next one opens when every key of the previous one is mastered.",
+    "trainHint": "Click an open key to practise it on its own. Your course progress counts too.",
+    "continue": "Continue the course",
+    "stageN": "Stage {{n}}.",
+    "status": {
+      "done": "Done",
+      "current": "In progress",
+      "locked": "Not open yet"
+    },
+    "mastered": "Keys mastered: {{mastered}} of {{total}}",
+    "keys": "Keys of the stage",
+    "train": "Practise {{key}}",
+    "weakest": "The weakest keys right now"
+  },
+  "training": {
+    "label": "Practising {{key}}",
+    "stop": "Back to the course"
   },
   "units": {
     "wpm": "WPM",
@@ -115,6 +183,8 @@
     "unlockedOne": "New key unlocked",
     "unlockedMany": "New keys unlocked",
     "unlockedHint": "The next lesson starts with a short introduction.",
+    "stageDone": "Stage \"{{stage}}\" complete!",
+    "stageNext": "Next: {{stage}}.",
     "speed": "Speed",
     "accuracy": "Accuracy",
     "time": "Time",
@@ -169,6 +239,10 @@
     "strict": {
       "label": "Strict mode",
       "hint": "A new key opens only when every open key is fast and accurate right now. Without it, a key mastered once no longer holds you back."
+    },
+    "yo": {
+      "label": "Letter ё",
+      "hint": "The Russian course teaches «ё» and keeps it in the texts. Without this setting «ё» is replaced with «е», as in most Russian texts."
     },
     "speedUnit": {
       "label": "Speed unit",

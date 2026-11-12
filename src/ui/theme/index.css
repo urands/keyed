@@ -69,7 +69,7 @@
    * and 5u high. It shrinks with the window so the practice screen fits without scrolling.
    */
   .kd-keyboard {
-    --u: clamp(2rem, min((100vw - 8rem) / 15, (100vh - 35rem) / 5), 3.1rem);
+    --u: clamp(2rem, min((100vw - 8rem) / 15, (100vh - 35.5rem) / 5), 3.1rem);
   }
 
   /* Short flash on a pressed key. Color and opacity only, no movement. */

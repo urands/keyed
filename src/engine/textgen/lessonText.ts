@@ -91,7 +91,20 @@ export function buildLessonText(input: LessonTextInput): string {
   if (pool.length < MIN_VARIETY) {
     const weight = pool.length > 0 ? rareWeight : 1;
     for (const { word } of letterCombinations(letters, focus, random)) {
-      if (!known.has(word) && !isBlocked(word, input.blocklist)) pool.push({ word, weight });
+      if (!known.has(word) && !isBlocked(word, input.blocklist)) {
+        pool.push({ word, weight });
+        known.add(word);
+      }
+    }
+  }
+  // Pseudo-words may never reach the focus key ("j" before any vowel is open):
+  // letter combinations always do.
+  if (focus !== null && !pool.some((c) => containsFocus(c.word))) {
+    for (const { word } of letterCombinations(letters, focus, random)) {
+      if (containsFocus(word) && !known.has(word) && !isBlocked(word, input.blocklist)) {
+        pool.push({ word, weight: rareWeight });
+        known.add(word);
+      }
     }
   }
 

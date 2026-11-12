@@ -3,6 +3,7 @@
   "stages": [
     {
       "id": "letters",
+      "kind": "letters",
       "intro": 3,
       "start": ["f", "j"],
       "order": [
@@ -29,6 +30,30 @@
         "q",
         "z"
       ]
+    },
+    {
+      "id": "capitals",
+      "kind": "capitals",
+      "start": ["F", "J"],
+      "order": ["DK", "SLA", "EIT", "NOR", "HUC", "MGW", "YPB", "VXQZ"]
+    },
+    {
+      "id": "punctuation",
+      "kind": "punctuation",
+      "start": ["."],
+      "order": [",", "'", "?", "!", "-", ";", ":", "\""]
+    },
+    {
+      "id": "digits",
+      "kind": "digits",
+      "start": ["4", "7"],
+      "order": ["38", "29", "10", "56"]
+    },
+    {
+      "id": "free",
+      "kind": "free",
+      "start": [],
+      "order": []
     }
   ]
 }

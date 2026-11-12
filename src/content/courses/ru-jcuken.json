@@ -3,6 +3,7 @@
   "stages": [
     {
       "id": "letters",
+      "kind": "letters",
       "intro": 2,
       "start": ["а", "о"],
       "order": [
@@ -33,8 +34,34 @@
         "ц",
         "щ",
         "ф",
-        "ъ"
-      ]
+        "ъ",
+        "ё"
+      ],
+      "optional": ["ё"]
+    },
+    {
+      "id": "capitals",
+      "kind": "capitals",
+      "start": ["А", "О"],
+      "order": ["ВЛ", "Д", "РП", "ЕИ", "НТ", "СК", "МУ", "ЯГ", "ЗБ", "ЧЙ", "ЖХ", "ШЮ", "ЭЦ", "ЩФ"]
+    },
+    {
+      "id": "punctuation",
+      "kind": "punctuation",
+      "start": ["."],
+      "order": [",", "!", "?", "-", ":", ";", "\"", "()"]
+    },
+    {
+      "id": "digits",
+      "kind": "digits",
+      "start": ["4", "7"],
+      "order": ["38", "29", "10", "56"]
+    },
+    {
+      "id": "free",
+      "kind": "free",
+      "start": [],
+      "order": []
     }
   ]
 }

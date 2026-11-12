@@ -2,13 +2,15 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
+import { keyViews } from '../../app/courseView';
 import { practiceGeometry } from '../../app/layouts';
 import { useMotivation } from '../../app/motivation';
 import { useLayoutKit, usePractice } from '../../app/practice';
+import { useSettings } from '../../app/settings';
 import { getStorage } from '../../app/storage';
+import { keyForChar } from '../../engine/layout/layout';
 import { mostProductiveDay } from '../../engine/motivation/history';
 import { DEFAULT_PARAMS } from '../../engine/params';
-import { stageKeys } from '../../engine/progress/course';
 import type { LessonSummary } from '../../storage/types';
 import { KeyHeatmap, type HeatKey } from '../charts/KeyHeatmap';
 import { LineChart } from '../charts/LineChart';
@@ -59,10 +61,16 @@ function TableView({ summary, children }: { summary: string; children: ReactNode
 /** Statistics screen (docs/screens.md, section 7; task 2.15). */
 export function StatsScreen() {
   const { t, i18n } = useTranslation();
-  const { layout, stage } = useLayoutKit();
+  const kit = useLayoutKit();
+  const { layout } = kit;
   const unit = useSpeedUnit();
   const keyStats = usePractice((s) => s.keyStats);
-  const progress = usePractice((s) => s.progress);
+  const course = usePractice((s) => s.course);
+  const strict = useSettings((s) => s.strictMode);
+  const views = useMemo(
+    () => keyViews(kit, keyStats, course, strict),
+    [kit, keyStats, course, strict],
+  );
   const days = useMotivation((s) => s.days);
   const layoutRecords = useMotivation((s) => s.totals.byLayout[layout.id]);
   const today = useToday();
@@ -105,16 +113,22 @@ export function StatsScreen() {
   const unitLabel = t(`units.${unit}`);
   const label = (key: string) => charLabel(layout, key, t('keyboard.space'));
 
-  const heatKeys = progress.open.flatMap((key): HeatKey[] => {
-    const code = codesFor(layout, [key]).values().next().value;
-    if (code === undefined) return [];
+  // Open keys of the whole course in course order; the heatmap shows the first
+  // open character of each physical key (the letter before its capital).
+  const openKeys = [...views].filter(([, view]) => view.open).map(([key]) => key);
+  const heatCodes = new Set<string>();
+  const heatKeys = openKeys.flatMap((key): HeatKey[] => {
+    const code = keyForChar(layout, key)?.code;
+    const view = views.get(key);
+    if (code === undefined || !view || heatCodes.has(code)) return [];
+    heatCodes.add(code);
     const stat = keyStats[key];
-    const percent = percentFloor(progress.confidence[key] ?? 0);
+    const percent = percentFloor(view.confidence);
     return [
       {
         code,
-        confidence: progress.confidence[key] ?? 0,
-        mastered: progress.mastered.has(key),
+        confidence: view.confidence,
+        mastered: view.mastered,
         detail: t('stats.keyDetail', {
           key: label(key),
           percent,
@@ -269,7 +283,10 @@ export function StatsScreen() {
           layout={layout}
           geometry={practiceGeometry}
           keys={heatKeys}
-          closedCodes={codesFor(layout, progress.closed)}
+          closedCodes={codesFor(
+            layout,
+            [...views.keys()].filter((key) => !heatCodes.has(keyForChar(layout, key)?.code ?? '')),
+          )}
         />
         <TableView summary={t('stats.keyTable')}>
           <table className="w-full text-left tabular-nums">
@@ -283,27 +300,26 @@ export function StatsScreen() {
               </tr>
             </thead>
             <tbody>
-              {stageKeys(stage)
-                .filter((key) => progress.open.includes(key))
-                .map((key) => {
-                  const stat = keyStats[key];
-                  return (
-                    <tr key={key} className="border-t border-line">
-                      <td className="py-1 pr-4 font-mono">{label(key)}</td>
-                      <td className="py-1 pr-4">
-                        {percentFloor(progress.confidence[key] ?? 0)}%
-                        {progress.mastered.has(key) ? ` ✓ ${t('stats.mastered')}` : ''}
-                      </td>
-                      <td className="py-1 pr-4">
-                        {stat?.timeEma
-                          ? `${speedValue(60000 / stat.timeEma, unit)} ${unitLabel}`
-                          : '—'}
-                      </td>
-                      <td className="py-1 pr-4">{stat?.hits ?? 0}</td>
-                      <td className="py-1">{stat?.misses ?? 0}</td>
-                    </tr>
-                  );
-                })}
+              {openKeys.map((key) => {
+                const stat = keyStats[key];
+                const view = views.get(key);
+                return (
+                  <tr key={key} className="border-t border-line">
+                    <td className="py-1 pr-4 font-mono">{label(key)}</td>
+                    <td className="py-1 pr-4">
+                      {percentFloor(view?.confidence ?? 0)}%
+                      {view?.mastered ? ` ✓ ${t('stats.mastered')}` : ''}
+                    </td>
+                    <td className="py-1 pr-4">
+                      {stat?.timeEma
+                        ? `${speedValue(60000 / stat.timeEma, unit)} ${unitLabel}`
+                        : '—'}
+                    </td>
+                    <td className="py-1 pr-4">{stat?.hits ?? 0}</td>
+                    <td className="py-1">{stat?.misses ?? 0}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </TableView>

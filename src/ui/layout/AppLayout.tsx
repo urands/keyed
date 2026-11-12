@@ -53,6 +53,9 @@ export function AppLayout() {
             <NavLink to="/practice" className={navClass}>
               {t('nav.practice')}
             </NavLink>
+            <NavLink to="/course" className={navClass}>
+              {t('nav.course')}
+            </NavLink>
             <NavLink to="/stats" className={navClass}>
               {t('nav.stats')}
             </NavLink>

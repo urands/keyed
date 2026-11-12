@@ -52,6 +52,56 @@ describe('new key card', () => {
   });
 });
 
+describe('course screen', () => {
+  const allLetters = Object.fromEntries(
+    [...'abcdefghijklmnopqrstuvwxyz'].map((key) => [key, mastered]),
+  );
+
+  it('shows the stages with their status', () => {
+    usePractice.getState().restore(EN, { keyStats: allLetters, opened: { letters: 22 } });
+    const { container } = renderAt('/course');
+    expect(screen.getByRole('heading', { name: 'Course' })).toBeVisible();
+    const statuses = [...container.querySelectorAll('[data-stage-status]')].map((item) =>
+      item.getAttribute('data-stage-status'),
+    );
+    expect(statuses).toEqual(['done', 'current', 'locked', 'locked', 'locked']);
+    expect(screen.getByText('Keys mastered: 26 of 26')).toBeVisible();
+    expect(screen.getByRole('button', { name: /^Practise ⇧F/ })).toBeVisible();
+  });
+
+  it('trains a chosen key and goes back to the course from practice', async () => {
+    const user = userEvent.setup();
+    usePractice.getState().restore(EN, { keyStats: allLetters, opened: { letters: 22 } });
+    const { router } = renderAt('/course');
+
+    await user.click(screen.getByRole('button', { name: /^Practise Q/ }));
+    expect(router.state.location.pathname).toBe('/practice');
+    expect(usePractice.getState().training).toBe('q');
+    expect(screen.getByText('Practising Q')).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Back to the course' }));
+    expect(usePractice.getState().training).toBeNull();
+  });
+});
+
+describe('Shift with the other hand', () => {
+  it('highlights the right Shift for a capital of the left hand', () => {
+    const allLetters = Object.fromEntries(
+      [...'abcdefghijklmnopqrstuvwxyz'].map((key) => [key, mastered]),
+    );
+    usePractice.getState().restore(EN, { keyStats: allLetters, opened: { letters: 22 } });
+    // The capitals stage starts with its card.
+    expect(usePractice.getState().introduce).toEqual(['F', 'J']);
+    usePractice.getState().dismissIntro();
+    usePractice.getState().startLesson('F');
+    const { container } = renderAt('/practice');
+    expect(container.querySelector('[data-code="KeyF"]')).toHaveAttribute('data-next');
+    expect(container.querySelector('[data-code="ShiftRight"]')).toHaveAttribute('data-next');
+    expect(container.querySelector('[data-code="ShiftLeft"]')).not.toHaveAttribute('data-next');
+    expect(screen.getByText('Right Shift')).toBeVisible();
+  });
+});
+
 describe('home screen', () => {
   it('says which keys to practise before the next key opens', () => {
     usePractice.getState().restore(EN, { keyStats: { f: mastered, j: learning }, opened: {} });

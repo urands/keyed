@@ -64,3 +64,11 @@ export function keyForChar(layout: Layout, char: string): KeyStroke | null {
   }
   return strokes.get(char) ?? null;
 }
+
+/**
+ * The time allowance of each character on this layout: `allowance` for
+ * characters typed with Shift, 1 for the rest.
+ */
+export function shiftAllowance(layout: Layout, allowance: number): (char: string) => number {
+  return (char) => (keyForChar(layout, char)?.shift ? allowance : 1);
+}

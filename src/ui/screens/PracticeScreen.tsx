@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { kitFor, practiceGeometry } from '../../app/layouts';
 import { useLayoutKit, usePractice } from '../../app/practice';
@@ -9,9 +9,10 @@ import { toInput } from '../../engine/input/toInput';
 import { keyForChar } from '../../engine/layout/layout';
 import { DEFAULT_PARAMS } from '../../engine/params';
 import { stageKeys } from '../../engine/progress/course';
+import { buttonClass } from '../components/buttonClass';
 import { liveMetrics } from '../../engine/stats/lessonResult';
 import { CourseStrip } from '../practice/CourseStrip';
-import { charLabel, codesFor } from '../practice/keyCodes';
+import { charLabel, codesWithShift, inlineLabel, shiftCodeFor } from '../practice/keyCodes';
 import { isActivatable, isTextEntry } from '../practice/keyTargets';
 import { Keyboard } from '../practice/Keyboard';
 import { LessonResultView } from '../practice/LessonResultView';
@@ -22,6 +23,9 @@ import { NextKeyHint } from '../practice/NextKeyHint';
 import { useDailyProgress, useStreak } from '../motivation/hooks';
 import { playErrorSound, playKeySound } from '../sound';
 import { useSpeedUnit } from '../useSpeedUnit';
+
+/** In free practice the course strip shows this many of the weakest keys. */
+const FREE_STRIP_KEYS = 12;
 
 /** Keys that do not end a pause, so Tab still moves focus and Shift alone does nothing. */
 const NOT_RESUMING = new Set(['Shift', 'Control', 'Alt', 'AltGraph', 'Meta', 'CapsLock', 'Tab']);
@@ -39,6 +43,10 @@ export function PracticeScreen() {
   const result = usePractice((s) => s.result);
   const feedback = usePractice((s) => s.feedback);
   const progress = usePractice((s) => s.progress);
+  const course = usePractice((s) => s.course);
+  const training = usePractice((s) => s.training);
+  const stageDone = usePractice((s) => s.stageDone);
+  const train = usePractice((s) => s.train);
   const unlocked = usePractice((s) => s.unlocked);
   const introduce = usePractice((s) => s.introduce);
   const wrongLayout = usePractice((s) => s.wrongLayout);
@@ -54,8 +62,30 @@ export function PracticeScreen() {
   const daily = useDailyProgress(status === 'finished' ? 0 : lesson.activeMs);
   const streak = useStreak();
   const showIntro = introduce.length > 0 && status !== 'finished';
-  const courseKeys = useMemo(() => stageKeys(kit.stage), [kit]);
-  const openCodes = useMemo(() => codesFor(kit.layout, [...progress.open, ' ']), [kit, progress]);
+  // Free practice has every key: the strip shows the weakest ones.
+  const courseKeys = useMemo(
+    () =>
+      course.stage.kind === 'free'
+        ? [...progress.open]
+            .sort((a, b) => (progress.confidence[a] ?? 0) - (progress.confidence[b] ?? 0))
+            .slice(0, FREE_STRIP_KEYS)
+        : stageKeys(course.stage),
+    [course, progress],
+  );
+  const openCodes = useMemo(
+    () => codesWithShift(kit.layout, practiceGeometry, [...course.open, ' ']),
+    [kit, course],
+  );
+  const stageCount = kit.course.stages.length;
+  const stageName = t(`stage.${course.stage.kind}`);
+  // The start keys of a new stage come with an explanation of the stage.
+  const introStage =
+    course.stageIndex > 0 &&
+    course.stage.kind !== 'free' &&
+    introduce.length === course.stage.start.length &&
+    introduce.every((key) => course.stage.start.includes(key))
+      ? course.stage.kind
+      : null;
 
   useEffect(() => {
     const trackCapsLock = (event: KeyboardEvent) => {
@@ -120,7 +150,7 @@ export function PracticeScreen() {
         return;
       }
 
-      const { layout } = kitFor(store.layoutId);
+      const { layout } = kitFor(store.layoutId, { yoLetter: useSettings.getState().yoLetter });
       const input = toInput(event, layout, useSettings.getState().inputMode);
       if (!input) return;
       event.preventDefault();
@@ -172,10 +202,24 @@ export function PracticeScreen() {
         result={result}
         unit={unit}
         unlocked={unlocked.map((key) => charLabel(kit.layout, key, t('keyboard.space')))}
+        stageDone={
+          stageDone === null
+            ? null
+            : {
+                done: t(
+                  `stage.${kit.course.stages.find((s) => s.id === stageDone)?.kind ?? 'letters'}`,
+                ),
+                next: stageName,
+              }
+        }
         outcome={outcome}
         daily={daily}
         streak={streak}
-        label={(char) => charLabel(kit.layout, char, t('keyboard.space'))}
+        label={(char) =>
+          inlineLabel(kit.layout, char, t('keyboard.space'), (mark) =>
+            t('keyboard.quoted', { key: mark }),
+          )
+        }
         onNext={() => {
           startLesson();
         }}
@@ -190,7 +234,8 @@ export function PracticeScreen() {
         layout={kit.layout}
         geometry={practiceGeometry}
         keys={introduce}
-        openKeys={progress.open}
+        openKeys={course.open}
+        stage={introStage}
         onStart={dismissIntro}
       />
     );
@@ -198,6 +243,12 @@ export function PracticeScreen() {
 
   const nextChar = lesson.chars[lesson.position]?.char;
   const nextCode = nextChar === undefined ? null : (keyForChar(kit.layout, nextChar)?.code ?? null);
+  const nextShift =
+    nextChar === undefined ? null : shiftCodeFor(kit.layout, practiceGeometry, nextChar);
+  const label = (key: string) =>
+    inlineLabel(kit.layout, key, t('keyboard.space'), (mark) =>
+      t('keyboard.quoted', { key: mark }),
+    );
   const live = liveMetrics(lesson);
   const paused = status === 'paused';
   const warnings = [
@@ -221,8 +272,29 @@ export function PracticeScreen() {
 
       <CourseStrip layout={kit.layout} keys={courseKeys} progress={progress} />
 
-      <div className="relative rounded-lg border border-line bg-surface px-8 pt-5 pb-2">
+      <div className="relative rounded-lg border border-line bg-surface px-8 pt-7 pb-2">
         <h1 className="sr-only">{t('nav.practice')}</h1>
+        <div className="absolute inset-x-3 top-1.5 flex items-center justify-between gap-3 text-xs text-ink-muted">
+          <Link to="/course" className="rounded hover:text-ink">
+            {t('practice.stage', { n: course.stageIndex + 1, total: stageCount, name: stageName })}
+          </Link>
+          {training !== null && (
+            <span className="flex items-center gap-2">
+              <span className="font-medium text-ink">
+                {t('training.label', { key: label(training) })}
+              </span>
+              <button
+                type="button"
+                className={`${buttonClass('secondary')} px-2 py-0.5 text-xs`}
+                onClick={() => {
+                  train(null);
+                }}
+              >
+                {t('training.stop')}
+              </button>
+            </span>
+          )}
+        </div>
         <LessonText lesson={lesson} dimmed={paused} />
         <p className="mt-1 flex h-6 gap-4 text-sm" aria-live="polite">
           {warnings.length > 0 ? (
@@ -254,9 +326,15 @@ export function PracticeScreen() {
         geometry={practiceGeometry}
         openCodes={openCodes}
         nextCode={nextCode}
+        nextShift={nextShift}
         flash={feedback}
       />
-      <NextKeyHint layout={kit.layout} geometry={practiceGeometry} code={nextCode} />
+      <NextKeyHint
+        layout={kit.layout}
+        geometry={practiceGeometry}
+        code={nextCode}
+        shift={nextShift}
+      />
     </div>
   );
 }

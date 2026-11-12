@@ -41,12 +41,25 @@ function ema(current: number | null, sample: number, alpha: number): number {
 }
 
 /**
- * How close a key is to the target speed and accuracy, 0–1:
- * min(1, target time / time) × min(1, accuracy / threshold).
+ * How many times the target time a key may take: more than 1 for keys typed
+ * with Shift, whose time includes the Shift press (docs/learning-method.md,
+ * "Статистика клавиш и уверенность").
  */
-export function keyConfidence(stat: KeyStat | undefined, params: ConfidenceParams): number {
+export type TimeAllowance = (key: string) => number;
+
+export const NO_ALLOWANCE: TimeAllowance = () => 1;
+
+/**
+ * How close a key is to the target speed and accuracy, 0–1:
+ * min(1, target time × allowance / time) × min(1, accuracy / threshold).
+ */
+export function keyConfidence(
+  stat: KeyStat | undefined,
+  params: ConfidenceParams,
+  allowance = 1,
+): number {
   if (!stat || stat.timeEma === null || stat.accEma === null) return 0;
-  const targetTime = 60000 / params.targetCpm;
+  const targetTime = (60000 / params.targetCpm) * allowance;
   const speedScore = Math.min(1, targetTime / stat.timeEma);
   const accuracyScore = Math.min(1, stat.accEma / params.accuracyThreshold);
   return speedScore * accuracyScore;
@@ -60,9 +73,10 @@ export function isKeyMastered(
   stat: KeyStat | undefined,
   params: MasteryParams,
   strict = false,
+  allowance = 1,
 ): boolean {
   if (!stat || stat.hits < params.minHitsToMaster) return false;
-  const confidence = strict ? keyConfidence(stat, params) : stat.bestConfidence;
+  const confidence = strict ? keyConfidence(stat, params, allowance) : stat.bestConfidence;
   return confidence >= 1;
 }
 
@@ -71,6 +85,7 @@ export function applySamples(
   stats: Readonly<Record<string, KeyStat>>,
   samples: readonly KeySample[],
   params: UpdateParams,
+  allowance: TimeAllowance = NO_ALLOWANCE,
 ): Record<string, KeyStat> {
   const next: Record<string, KeyStat> = { ...stats };
   for (const { char, typos, time } of samples) {
@@ -85,7 +100,10 @@ export function applySamples(
     }
     // Early lucky presses must not count: best confidence is kept only with enough hits.
     if (stat.hits >= params.minHitsToMaster) {
-      stat.bestConfidence = Math.max(stat.bestConfidence, keyConfidence(stat, params));
+      stat.bestConfidence = Math.max(
+        stat.bestConfidence,
+        keyConfidence(stat, params, allowance(char)),
+      );
     }
     next[char] = stat;
   }

@@ -1,5 +1,11 @@
 import type { LearningParams } from '../params';
-import { isKeyMastered, keyConfidence, type KeyStat } from '../stats/keyStats';
+import {
+  isKeyMastered,
+  keyConfidence,
+  NO_ALLOWANCE,
+  type KeyStat,
+  type TimeAllowance,
+} from '../stats/keyStats';
 import type { CourseStage } from './course';
 
 type Params = Pick<LearningParams, 'targetCpm' | 'accuracyThreshold' | 'minHitsToMaster'>;
@@ -35,6 +41,7 @@ export function evaluateStage(
   stats: Readonly<Record<string, KeyStat>>,
   params: Params,
   strict = false,
+  allowance: TimeAllowance = NO_ALLOWANCE,
 ): StageProgress {
   const count = clampOpened(stage, opened);
   const open = [...stage.start, ...stage.order.slice(0, count).flat()];
@@ -42,19 +49,24 @@ export function evaluateStage(
 
   const confidence: Record<string, number> = {};
   const mastered = new Set<string>();
+  for (const key of open) {
+    confidence[key] = keyConfidence(stats[key], params, allowance(key));
+    if (isKeyMastered(stats[key], params, strict, allowance(key))) mastered.add(key);
+  }
+  const blockers = open.filter((key) => !mastered.has(key));
+
+  // The focus is a key that is not mastered yet: a key may be fast already but
+  // still lack hits. With every key mastered, the weakest one gets practice.
   let focus: string | null = null;
   let lowest = Infinity;
-  for (const key of open) {
-    const value = keyConfidence(stats[key], params);
-    confidence[key] = value;
-    if (isKeyMastered(stats[key], params, strict)) mastered.add(key);
+  for (const key of blockers.length > 0 ? blockers : open) {
+    const value = confidence[key] ?? 0;
     // On a tie the later key wins: a key just opened has confidence 0 and comes last.
     if (value <= lowest) {
       lowest = value;
       focus = key;
     }
   }
-  const blockers = open.filter((key) => !mastered.has(key));
   return {
     open,
     closed,
@@ -77,8 +89,9 @@ export function advanceStage(
   stats: Readonly<Record<string, KeyStat>>,
   params: Params,
   strict = false,
+  allowance: TimeAllowance = NO_ALLOWANCE,
 ): number {
-  const progress = evaluateStage(stage, opened, stats, params, strict);
+  const progress = evaluateStage(stage, opened, stats, params, strict, allowance);
   const count = clampOpened(stage, opened);
   return progress.blockers.length === 0 && progress.next !== null ? count + 1 : count;
 }
