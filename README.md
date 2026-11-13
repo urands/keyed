@@ -1,52 +1,54 @@
 # KeyEd
 
-Бесплатное настольное приложение для обучения слепой десятипальцевой печати. Первая версия учит английской раскладке QWERTY и русской ЙЦУКЕН.
+English | [Русский](README.ru.md)
 
-**Скачать:** [urands.github.io/keyed](https://urands.github.io/keyed/) или [страница релизов](https://github.com/urands/keyed/releases/latest).
+A free desktop app for learning touch typing with all ten fingers. The first version teaches the English QWERTY layout and the Russian ЙЦУКЕН layout.
 
-Готовы все фазы из [плана реализации](docs/implementation-plan.md). Это полный курс на английской и русской раскладках: буквы, заглавные с Shift другой рукой, знаки препинания, цифры и свободная практика предложениями. Клавиши открываются по мере освоения. Ещё есть:
+**Download:** [urands.github.io/keyed](https://urands.github.io/keyed/) or the [releases page](https://github.com/urands/keyed/releases/latest).
 
-- мастер первого запуска, клавиатуры ANSI и ISO, буква «ё» по желанию;
-- экран курса с тренировкой любой клавиши, статистика;
-- дневная цель, серия дней, достижения, напоминания и звуки;
-- светлая и тёмная тема;
-- экспорт, импорт и сброс данных;
-- автообновление.
+All phases of the [implementation plan](docs/implementation-plan.md) are done. KeyEd is a full course for the English and Russian layouts: letters, capitals with Shift on the opposite hand, punctuation, digits, and free practice with sentences. New keys unlock as you master the previous ones. It also has:
 
-## Что нужно для разработки
+- a first-run wizard, ANSI and ISO keyboards, and an optional «ё» letter;
+- a course screen where you can practise any key, plus statistics;
+- a daily goal, day streaks, achievements, reminders and sounds;
+- light and dark themes;
+- data export, import and reset;
+- automatic updates.
 
-- Node.js 22.13 или новее и pnpm 12.
-- [rustup](https://rustup.rs/). Нужную версию Rust он ставит сам по файлу `src-tauri/rust-toolchain.toml`.
-- Системные зависимости Tauri для вашей ОС: [tauri.app/start/prerequisites](https://tauri.app/start/prerequisites/).
+## Development requirements
 
-## Команды
+- Node.js 22.13 or newer and pnpm 12.
+- [rustup](https://rustup.rs/). It installs the required Rust version from `src-tauri/rust-toolchain.toml` on its own.
+- Tauri system dependencies for your OS: [tauri.app/start/prerequisites](https://tauri.app/start/prerequisites/).
 
-| Команда              | Что делает                                                     |
-| -------------------- | -------------------------------------------------------------- |
-| `pnpm install`       | Ставит зависимости                                             |
-| `pnpm tauri dev`     | Запускает приложение в окне с горячей перезагрузкой            |
-| `pnpm dev`           | Запускает только интерфейс в браузере: `http://localhost:1420` |
-| `pnpm lint`          | Проверяет код линтером                                         |
-| `pnpm typecheck`     | Проверяет типы                                                 |
-| `pnpm test`          | Запускает тесты                                                |
-| `pnpm format`        | Форматирует код                                                |
-| `pnpm tauri build`   | Собирает установщик для текущей ОС                             |
-| `pnpm content:build` | Пересобирает словари уроков из `tools/sources/`                |
+## Commands
 
-Первая сборка оболочки на Rust занимает несколько минут и около 2 ГБ в `src-tauri/target/`.
+| Command              | What it does                                             |
+| -------------------- | -------------------------------------------------------- |
+| `pnpm install`       | Installs dependencies                                    |
+| `pnpm tauri dev`     | Runs the app in a window with hot reload                 |
+| `pnpm dev`           | Runs only the UI in a browser at `http://localhost:1420` |
+| `pnpm lint`          | Lints the code                                           |
+| `pnpm typecheck`     | Checks types                                             |
+| `pnpm test`          | Runs the tests                                           |
+| `pnpm format`        | Formats the code                                         |
+| `pnpm tauri build`   | Builds an installer for the current OS                   |
+| `pnpm content:build` | Rebuilds the lesson dictionaries from `tools/sources/`   |
 
-В обычном браузере (`pnpm dev`) данные хранятся в `localStorage`, в настольном приложении — в SQLite.
+The first build of the Rust shell takes several minutes and about 2 GB in `src-tauri/target/`.
 
-Локальная сборка установщика с файлами обновления просит ключ подписи обновлений (`TAURI_SIGNING_PRIVATE_KEY`). Для проверки достаточно `pnpm tauri build --no-bundle`: соберётся exe без установщика.
+In a regular browser (`pnpm dev`) data is stored in `localStorage`; in the desktop app it is stored in SQLite.
 
-## Выпуск версии
+Building an installer with update files locally requires the update signing key (`TAURI_SIGNING_PRIVATE_KEY`). To check that the app builds, `pnpm tauri build --no-bundle` is enough: it produces the executable without an installer.
 
-Поднять версию в `package.json`, закоммитить и отправить тег `vX.Y.Z` с той же версией. GitHub Actions соберёт установщики для Windows, macOS и Linux и создаст черновик релиза; после проверки его нужно опубликовать. Подробнее — в [архитектуре](docs/architecture.md#как-выпустить-версию).
+## Releasing a version
 
-## Документация
+Bump the version in `package.json`, commit, and push a `vX.Y.Z` tag with the same version. GitHub Actions builds installers for Windows, macOS and Linux and creates a draft release; publish it after checking. See the [architecture document](docs/architecture.md#как-выпустить-версию) for details.
 
-Описание продукта, методика, экраны, архитектура и план лежат в папке [docs](docs/README.md). Структура проекта описана в [архитектуре](docs/architecture.md).
+## Documentation
 
-## Лицензия
+The product description, learning method, screens, architecture and plan are in the [docs](docs/README.md) folder (in Russian). The project structure is described in the [architecture document](docs/architecture.md).
 
-Код — [MIT](LICENSE). Словари уроков сделаны на основе [FrequencyWords](https://github.com/hermitdave/FrequencyWords) (Hermit Dave, OpenSubtitles 2018) и распространяются под [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Источники перечислены в `tools/sources/README.md`.
+## License
+
+The code is licensed under [MIT](LICENSE). The lesson dictionaries are based on [FrequencyWords](https://github.com/hermitdave/FrequencyWords) (Hermit Dave, OpenSubtitles 2018) and are distributed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The sources are listed in `tools/sources/README.md`.
