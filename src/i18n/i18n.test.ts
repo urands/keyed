@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
+import de from './de.json';
 import en from './en.json';
-import { detectLanguage } from './index';
+import es from './es.json';
+import fr from './fr.json';
+import { detectLanguage, LANGUAGES } from './index';
 import ru from './ru.json';
+
+const RESOURCES = { ru, en, de, fr, es };
 
 function keyPaths(value: unknown, prefix = ''): string[] {
   if (typeof value !== 'object' || value === null) return [prefix];
@@ -13,7 +18,7 @@ function keyPaths(value: unknown, prefix = ''): string[] {
 
 const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/;
 
-/** Keys without plural suffixes: Russian has more plural forms than English. */
+/** Keys without plural suffixes: languages have different plural forms. */
 function baseKeys(resource: unknown): string[] {
   return [...new Set(keyPaths(resource).map((path) => path.replace(PLURAL_SUFFIX, '')))].sort();
 }
@@ -29,18 +34,51 @@ function pluralForms(resource: unknown): Record<string, string[]> {
 }
 
 describe('translations', () => {
-  it('have the same keys in Russian and English', () => {
-    expect(baseKeys(ru)).toEqual(baseKeys(en));
+  it.each(LANGUAGES)('have the same keys in %s and English', (language) => {
+    expect(baseKeys(RESOURCES[language])).toEqual(baseKeys(en));
   });
 
-  it('have every plural form each language needs', () => {
-    for (const forms of Object.values(pluralForms(en))) {
-      expect(forms.sort()).toEqual(['one', 'other']);
+  it.each(LANGUAGES)('have every plural form %s needs', (language) => {
+    // i18next picks the form with Intl.PluralRules: one, few, many, other.
+    const needed = [...new Intl.PluralRules(language).resolvedOptions().pluralCategories].sort();
+    const forms = pluralForms(RESOURCES[language]);
+    for (const [key, found] of Object.entries(forms)) expect(found.sort(), key).toEqual(needed);
+    expect(Object.keys(forms).sort()).toEqual(Object.keys(pluralForms(en)).sort());
+  });
+
+  it.each(LANGUAGES)('keep the placeholders of English in %s', (language) => {
+    const placeholders = (value: unknown) =>
+      [...String(value).matchAll(/\{\{\w+\}\}/gu)].map((match) => match[0]).sort();
+    const valueAt = (resource: unknown, path: string) =>
+      path
+        .split('.')
+        .reduce<unknown>((node, key) => (node as Record<string, unknown>)[key], resource);
+    const resource = RESOURCES[language];
+    for (const path of keyPaths(en)) {
+      const base = path.replace(PLURAL_SUFFIX, '');
+      const own = keyPaths(resource).filter((p) => p.replace(PLURAL_SUFFIX, '') === base);
+      for (const ownPath of own) {
+        // A singular form may say "one" instead of {{count}}.
+        const expected = placeholders(valueAt(en, path)).filter(
+          (p) => !(p === '{{count}}' && PLURAL_SUFFIX.test(path)),
+        );
+        for (const placeholder of expected) {
+          expect(String(valueAt(resource, ownPath)), ownPath).toContain(placeholder);
+        }
+      }
     }
-    for (const forms of Object.values(pluralForms(ru))) {
-      expect(forms.sort()).toEqual(['few', 'many', 'one', 'other']);
+  });
+
+  it('name every language in its own language, the same in every file', () => {
+    for (const resource of Object.values(RESOURCES)) {
+      expect(resource.settings.language).toMatchObject({
+        ru: 'Русский',
+        en: 'English',
+        de: 'Deutsch',
+        fr: 'Français',
+        es: 'Español',
+      });
     }
-    expect(Object.keys(pluralForms(ru)).sort()).toEqual(Object.keys(pluralForms(en)).sort());
   });
 
   it('pick the right Russian plural form', async () => {
@@ -53,7 +91,7 @@ describe('translations', () => {
   });
 
   it('contain no empty strings', () => {
-    for (const resource of [en, ru]) {
+    for (const resource of Object.values(RESOURCES)) {
       const empty = keyPaths(resource).filter((path) => {
         const value = path
           .split('.')
@@ -72,9 +110,17 @@ describe('detectLanguage', () => {
     expect(detectLanguage('RU-by')).toBe('ru');
   });
 
+  it('chooses German, French and Spanish for their locales', () => {
+    expect(detectLanguage('de-DE')).toBe('de');
+    expect(detectLanguage('de-AT')).toBe('de');
+    expect(detectLanguage('fr-CA')).toBe('fr');
+    expect(detectLanguage('es-MX')).toBe('es');
+    expect(detectLanguage('es_ES')).toBe('es');
+  });
+
   it('falls back to English for everything else', () => {
     expect(detectLanguage('en-US')).toBe('en');
-    expect(detectLanguage('de-DE')).toBe('en');
+    expect(detectLanguage('it-IT')).toBe('en');
     expect(detectLanguage('')).toBe('en');
   });
 });

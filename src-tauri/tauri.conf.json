@@ -51,7 +51,7 @@
     "createUpdaterArtifacts": true,
     "category": "Education",
     "shortDescription": "Touch typing tutor",
-    "longDescription": "KeyEd teaches touch typing on the English QWERTY and Russian ЙЦУКЕН layouts with adaptive lessons.",
+    "longDescription": "KeyEd teaches touch typing on the English, Russian, German, French and Spanish layouts with adaptive lessons.",
     "copyright": "© 2026 KeyEd contributors. MIT License.",
     "homepage": "https://urands.github.io/keyed/",
     "icon": [

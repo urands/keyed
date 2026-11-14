@@ -6,6 +6,9 @@ describe('format', () => {
   it('chooses the speed unit by layout language', () => {
     expect(defaultSpeedUnit('en')).toBe('wpm');
     expect(defaultSpeedUnit('ru')).toBe('cpm');
+    expect(defaultSpeedUnit('de')).toBe('cpm');
+    expect(defaultSpeedUnit('fr')).toBe('wpm');
+    expect(defaultSpeedUnit('es')).toBe('cpm');
   });
 
   it('converts and rounds speed', () => {

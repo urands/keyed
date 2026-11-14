@@ -97,6 +97,16 @@ describe('first-run wizard', () => {
     expect(useSettings.getState().language).toBe('ru');
   });
 
+  it('offers the layout of the chosen language first', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    await user.click(screen.getByRole('radio', { name: 'Deutsch' }));
+    expect(useSettings.getState().language).toBe('de');
+    await user.keyboard('{Enter}');
+    // The interface language changes through the settings sync, which this test does not run.
+    expect(screen.getByRole('radio', { name: 'German (QWERTZ)' })).toBeChecked();
+  });
+
   it('opens every letter for a learner who types blind', async () => {
     const user = userEvent.setup();
     renderApp();

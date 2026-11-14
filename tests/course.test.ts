@@ -1,13 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  deQwertz,
+  deQwertzCourse,
   englishContent,
   enUsQwerty,
   enUsQwertyCourse,
+  esQwerty,
+  esQwertyCourse,
+  frAzerty,
+  frAzertyCourse,
+  frenchContent,
+  germanContent,
   ruJcuken,
   ruJcukenCourse,
   russianContent,
   russianYoContent,
+  spanishContent,
   type LanguageContent,
 } from '../src/content';
 import { shiftAllowance, type Layout } from '../src/engine/layout/layout';
@@ -109,6 +118,31 @@ describe.each([
     first: /^[ао]+( [ао]+)*$/,
     wordsOnceOpen: 'л',
   },
+  {
+    name: 'German',
+    course: deQwertzCourse,
+    layout: deQwertz,
+    content: germanContent,
+    first: /^[fj]+( [fj]+)*$/,
+    wordsOnceOpen: 'a',
+  },
+  {
+    name: 'French',
+    course: frAzertyCourse,
+    layout: frAzerty,
+    content: frenchContent,
+    first: /^[fj]+( [fj]+)*$/,
+    // The French home row has no vowels; words start with "E".
+    wordsOnceOpen: 'e',
+  },
+  {
+    name: 'Spanish',
+    course: esQwertyCourse,
+    layout: esQwerty,
+    content: spanishContent,
+    first: /^[fj]+( [fj]+)*$/,
+    wordsOnceOpen: 'a',
+  },
 ])(
   'the $name course with a synthetic learner',
   ({ course, layout, content, first, wordsOnceOpen }) => {
@@ -173,11 +207,12 @@ describe.each([
       const free = of('free');
       expect(free).toHaveLength(FREE_LESSONS);
       for (const { text } of free) {
-        // A sentence starts with a capital, maybe after an opening quote or parenthesis.
-        expect(text).toMatch(/^["'(]?\p{Lu}/u);
-        expect(text).toMatch(/[.!?]["')]? ["'(]?\p{Lu}/u);
+        // A sentence starts with a capital, maybe after an opening quote,
+        // parenthesis or Spanish "¿" and "¡".
+        expect(text).toMatch(/^["'(¿¡]?\p{Lu}/u);
+        expect(text).toMatch(/[.!?]["')]? ["'(¿¡]?\p{Lu}/u);
         // Never a small letter or a number after the end of a sentence.
-        expect(text).not.toMatch(/[.!?]["')]? ["'(]?[\p{Ll}\p{Nd}]/u);
+        expect(text).not.toMatch(/[.!?]["')]? ["'(¿¡]?[\p{Ll}\p{Nd}]/u);
       }
       // Free practice mixes in numbers and other marks.
       const share = (pattern: RegExp) =>

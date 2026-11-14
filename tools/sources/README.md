@@ -4,14 +4,14 @@
 
 | Папка | Что это | Откуда | Лицензия |
 |---|---|---|---|
-| `frequencywords-2018/` | Частотные списки слов по субтитрам OpenSubtitles 2018: `en_50k.txt`, `ru_50k.txt` | [hermitdave/FrequencyWords](https://github.com/hermitdave/FrequencyWords), коммит `525f9b560de45753a5ea01069454e72e9aa541c6`, папка `content/2018` | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), автор — Hermit Dave |
-| `ldnoobw/` | Списки нежелательных слов для фильтра: `en.txt`, `ru.txt` | [LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words](https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words), коммит `5faf2ba42d7b1c0977169ec3611df25a3c08eb13` | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), Shutterstock и участники проекта |
+| `frequencywords-2018/` | Частотные списки слов по субтитрам OpenSubtitles 2018: `en_50k.txt`, `ru_50k.txt`, `de_50k.txt`, `fr_50k.txt`, `es_50k.txt` | [hermitdave/FrequencyWords](https://github.com/hermitdave/FrequencyWords), коммит `525f9b560de45753a5ea01069454e72e9aa541c6`, папка `content/2018` | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), автор — Hermit Dave |
+| `ldnoobw/` | Списки нежелательных слов для фильтра: `en.txt`, `ru.txt`, `de.txt`, `fr.txt`, `es.txt` | [LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words](https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words), коммит `5faf2ba42d7b1c0977169ec3611df25a3c08eb13` | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), Shutterstock и участники проекта |
 | `blocklist-extra/` | Наши дополнения к фильтру нежелательных слов | KeyEd | Как у словарей приложения |
 | `exclude/` | Не слова, а междометия и сокращения (`uh`, `mr`, `хм`): убираются из словаря, но не попадают в фильтр псевдослов | KeyEd | Как у словарей приложения |
 
 ## Что получается на выходе
 
-Словари `words.json` и буквенные модели `ngrams.json` — переработка списков FrequencyWords: оставлены слова только из букв языка длиной 2–10, «ё» заменена на «е», убраны нежелательные слова, междометия и сокращения, двухбуквенные слова взяты только из первых 600 строк источника, взяты первые 10 000 слов по частоте. Поэтому они распространяются под той же лицензией CC BY-SA 4.0 с указанием авторства. На лицензию кода приложения это не влияет.
+Словари `words.json` и буквенные модели `ngrams.json` — переработка списков FrequencyWords: оставлены слова только из букв курса длиной 2–10, «ё» заменена на «е», французские `œ æ` — на `oe ae`, убраны нежелательные слова, междометия и сокращения, двухбуквенные слова взяты только из первых 600 строк источника, взяты первые 10 000 слов по частоте. Поэтому они распространяются под той же лицензией CC BY-SA 4.0 с указанием авторства. На лицензию кода приложения это не влияет.
 
 Авторство источников нужно показать в разделе «О программе» (задача 6.10).
 

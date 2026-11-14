@@ -8,14 +8,13 @@ import { useLayoutKit, usePractice } from '../../app/practice';
 import { useSettings } from '../../app/settings';
 import { toInput } from '../../engine/input/toInput';
 import type { Finger } from '../../engine/layout/geometry';
-import { keyForChar } from '../../engine/layout/layout';
 import { DEFAULT_PARAMS } from '../../engine/params';
 import { stageKeys } from '../../engine/progress/course';
 import { buttonClass } from '../components/buttonClass';
 import { liveMetrics } from '../../engine/stats/lessonResult';
 import { CourseStrip } from '../practice/CourseStrip';
 import { Hand } from '../practice/Hands';
-import { charLabel, codesWithShift, inlineLabel, shiftCodeFor } from '../practice/keyCodes';
+import { charLabel, codesWithShift, inlineLabel, nextPress } from '../practice/keyCodes';
 import { isActivatable, isTextEntry } from '../practice/keyTargets';
 import { Keyboard } from '../practice/Keyboard';
 import { LessonResultView } from '../practice/LessonResultView';
@@ -54,6 +53,7 @@ export function PracticeScreen() {
   const unlocked = usePractice((s) => s.unlocked);
   const introduce = usePractice((s) => s.introduce);
   const wrongLayout = usePractice((s) => s.wrongLayout);
+  const deadKey = usePractice((s) => s.deadKey);
   const outcome = usePractice((s) => s.outcome);
   const startLesson = usePractice((s) => s.startLesson);
   const repeatLesson = usePractice((s) => s.repeatLesson);
@@ -158,10 +158,19 @@ export function PracticeScreen() {
       }
 
       const { layout } = kitFor(store.layoutId, { yoLetter: useSettings.getState().yoLetter });
-      const input = toInput(event, layout, useSettings.getState().inputMode);
-      if (!input) return;
-      event.preventDefault();
-      store.press(input);
+      const { input, dead } = toInput(
+        event,
+        layout,
+        useSettings.getState().inputMode,
+        store.deadKey,
+      );
+      if (input) {
+        event.preventDefault();
+        store.press(input);
+      } else if (dead !== store.deadKey) {
+        event.preventDefault();
+        store.setDeadKey(dead);
+      }
     };
 
     window.addEventListener('keydown', onKeyDown);
@@ -249,8 +258,11 @@ export function PracticeScreen() {
   }
 
   const nextChar = lesson.chars[lesson.position]?.char;
-  const nextCode = nextChar === undefined ? null : (keyForChar(kit.layout, nextChar)?.code ?? null);
-  const nextShift = nextChar === undefined ? null : shiftCodeFor(kit.layout, geometry, nextChar);
+  // A letter with an accent starts with its dead key, then the letter.
+  const next =
+    nextChar === undefined ? null : nextPress(kit.layout, geometry, nextChar, deadKey !== null);
+  const nextCode = next?.code ?? null;
+  const nextShift = next?.shift ?? null;
   const label = (key: string) =>
     inlineLabel(kit.layout, key, t('keyboard.space'), (mark) =>
       t('keyboard.quoted', { key: mark }),

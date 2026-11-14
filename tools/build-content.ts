@@ -8,6 +8,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import type { LayoutLanguage } from '../src/engine/layout/layout.ts';
 import { isBlocked } from '../src/engine/textgen/blocklist.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -22,10 +23,17 @@ const WORD_COUNT = 10_000;
  */
 const TWO_LETTER_MAX_RANK = 600;
 
-const SOURCE_NOTE =
-  'FrequencyWords by Hermit Dave (OpenSubtitles 2018), https://github.com/hermitdave/FrequencyWords. ' +
-  'Filtered and shortened for KeyEd: letters of the alphabet only, 2–10 letters, ё replaced with е, ' +
-  'unwanted words removed, first 10,000 by frequency.';
+/** Where a dictionary comes from and how it was changed. */
+function sourceNote(config: LanguageConfig): string {
+  const replaced = Object.entries(config.replace)
+    .map(([from, to]) => `${from} replaced with ${to}, `)
+    .join('');
+  return (
+    'FrequencyWords by Hermit Dave (OpenSubtitles 2018), https://github.com/hermitdave/FrequencyWords. ' +
+    `Filtered and shortened for KeyEd: letters of the alphabet only, 2–10 letters, ${replaced}` +
+    'unwanted words removed, first 10,000 by frequency.'
+  );
+}
 const SOURCE_LICENSE = 'CC BY-SA 4.0, https://creativecommons.org/licenses/by-sa/4.0/';
 const BLOCKLIST_NOTE =
   'List of Dirty, Naughty, Obscene, and Otherwise Bad Words (CC BY 4.0), ' +
@@ -33,15 +41,24 @@ const BLOCKLIST_NOTE =
   'with additions by KeyEd.';
 
 interface LanguageConfig {
-  language: 'en' | 'ru';
+  language: LayoutLanguage;
+  /** Letters the course teaches; words with other letters are left out. */
   alphabet: string;
   /** Letters replaced before filtering. */
   replace: Record<string, string>;
 }
 
+const LATIN = 'abcdefghijklmnopqrstuvwxyz';
+
 const LANGUAGES: LanguageConfig[] = [
-  { language: 'en', alphabet: 'abcdefghijklmnopqrstuvwxyz', replace: {} },
+  { language: 'en', alphabet: LATIN, replace: {} },
   { language: 'ru', alphabet: 'абвгдежзийклмнопрстуфхцчшщъыьэюя', replace: { ё: 'е' } },
+  { language: 'de', alphabet: `${LATIN}äöüß`, replace: {} },
+  // "œ" and "æ" are not on the AZERTY keyboard; people type "oe" and "ae".
+  // "ë", "ü" and "ÿ" are left out: only a few names and loanwords have them.
+  { language: 'fr', alphabet: `${LATIN}àâçéèêîïôùû`, replace: { œ: 'oe', æ: 'ae' } },
+  // "ü" is left out: only a few words have it (vergüenza), too few to practise.
+  { language: 'es', alphabet: `${LATIN}ñáéíóú`, replace: {} },
 ];
 
 function readLines(path: string): string[] {
@@ -52,7 +69,8 @@ function readLines(path: string): string[] {
 }
 
 function normalize(word: string, config: LanguageConfig): string {
-  let result = word.toLocaleLowerCase(config.language);
+  // Composed characters, so "é" is one character as typed with a dead key.
+  let result = word.normalize('NFC').toLocaleLowerCase(config.language);
   for (const [from, to] of Object.entries(config.replace)) result = result.replaceAll(from, to);
   return result;
 }
@@ -137,12 +155,12 @@ function build(base: LanguageConfig, keep = ''): void {
 
   const out = join(ROOT, 'src', 'content', config.language);
   writeJson(join(out, `words${suffix}.json`), {
-    source: SOURCE_NOTE,
+    source: sourceNote(config),
     license: SOURCE_LICENSE,
     words,
   });
   writeJson(join(out, `ngrams${suffix}.json`), {
-    source: SOURCE_NOTE,
+    source: sourceNote(config),
     license: SOURCE_LICENSE,
     counts: buildLetterModel(words),
   });

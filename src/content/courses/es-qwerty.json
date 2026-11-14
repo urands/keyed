@@ -1,0 +1,65 @@
+{
+  "layoutId": "es-qwerty",
+  "stages": [
+    {
+      "id": "letters",
+      "kind": "letters",
+      "intro": 3,
+      "start": ["f", "j"],
+      "order": [
+        "dk",
+        "sl",
+        "a",
+        "e",
+        "o",
+        "r",
+        "n",
+        "i",
+        "c",
+        "t",
+        "u",
+        "m",
+        "p",
+        "ó",
+        "b",
+        "g",
+        "í",
+        "v",
+        "á",
+        "y",
+        "q",
+        "é",
+        "h",
+        "z",
+        "ñ",
+        "ú",
+        "x",
+        "w"
+      ]
+    },
+    {
+      "id": "capitals",
+      "kind": "capitals",
+      "start": ["F", "J"],
+      "order": ["DK", "SLA", "EOR", "NIC", "TUM", "PBG", "VYQ", "HZXW", "ÉÁ", "ÚÓÍ"]
+    },
+    {
+      "id": "punctuation",
+      "kind": "punctuation",
+      "start": ["."],
+      "order": [",", "¿?", "¡!", "-", ":", ";", "\"", "()"]
+    },
+    {
+      "id": "digits",
+      "kind": "digits",
+      "start": ["4", "7"],
+      "order": ["38", "29", "10", "56"]
+    },
+    {
+      "id": "free",
+      "kind": "free",
+      "start": [],
+      "order": []
+    }
+  ]
+}

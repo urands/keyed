@@ -2,9 +2,13 @@ import type { LayoutLanguage } from '../engine/layout/layout';
 
 export type SpeedUnit = 'wpm' | 'cpm';
 
-/** Russian lessons show characters per minute, English ones words per minute. */
+/**
+ * The unit typing tests usually use in the language: characters per minute for
+ * Russian, German ("Anschläge") and Spanish ("pulsaciones"), words per minute
+ * for English and French.
+ */
 export function defaultSpeedUnit(language: LayoutLanguage): SpeedUnit {
-  return language === 'ru' ? 'cpm' : 'wpm';
+  return language === 'en' || language === 'fr' ? 'wpm' : 'cpm';
 }
 
 /** Speed in the chosen unit, rounded for display. */

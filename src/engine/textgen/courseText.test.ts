@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { englishContent, russianContent } from '../../content';
+import { englishContent, frenchContent, russianContent, spanishContent } from '../../content';
 import { DEFAULT_PARAMS } from '../params';
 import type { StageKind } from '../progress/course';
 import { createRandom } from '../random';
@@ -130,5 +130,59 @@ describe('buildCourseText', () => {
       const words = text('free', open, 'z', 5).split(' ');
       expect(words.filter((word) => word.includes('z')).length).toBeGreaterThanOrEqual(5);
     });
+  });
+});
+
+describe('Spanish and French texts', () => {
+  const es = 'abcdefghijklmnopqrstuvwxyzñáéíóú';
+  const fr = 'abcdefghijklmnopqrstuvwxyzàâçéèêîïôùû';
+  const spanish = (kind: StageKind, open: string, focus: string | null, seed: number) =>
+    buildCourseText({
+      ...spanishContent,
+      kind,
+      open: new Set(open),
+      focus,
+      random: createRandom(seed),
+      params,
+      locale: 'es',
+    });
+
+  it('opens a question with "¿" and an exclamation with "¡"', () => {
+    const open = `${es}${es.toUpperCase()}.,¿?¡!`;
+    for (let seed = 1; seed <= 10; seed += 1) {
+      const value = spanish('punctuation', open, '?', seed);
+      const questions = value.split(' ').filter((word) => word.endsWith('?'));
+      expect(questions.length).toBeGreaterThan(0);
+      for (const word of questions) expect(word, value).toMatch(/^¿/u);
+      expect(spanish('punctuation', open, '¡', seed)).toMatch(/¡\p{L}+!/u);
+    }
+  });
+
+  it('ends Spanish sentences in free practice with "." when "¿" is learned', () => {
+    const open = `${es}${es.toUpperCase()}.,¿?¡!0123456789`;
+    for (let seed = 1; seed <= 10; seed += 1) {
+      const value = spanish('free', open, null, seed);
+      for (const word of value.split(' ').filter((w) => /[?!]$/u.test(w))) {
+        expect(word, value).toMatch(/^[¿¡]/u);
+      }
+    }
+  });
+
+  it('starts a sentence with a word whose capital is learned', () => {
+    // French capitals are only A–Z: "été" cannot start a sentence as "Été".
+    const open = `${fr}${lower.toUpperCase()}.,'`;
+    for (let seed = 1; seed <= 10; seed += 1) {
+      const value = buildCourseText({
+        ...frenchContent,
+        kind: 'free',
+        open: new Set(open),
+        focus: 'é',
+        random: createRandom(seed),
+        params,
+        locale: 'fr',
+      });
+      expect(value, value).toMatch(/^\p{Lu}/u);
+      expect(value, value).not.toMatch(/[.!?] \P{Lu}/u);
+    }
   });
 });

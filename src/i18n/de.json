@@ -1,0 +1,585 @@
+{
+  "app": {
+    "name": "KeyEd",
+    "storageError": "Dein Fortschritt kann nicht gespeichert werden. Die Lektionen funktionieren weiter, aber die Ergebnisse gehen verloren, wenn du die App schließt."
+  },
+  "nav": {
+    "label": "Bereiche",
+    "home": "Start",
+    "practice": "Üben",
+    "course": "Kurs",
+    "stats": "Statistik",
+    "settings": "Einstellungen",
+    "achievements": "Erfolge"
+  },
+  "layout": {
+    "label": "Layout",
+    "name": {
+      "en-us-qwerty": "Englisch (QWERTY)",
+      "ru-jcuken": "Russisch (ЙЦУКЕН)",
+      "de-qwertz": "Deutsch (QWERTZ)",
+      "fr-azerty": "Französisch (AZERTY)",
+      "es-qwerty": "Spanisch (QWERTY)"
+    },
+    "short": {
+      "en-us-qwerty": "EN",
+      "ru-jcuken": "RU",
+      "de-qwertz": "DE",
+      "fr-azerty": "FR",
+      "es-qwerty": "ES"
+    }
+  },
+  "home": {
+    "title": "Lerne das Zehnfingersystem",
+    "intro": "Kurze Lektionen passen sich an dich an: Neue Tasten kommen dazu, sobald du die bisherigen beherrschst.",
+    "chooseLayout": "Welches Layout lernen?",
+    "and": " und ",
+    "how": {
+      "start": "Du beginnst mit zwei Tasten unter deinen Zeigefingern: {{keys}}.",
+      "unlock": "Eine neue Taste kommt dazu, wenn du die freigeschalteten schnell und genau tippst.",
+      "focus": "Tasten, die dir am schwersten fallen, kommen in den Lektionen öfter vor."
+    },
+    "start": "Üben starten",
+    "continue": "Weiterüben",
+    "next": "Als Nächstes: {{key}}, sobald du {{keys}} beherrschst.",
+    "nextSoon": "Als Nächstes: {{key}}, nach deiner nächsten Lektion.",
+    "allOpen": "Alle Tasten dieser Stufe sind freigeschaltet. Übe weiter: {{keys}}.",
+    "complete": "Du beherrschst alle Tasten des Kurses.",
+    "stage": "Stufe {{n}} von {{total}}: {{name}}",
+    "courseLink": "der ganze Kurs",
+    "free": "Kurs abgeschlossen, jetzt freies Üben. Im Fokus stehen: {{keys}}.",
+    "keyboard": "Deine Tastatur",
+    "legend": {
+      "open": "freigeschaltet",
+      "mastered": "beherrscht",
+      "next": "kommt als Nächste",
+      "closed": "noch gesperrt"
+    }
+  },
+  "course": {
+    "strip": "Tasten des Kurses",
+    "closed": "{{key}}: noch gesperrt",
+    "open": "{{key}}: Sicherheit {{percent}} %",
+    "mastered": "{{key}}: beherrscht",
+    "focus": "Fokustaste"
+  },
+  "newKey": {
+    "titleOne": "Neue Taste: {{keys}}",
+    "titleMany": "Neue Tasten: {{keys}}",
+    "direction": {
+      "home": "in Grundstellung",
+      "up": "von {{key}} nach oben",
+      "down": "von {{key}} nach unten",
+      "left": "von {{key}} nach links",
+      "right": "von {{key}} nach rechts",
+      "upLeft": "von {{key}} nach links oben",
+      "upRight": "von {{key}} nach rechts oben",
+      "downLeft": "von {{key}} nach links unten",
+      "downRight": "von {{key}} nach rechts unten"
+    },
+    "hint": "Lass die Finger auf der Grundreihe und greif nur mit einem Finger nach der Taste. Bring ihn nach jedem Anschlag an seinen Platz zurück.",
+    "shiftHint": "Halte zuerst Shift mit dem kleinen Finger der anderen Hand gedrückt, drück dann die Taste und lass beide los. Die übrigen Finger bleiben auf der Grundreihe.",
+    "deadKey": "Drück zuerst {{accent}} und lass die Taste los: Sie schreibt allein nichts, sondern setzt einen Akzent auf den nächsten Buchstaben. Drück dann den Buchstaben.",
+    "deadKeyShift": "Drück zuerst {{accent}} zusammen mit Shift und lass los: Diese Taste schreibt allein nichts, sondern setzt einen Akzent auf den nächsten Buchstaben. Drück dann den Buchstaben.",
+    "start": "Starten",
+    "stageTitle": "Neue Stufe: {{name}}",
+    "stage": {
+      "letters": "Die Buchstaben des Layouts, beginnend mit der Grundstellung.",
+      "capitals": "Großbuchstaben tippst du mit Shift. Drück Shift mit dem kleinen Finger der anderen Hand: die rechte Shift-Taste für Buchstaben der linken Hand, die linke Shift-Taste für Buchstaben der rechten Hand.",
+      "punctuation": "Punkt, Komma und weitere Zeichen. Nach einem Punkt, Ausrufezeichen oder Fragezeichen beginnt der Satz mit einem Großbuchstaben.",
+      "digits": "Die Ziffern liegen in der obersten Reihe. Greif nach einer Ziffer mit demselben Finger wie nach dem Buchstaben darunter und bring den Finger zurück auf die Grundreihe.",
+      "free": "Normale Sätze mit allem, was du gelernt hast."
+    },
+    "holdShift": {
+      "ShiftLeft": "Taste {{key}} zusammen mit der linken Shift-Taste. Die drückst du mit dem linken kleinen Finger.",
+      "ShiftRight": "Taste {{key}} zusammen mit der rechten Shift-Taste. Die drückst du mit dem rechten kleinen Finger."
+    },
+    "notes": {
+      "ru-jcuken": {
+        "period": "Im russischen Layout liegt der Punkt rechts in der unteren Reihe, auf der Taste, die im englischen Layout „/“ schreibt.",
+        "comma": "Das Komma liegt auf derselben Taste wie der Punkt, mit Shift.",
+        "hyphen": "Der Bindestrich liegt rechts neben der 0. Davor und danach steht kein Leerzeichen: «кто-то», «по-моему».",
+        "quote": "Anführungszeichen sind Shift und 2. Öffnende und schließende werden gleich getippt."
+      },
+      "en-us-qwerty": {
+        "apostrophe": "Der Apostroph liegt rechts neben „;“. Du brauchst ihn in Kurzformen: don't, it's, I'm.",
+        "quote": "Anführungszeichen liegen auf der Apostroph-Taste, mit Shift.",
+        "hyphen": "Der Bindestrich liegt rechts neben der 0. Davor und danach steht kein Leerzeichen: well-known, e-mail."
+      },
+      "de-qwertz": {
+        "question": "Das Fragezeichen ist Shift und ß, rechts neben der 0.",
+        "quote": "Anführungszeichen sind Shift und 2. Öffnende und schließende werden gleich getippt.",
+        "hyphen": "Der Bindestrich liegt rechts in der unteren Reihe, auf der Taste, die im englischen Layout „/“ schreibt. Davor und danach steht kein Leerzeichen: E-Mail, T-Shirt.",
+        "colon": "Der Doppelpunkt ist Shift und Punkt.",
+        "semicolon": "Das Semikolon ist Shift und Komma.",
+        "parenLeft": "Klammern sind Shift und 8, Shift und 9.",
+        "parenRight": "Klammern sind Shift und 8, Shift und 9."
+      },
+      "fr-azerty": {
+        "period": "Im französischen Layout braucht der Punkt Shift: Er liegt auf der Taste „;“ in der unteren Reihe, der zweiten rechts von N.",
+        "comma": "Das Komma liegt rechts neben N, ohne Shift.",
+        "apostrophe": "Der Apostroph liegt auf der Taste 4, ohne Shift. Du brauchst ihn in Wörtern wie c'est, j'ai, l'eau.",
+        "question": "Das Fragezeichen ist Shift und Komma.",
+        "exclamation": "Das Ausrufezeichen ist die Taste ganz rechts in der unteren Reihe, ohne Shift.",
+        "hyphen": "Der Bindestrich liegt auf der Taste 6, ohne Shift. Davor und danach steht kein Leerzeichen: peut-être, est-ce.",
+        "colon": "Der Doppelpunkt liegt in der unteren Reihe rechts neben „;“, ohne Shift.",
+        "semicolon": "Das Semikolon liegt rechts neben dem Komma, ohne Shift.",
+        "quote": "Anführungszeichen liegen auf der Taste 3, ohne Shift.",
+        "parenLeft": "Die öffnende Klammer liegt auf der Taste 5, die schließende rechts neben der 0. Beide ohne Shift.",
+        "parenRight": "Die öffnende Klammer liegt auf der Taste 5, die schließende rechts neben der 0. Beide ohne Shift."
+      },
+      "es-qwerty": {
+        "question": "Das Fragezeichen ist Shift und die Taste rechts neben der 0. Eine Frage beginnt mit dem umgedrehten Zeichen: ¿Qué?",
+        "questionInverted": "Das umgedrehte Fragezeichen ist Shift und die zweite Taste rechts von der 0. Damit beginnt eine Frage: ¿Qué?",
+        "exclamation": "Das Ausrufezeichen ist Shift und 1. Ein Ausruf beginnt mit dem umgedrehten Zeichen: ¡Hola!",
+        "exclamationInverted": "Das umgedrehte Ausrufezeichen ist die zweite Taste rechts von der 0, ohne Shift. Damit beginnt ein Ausruf: ¡Hola!",
+        "hyphen": "Der Bindestrich liegt rechts in der unteren Reihe, auf der Taste, die im englischen Layout „/“ schreibt.",
+        "quote": "Anführungszeichen sind Shift und 2. Öffnende und schließende werden gleich getippt.",
+        "colon": "Der Doppelpunkt ist Shift und Punkt.",
+        "semicolon": "Das Semikolon ist Shift und Komma.",
+        "parenLeft": "Klammern sind Shift und 8, Shift und 9.",
+        "parenRight": "Klammern sind Shift und 8, Shift und 9."
+      }
+    },
+    "stageBadge": "Neue Stufe"
+  },
+  "practice": {
+    "speed": "Tempo",
+    "accuracy": "Genauigkeit",
+    "progress": "Lektionsfortschritt",
+    "pause": "Pause",
+    "resume": "Weiter",
+    "readyHint": "Fang einfach an zu tippen: Die Zeit läuft ab der ersten Taste.",
+    "pausedTitle": "Pause",
+    "pausedHint": "Drück eine beliebige Taste, um weiterzumachen. Mit Esc verlässt du die Lektion.",
+    "capsLock": "Caps Lock ist an",
+    "wrongLayout": {
+      "en-us-qwerty": "Stell das Tastaturlayout im System auf Englisch um",
+      "ru-jcuken": "Stell das Tastaturlayout im System auf Russisch um",
+      "de-qwertz": "Stell das Tastaturlayout im System auf Deutsch um",
+      "fr-azerty": "Stell das Tastaturlayout im System auf Französisch um",
+      "es-qwerty": "Stell das Tastaturlayout im System auf Spanisch um"
+    },
+    "nextKey": "Nächste Taste",
+    "stage": "Stufe {{n}} von {{total}}: {{name}}",
+    "finger": {
+      "lPinky": "Linker kleiner Finger",
+      "lRing": "Linker Ringfinger",
+      "lMiddle": "Linker Mittelfinger",
+      "lIndex": "Linker Zeigefinger",
+      "thumb": "Daumen",
+      "rIndex": "Rechter Zeigefinger",
+      "rMiddle": "Rechter Mittelfinger",
+      "rRing": "Rechter Ringfinger",
+      "rPinky": "Rechter kleiner Finger"
+    },
+    "view": "Anzeigen",
+    "showKeyboard": "Tastatur",
+    "showHands": "Hände"
+  },
+  "keyboard": {
+    "backspace": "⌫",
+    "tab": "Tab",
+    "capsLock": "Caps",
+    "enter": "Enter",
+    "escape": "Esc",
+    "shift": "Shift",
+    "shiftLeft": "Shift links",
+    "quoted": "„{{key}}“",
+    "shiftRight": "Shift rechts",
+    "space": "Leertaste"
+  },
+  "stage": {
+    "letters": "Buchstaben",
+    "capitals": "Großbuchstaben",
+    "punctuation": "Satzzeichen",
+    "digits": "Ziffern",
+    "free": "Freies Üben"
+  },
+  "stageAbout": {
+    "letters": "Alle Buchstaben des Layouts, von der Grundstellung bis zum Rand der Tastatur.",
+    "capitals": "Großbuchstaben: Shift drückt der kleine Finger der anderen Hand.",
+    "punctuation": "Punkt, Komma, Anführungszeichen und weitere Zeichen, so wie sie in normalem Text vorkommen.",
+    "digits": "Zahlen in der obersten Reihe der Tastatur.",
+    "free": "Normale Sätze mit allem, was du gelernt hast, die schwächsten Tasten am häufigsten. Wird nach allen Stufen freigeschaltet."
+  },
+  "courseScreen": {
+    "title": "Kurs",
+    "intro": "Die Stufen kommen der Reihe nach: Die nächste wird freigeschaltet, sobald du alle Tasten der vorherigen beherrschst.",
+    "trainHint": "Klick auf eine freigeschaltete Taste, um sie einzeln zu üben. Auch das zählt für deinen Kursfortschritt.",
+    "continue": "Kurs fortsetzen",
+    "stageN": "Stufe {{n}}.",
+    "status": {
+      "done": "Abgeschlossen",
+      "current": "Aktuell",
+      "locked": "Noch gesperrt"
+    },
+    "mastered": "Beherrschte Tasten: {{mastered}} von {{total}}",
+    "keys": "Tasten der Stufe",
+    "train": "{{key}} üben",
+    "weakest": "Deine zurzeit schwächsten Tasten"
+  },
+  "training": {
+    "label": "Du übst {{key}}",
+    "stop": "Zurück zum Kurs"
+  },
+  "units": {
+    "wpm": "WPM",
+    "cpm": "Anschl./min"
+  },
+  "result": {
+    "title": "Lektion abgeschlossen",
+    "unlockedOne": "Neue Taste freigeschaltet",
+    "unlockedMany": "Neue Tasten freigeschaltet",
+    "unlockedHint": "Die nächste Lektion beginnt mit einer kurzen Einführung.",
+    "stageDone": "Stufe „{{stage}}“ geschafft",
+    "stageNext": "Als Nächstes: {{stage}}.",
+    "speed": "Tempo",
+    "accuracy": "Genauigkeit",
+    "time": "Zeit",
+    "errors": "Fehler",
+    "keys": "Tasten dieser Lektion",
+    "next": "Nächste Lektion",
+    "repeat": "Wiederholen",
+    "home": "Zur Startseite",
+    "record": "Persönlicher Rekord",
+    "vsAverage": "Dein Durchschnitt: {{average}}",
+    "achievements": "Neue Erfolge",
+    "insight": {
+      "confusion": "Statt {{expected}} tippst du oft {{typed}}",
+      "slowest": "Langsamste Taste: {{key}}, {{speed}} {{unit}}"
+    }
+  },
+  "stats": {
+    "title": "Statistik",
+    "totalTime": "Tippzeit",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "empty": "Schließ eine Lektion ab, um deine Statistik zu sehen.",
+    "lessons": "Lektionen",
+    "recentSpeed": "Tempo, letzte {{count}}",
+    "recentAccuracy": "Genauigkeit, letzte {{count}}",
+    "speed": "Tempo pro Lektion, {{unit}}",
+    "accuracy": "Genauigkeit pro Lektion",
+    "target": "Ziel",
+    "lessonPoint": "Lektion {{n}} · {{date}}",
+    "lessonTable": "Lektionen als Tabelle zeigen",
+    "date": "Datum",
+    "keys": "Sicherheit pro Taste",
+    "keyDetail": "{{key}}: Sicherheit {{percent}} %, {{hits}} richtig, {{misses}} Fehler",
+    "heatHint": "Zeig auf eine Taste, um Details zu sehen.",
+    "notOpen": "noch gesperrt",
+    "mastered": "beherrscht",
+    "keyTable": "Tasten als Tabelle zeigen",
+    "key": "Taste",
+    "confidence": "Sicherheit",
+    "correct": "Richtig"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "section": {
+      "learning": "Lernen",
+      "practice": "Übungsansicht",
+      "keyboard": "Tastatur",
+      "appearance": "Darstellung",
+      "motivation": "Tagesziel und Erinnerungen",
+      "sound": "Ton",
+      "data": "Daten",
+      "about": "Über KeyEd"
+    },
+    "layoutHint": "Jedes Layout hat seinen eigenen Fortschritt und eine eigene Statistik.",
+    "strict": {
+      "label": "Strenger Modus",
+      "hint": "Eine neue Taste kommt nur dazu, wenn alle freigeschalteten Tasten gerade jetzt schnell und genau sitzen. Ohne diesen Modus bremst dich eine einmal beherrschte Taste nicht mehr aus."
+    },
+    "yo": {
+      "label": "Buchstabe ё",
+      "hint": "Der Russischkurs bringt «ё» bei und lässt es in den Texten stehen. Ohne diese Einstellung wird «ё» durch «е» ersetzt, wie in den meisten russischen Texten."
+    },
+    "speedUnit": {
+      "label": "Tempoeinheit",
+      "hint": "Automatisch zeigt Anschläge pro Minute für Russisch, Deutsch und Spanisch und Wörter pro Minute (WPM) für Englisch und Französisch.",
+      "auto": "Automatisch",
+      "wpm": "WPM",
+      "cpm": "Anschläge/min"
+    },
+    "inputMode": {
+      "label": "Eingabe",
+      "emulate": "Nach Tastenposition",
+      "system": "Systemlayout",
+      "emulateHint": "Der Buchstabe ergibt sich aus der gedrückten Taste, deshalb klappt eine russische Lektion auch, wenn das englische Layout eingestellt ist.",
+      "systemHint": "Der Buchstabe kommt aus dem Tastaturlayout des Systems. Stell es vor dem Tippen auf das Layout der Lektion um."
+    },
+    "language": {
+      "label": "Sprache der Oberfläche",
+      "ru": "Русский",
+      "en": "English",
+      "de": "Deutsch",
+      "fr": "Français",
+      "es": "Español"
+    },
+    "theme": {
+      "label": "Design",
+      "system": "System",
+      "light": "Hell",
+      "dark": "Dunkel"
+    },
+    "goal": {
+      "label": "Tagesziel",
+      "hint": "Minuten Tippen pro Tag. Nur die Tippzeit zählt, keine Pausen."
+    },
+    "reminders": {
+      "label": "Erinnere mich",
+      "hint": "Eine Systembenachrichtigung zu dieser Uhrzeit, wenn das heutige Ziel noch nicht erreicht ist. KeyEd muss dafür laufen, zum Beispiel minimiert.",
+      "time": "Uhrzeit",
+      "denied": "Benachrichtigungen sind nicht erlaubt. Erlaube sie für KeyEd in den Systemeinstellungen."
+    },
+    "sound": {
+      "keys": "Tastenton",
+      "errors": "Fehlerton",
+      "volume": "Lautstärke"
+    },
+    "keyboardType": {
+      "label": "Tastaturtyp",
+      "hint": "ANSI hat eine lange Enter-Taste in einer Reihe, ISO eine hohe Enter-Taste und eine kurze linke Shift-Taste. Die Buchstaben liegen an denselben Stellen.",
+      "ansi": "ANSI",
+      "iso": "ISO"
+    },
+    "targetSpeed": {
+      "label": "Zieltempo",
+      "hint": "Eine Taste gilt als beherrscht, wenn du sie so schnell und genau tippst. Erhöhe den Wert, wenn Tasten zu leicht freigeschaltet werden.",
+      "value": "{{cpm}} Anschl./min · {{wpm}} WPM"
+    },
+    "lessonLength": {
+      "label": "Länge der Lektion",
+      "hint": "Zeichen pro Lektion. 120 sind für Anfänger etwa eine Minute."
+    },
+    "showKeyboard": {
+      "label": "Tastatur anzeigen"
+    },
+    "showHands": {
+      "label": "Hände anzeigen"
+    },
+    "textSize": {
+      "label": "Textgröße",
+      "small": "Klein",
+      "medium": "Mittel",
+      "large": "Groß",
+      "xlarge": "Sehr groß"
+    },
+    "reduceMotion": {
+      "label": "Weniger Bewegung",
+      "hint": "Keine Animationen: Cursor und Balken springen, statt zu gleiten. Ist auch aktiv, wenn das System weniger Bewegung verlangt."
+    },
+    "autoUpdate": {
+      "label": "Beim Start nach Updates suchen",
+      "hint": "Das Einzige, was KeyEd ins Netz sendet: eine Anfrage an GitHub nach der neuesten Version."
+    },
+    "data": {
+      "export": "Daten exportieren",
+      "exportHint": "Alle Lektionen, Fortschritte, Erfolge und Einstellungen in einer JSON-Datei.",
+      "exported": "Daten gespeichert.",
+      "import": "Daten importieren",
+      "importHint": "Ersetzt alles in KeyEd durch die Daten aus einer Exportdatei.",
+      "importTitle": "Alle Daten ersetzen?",
+      "importConfirm": "Lektionen, Fortschritt, Erfolge und Einstellungen werden durch die aus der Datei ersetzt. Die aktuellen Daten lassen sich nur wiederherstellen, wenn du sie vorher exportierst.",
+      "importButton": "Ersetzen",
+      "reset": "Fortschritt zurücksetzen",
+      "resetHint": "Löscht Lektionen, Tastenstatistik, Kursfortschritt, Tage und Erfolge aller Layouts. Die Einstellungen bleiben.",
+      "resetTitle": "Gesamten Fortschritt zurücksetzen?",
+      "resetConfirm": "Das lässt sich nicht rückgängig machen. Exportiere deine Daten vorher, falls du sie zurückhaben möchtest.",
+      "resetButton": "Zurücksetzen",
+      "cancel": "Abbrechen",
+      "error": {
+        "notBackup": "Das ist keine Exportdatei von KeyEd.",
+        "newerVersion": "Die Datei stammt aus einer neueren Version von KeyEd. Aktualisiere die App und versuch es noch einmal.",
+        "damaged": "Die Datei ist beschädigt und kann nicht importiert werden.",
+        "failed": "Der Vorgang konnte nicht abgeschlossen werden."
+      }
+    },
+    "about": {
+      "version": "Version {{version}}",
+      "description": "Ein kostenloser Trainer für das Zehnfingersystem. Funktioniert ohne Internet und ohne Konto; alle Daten bleiben auf diesem Computer.",
+      "check": "Nach Updates suchen",
+      "checking": "Suche läuft…",
+      "upToDate": "Du hast die neueste Version.",
+      "available": "Version {{version}} ist verfügbar.",
+      "install": "Installieren",
+      "error": "Updates konnten nicht geprüft werden. Prüfe die Internetverbindung.",
+      "unsupported": "Updates werden in der Desktop-App geprüft.",
+      "codeLicense": "KeyEd ist Open Source unter der MIT-Lizenz.",
+      "credits": "Wörterbücher, Schriften und Symbole",
+      "words": "Wortlisten: FrequencyWords von Hermit Dave, aus OpenSubtitles 2018, CC BY-SA 4.0. Die Wörterbücher der Lektionen sind daraus abgeleitet und stehen unter derselben Lizenz.",
+      "blocklist": "Filter für unerwünschte Wörter: List of Dirty, Naughty, Obscene and Otherwise Bad Words (LDNOOBW), CC BY 4.0.",
+      "fonts": "Schriften: JetBrains Mono und Inter, SIL Open Font License 1.1.",
+      "icons": "Symbole: Lucide, ISC-Lizenz.",
+      "libraries": "Erstellt mit Tauri, React und weiteren Open-Source-Bibliotheken unter MIT, Apache 2.0 und ähnlichen Lizenzen.",
+      "repository": "Quellcode auf GitHub",
+      "website": "Website"
+    }
+  },
+  "goal": {
+    "label": "Tagesziel",
+    "unit": "min",
+    "aria": "Heute: {{done}} von {{goal}} Minuten",
+    "short": "{{done}}/{{goal}} min",
+    "minutes": "{{count}} min",
+    "done": "Tagesziel erreicht",
+    "left_one": "Noch {{count}} Minute bis zum Tagesziel",
+    "left_other": "Noch {{count}} Minuten bis zum Tagesziel",
+    "ofMinutes": "{{done}} von {{total}} min"
+  },
+  "streak": {
+    "days_one": "Serie: {{count}} Tag",
+    "days_other": "Serie: {{count}} Tage",
+    "none": "Noch keine Serie: Erreiche heute dein Tagesziel, um eine zu beginnen.",
+    "broken_one": "Die Serie ist gerissen. Deine beste war {{count}} Tag lang – starte heute eine neue.",
+    "broken_other": "Die Serie ist gerissen. Deine beste war {{count}} Tage lang – starte heute eine neue.",
+    "freezes_one": "{{count}} Joker",
+    "freezes_other": "{{count}} Joker",
+    "freezesHint": "Ein Joker rettet deine Serie, wenn du einen Tag auslässt. Du bekommst einen für je 7 Tage am Stück und kannst zwei aufheben.",
+    "best_one": "Rekord: {{count}} Tag",
+    "best_other": "Rekord: {{count}} Tage",
+    "count_one": "{{count}} Tag",
+    "count_other": "{{count}} Tage"
+  },
+  "week": {
+    "title": "Letzte 7 Tage",
+    "vsPrevious": "Veränderung gegenüber den 7 Tagen davor",
+    "speed": "Tempo",
+    "accuracy": "Genauigkeit",
+    "time": "Tippzeit",
+    "noData": "In den letzten 7 Tagen keine Lektionen."
+  },
+  "records": {
+    "title": "Persönliche Rekorde",
+    "bestSpeed": "Bestes Tempo",
+    "bestAccuracy": "Beste Genauigkeit",
+    "bestStreak": "Längste Serie",
+    "bestDay": "Produktivster Tag"
+  },
+  "calendar": {
+    "title": "Aktivität",
+    "hint": "Zeig auf einen Tag, um zu sehen, wie viel du geübt hast.",
+    "none": "nicht geübt",
+    "goalMet": "Ziel erreicht",
+    "frozen": "Joker eingesetzt",
+    "belowShare": "unter {{percent}} % des Ziels",
+    "aboveShare": "ab {{percent}} % des Ziels"
+  },
+  "achievements": {
+    "title": "Erfolge",
+    "toast": "Erfolg freigeschaltet",
+    "all": "Alle Erfolge",
+    "close": "Schließen",
+    "levels": "Level",
+    "reached": "erreicht",
+    "unlockedOn": "Erreicht am {{date}}",
+    "progress": "{{value}} von {{next}}",
+    "notYet": "Noch nicht erreicht",
+    "list": {
+      "first-step": {
+        "name": "Erster Schritt",
+        "condition": "Die erste Lektion abschließen"
+      },
+      "home-row": {
+        "name": "Grundstellung",
+        "condition": "Die Tasten der ersten Lektionen beherrschen"
+      },
+      "halfway": {
+        "name": "Halbzeit",
+        "condition": "Die Hälfte der Buchstaben eines Layouts freischalten"
+      },
+      "alphabet": {
+        "name": "Das ganze Alphabet",
+        "condition": "Alle Buchstaben eines Layouts beherrschen"
+      },
+      "speed": {
+        "name": "Auf Touren",
+        "condition": "Eine Lektion mit {{value}} Anschlägen pro Minute"
+      },
+      "flawless": {
+        "name": "Fehlerfrei",
+        "condition": "Eine Lektion ohne einen einzigen Fehler"
+      },
+      "steady-hand": {
+        "name": "Ruhige Hand",
+        "condition": "Lektionen in Folge mit mindestens 97 % Genauigkeit: {{value}}"
+      },
+      "streak": {
+        "name": "Serie",
+        "condition": "Tage in Folge mit erreichtem Tagesziel: {{value}}"
+      },
+      "practice-time": {
+        "name": "Übungszeit",
+        "condition": "Stunden Tippzeit insgesamt: {{value}}"
+      },
+      "volume": {
+        "name": "Fleißig",
+        "condition": "Getippte Zeichen insgesamt: {{value}}"
+      },
+      "two-layouts": {
+        "name": "Zwei Layouts",
+        "condition": "Die Tasten der ersten Lektionen in einem zweiten Layout beherrschen"
+      }
+    }
+  },
+  "reminder": {
+    "title": "KeyEd",
+    "body_one": "Noch {{count}} Minute bis zu deinem heutigen Ziel.",
+    "body_other": "Noch {{count}} Minuten bis zu deinem heutigen Ziel."
+  },
+  "updates": {
+    "available": "Update verfügbar: Version {{version}}",
+    "description": "Das Update wird von GitHub geladen und installiert, dann startet KeyEd neu. Deine Daten bleiben erhalten.",
+    "install": "Aktualisieren und neu starten",
+    "installing": "Wird installiert… {{percent}} %",
+    "later": "Später"
+  },
+  "welcome": {
+    "step": "Schritt {{n}} von {{total}}",
+    "next": "Weiter",
+    "back": "Zurück",
+    "finish": "Lernen starten",
+    "language": {
+      "title": "Willkommen bei KeyEd",
+      "text": "KeyEd bringt dir bei, mit allen zehn Fingern zu tippen, ohne auf die Tastatur zu schauen. Wähle zuerst die Sprache der Oberfläche."
+    },
+    "layout": {
+      "title": "Welches Layout möchtest du lernen?",
+      "text": "Weitere kannst du später hinzufügen: Jedes Layout hat seinen eigenen Fortschritt."
+    },
+    "keyboard": {
+      "title": "Wie sieht deine Tastatur aus?",
+      "text": "Sieh dir die Enter-Taste und die linke Shift-Taste an.",
+      "ansiHint": "Lange Enter-Taste in einer Reihe und eine lange linke Shift-Taste.",
+      "isoHint": "Hohe Enter-Taste über zwei Reihen und eine kurze linke Shift-Taste mit einer zusätzlichen Taste daneben.",
+      "unsure": "Nicht sicher? Wähle ANSI: Die Buchstaben liegen auf beiden an denselben Stellen."
+    },
+    "level": {
+      "title": "Wie tippst du bisher?",
+      "text": "Davon hängt ab, wo der Kurs beginnt. Das Zieltempo kannst du später in den Einstellungen ändern.",
+      "beginner": "Ich fange bei null an",
+      "beginnerHint": "Der Kurs beginnt mit zwei Tasten unter deinen Zeigefingern und schaltet neue frei, sobald du die bisherigen beherrschst.",
+      "looking": "Ich tippe, schaue aber auf die Tastatur",
+      "lookingHint": "Derselbe Kurs ab der Grundstellung: Er zeigt, mit welchem Finger du welche Taste drückst. Bekannte Tasten werden schnell freigeschaltet.",
+      "blind": "Ich tippe blind und will schneller werden",
+      "blindHint": "Alle Buchstaben werden sofort freigeschaltet, das Zieltempo liegt bei {{cpm}} Anschlägen pro Minute und die Hände werden nicht angezeigt."
+    },
+    "hands": {
+      "title": "Leg deine Hände in die Grundstellung",
+      "text": "Ertaste mit den Zeigefingern die kleinen Erhebungen auf {{left}} und {{right}}. Die anderen Finger liegen auf den Tasten daneben, die Daumen auf der Leertaste.",
+      "check": "Drück jetzt {{left}} und {{right}}, ohne auf die Tastatur zu schauen.",
+      "done": "Gut, deine Hände liegen richtig."
+    },
+    "goal": {
+      "title": "Wie viel möchtest du am Tag üben?",
+      "text": "Nur die Tippzeit zählt. 10–15 Minuten jeden Tag bringen mehr als eine Stunde einmal pro Woche."
+    },
+    "reminders": {
+      "title": "Ans Üben erinnern?",
+      "text": "Eine Benachrichtigung zur gewählten Uhrzeit, wenn das heutige Ziel noch nicht erreicht ist. KeyEd muss dafür laufen, zum Beispiel minimiert.",
+      "on": "Erinnere mich",
+      "off": "Keine Erinnerungen"
+    }
+  }
+}

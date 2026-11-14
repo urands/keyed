@@ -26,6 +26,8 @@ const MARK_NAMES: Record<string, string> = {
   '-': 'hyphen',
   '(': 'parenLeft',
   ')': 'parenRight',
+  '¿': 'questionInverted',
+  '¡': 'exclamationInverted',
 };
 
 interface NewKeyCardProps {
@@ -117,6 +119,13 @@ export function NewKeyCard({
                     {finger}, {direction}
                   </span>
                 </span>
+                {stroke.dead && (
+                  <span className="max-w-xl">
+                    {t(stroke.dead.shift ? 'newKey.deadKeyShift' : 'newKey.deadKey', {
+                      accent: keyLabel(stroke.dead.code),
+                    })}
+                  </span>
+                )}
                 {shift !== null && (
                   <span className="max-w-xl">
                     {t(

@@ -1,0 +1,592 @@
+{
+  "app": {
+    "name": "KeyEd",
+    "storageError": "No se pudo guardar tu progreso. Las lecciones siguen funcionando, pero los resultados se perderán al cerrar la aplicación."
+  },
+  "nav": {
+    "label": "Secciones",
+    "home": "Inicio",
+    "practice": "Práctica",
+    "course": "Curso",
+    "stats": "Estadísticas",
+    "settings": "Ajustes",
+    "achievements": "Logros"
+  },
+  "layout": {
+    "label": "Distribución",
+    "name": {
+      "en-us-qwerty": "Inglés (QWERTY)",
+      "ru-jcuken": "Ruso (ЙЦУКЕН)",
+      "de-qwertz": "Alemán (QWERTZ)",
+      "fr-azerty": "Francés (AZERTY)",
+      "es-qwerty": "Español (QWERTY)"
+    },
+    "short": {
+      "en-us-qwerty": "EN",
+      "ru-jcuken": "RU",
+      "de-qwertz": "DE",
+      "fr-azerty": "FR",
+      "es-qwerty": "ES"
+    }
+  },
+  "home": {
+    "title": "Aprende a escribir sin mirar el teclado",
+    "intro": "Las lecciones son cortas y se adaptan a ti: las teclas nuevas se desbloquean cuando dominas las anteriores.",
+    "chooseLayout": "Qué distribución aprender",
+    "and": " y ",
+    "how": {
+      "start": "Empiezas con dos teclas bajo los dedos índices: {{keys}}.",
+      "unlock": "Una tecla nueva se desbloquea cuando escribes las ya desbloqueadas con rapidez y precisión.",
+      "focus": "Las lecciones dan más práctica a las teclas que más te cuestan."
+    },
+    "start": "Empezar a practicar",
+    "continue": "Continuar",
+    "next": "{{key}} se desbloqueará cuando domines {{keys}}.",
+    "nextSoon": "{{key}} se desbloqueará después de tu próxima lección.",
+    "allOpen": "Todas las teclas de esta etapa están desbloqueadas. Sigue practicando: {{keys}}.",
+    "complete": "Ya dominas todas las teclas del curso.",
+    "stage": "Etapa {{n}} de {{total}}: {{name}}",
+    "courseLink": "todo el curso",
+    "free": "Curso terminado, ahora toca práctica libre. Practicarás sobre todo: {{keys}}.",
+    "keyboard": "Tu teclado",
+    "legend": {
+      "open": "desbloqueada",
+      "mastered": "dominada",
+      "next": "la siguiente",
+      "closed": "aún bloqueada"
+    }
+  },
+  "course": {
+    "strip": "Teclas del curso",
+    "closed": "{{key}}: aún bloqueada",
+    "open": "{{key}}: confianza {{percent}}%",
+    "mastered": "{{key}}: dominada",
+    "focus": "Tecla en foco"
+  },
+  "newKey": {
+    "titleOne": "Tecla nueva: {{keys}}",
+    "titleMany": "Teclas nuevas: {{keys}}",
+    "direction": {
+      "home": "en la posición base",
+      "up": "hacia arriba desde {{key}}",
+      "down": "hacia abajo desde {{key}}",
+      "left": "hacia la izquierda desde {{key}}",
+      "right": "hacia la derecha desde {{key}}",
+      "upLeft": "hacia arriba y a la izquierda desde {{key}}",
+      "upRight": "hacia arriba y a la derecha desde {{key}}",
+      "downLeft": "hacia abajo y a la izquierda desde {{key}}",
+      "downRight": "hacia abajo y a la derecha desde {{key}}"
+    },
+    "hint": "Mantén los dedos en la fila guía y estira solo un dedo hasta la tecla. Después de cada pulsación, devuélvelo a su sitio.",
+    "shiftHint": "Primero mantén pulsada Mayús con el meñique de la otra mano, luego pulsa la tecla y suelta las dos. Los demás dedos se quedan en la fila guía.",
+    "deadKey": "Primero pulsa y suelta {{accent}}: esta tecla no escribe nada por sí sola, sino que pone un acento sobre la letra siguiente. Después pulsa la letra.",
+    "deadKeyShift": "Primero pulsa {{accent}} junto con Mayús y suelta: esta tecla no escribe nada por sí sola, sino que pone un acento sobre la letra siguiente. Después pulsa la letra.",
+    "start": "Empezar",
+    "stageTitle": "Nueva etapa: {{name}}",
+    "stage": {
+      "letters": "Las letras de la distribución, empezando por la posición base.",
+      "capitals": "Las mayúsculas se escriben con Mayús. Pulsa Mayús con el meñique de la otra mano: la Mayús derecha para las letras de la mano izquierda y la Mayús izquierda para las de la mano derecha.",
+      "punctuation": "Punto, coma y otros signos. Después de un punto, un signo de exclamación o uno de interrogación, la frase empieza con mayúscula.",
+      "digits": "Los números están en la fila superior. Estira hacia cada número el mismo dedo que usas para la letra de debajo y vuelve a la fila guía.",
+      "free": "Frases normales con todo lo que has aprendido."
+    },
+    "holdShift": {
+      "ShiftLeft": "Tecla {{key}} junto con la Mayús izquierda, que se pulsa con el meñique izquierdo.",
+      "ShiftRight": "Tecla {{key}} junto con la Mayús derecha, que se pulsa con el meñique derecho."
+    },
+    "notes": {
+      "ru-jcuken": {
+        "period": "En la distribución rusa, el punto está a la derecha de la fila inferior, en la tecla que escribe «/» en la distribución inglesa.",
+        "comma": "La coma está en la misma tecla que el punto, con Mayús.",
+        "hyphen": "El guion está a la derecha del 0. No lleva espacios alrededor: «кто-то», «по-моему».",
+        "quote": "Las comillas se escriben con Mayús y 2. Las de apertura y las de cierre se teclean igual."
+      },
+      "en-us-qwerty": {
+        "apostrophe": "El apóstrofo está a la derecha de «;». Se usa en las contracciones: don't, it's, I'm.",
+        "quote": "Las comillas están en la tecla del apóstrofo, con Mayús.",
+        "hyphen": "El guion está a la derecha del 0. No lleva espacios alrededor: well-known, e-mail."
+      },
+      "de-qwertz": {
+        "question": "El signo de interrogación se escribe con Mayús y ß, a la derecha del 0.",
+        "quote": "Las comillas se escriben con Mayús y 2. Las de apertura y las de cierre se teclean igual.",
+        "hyphen": "El guion está a la derecha de la fila inferior, en la tecla que escribe «/» en la distribución inglesa. No lleva espacios alrededor: E-Mail, T-Shirt.",
+        "colon": "Los dos puntos se escriben con Mayús y el punto.",
+        "semicolon": "El punto y coma se escribe con Mayús y la coma.",
+        "parenLeft": "Los paréntesis se escriben con Mayús y 8, y con Mayús y 9.",
+        "parenRight": "Los paréntesis se escriben con Mayús y 8, y con Mayús y 9."
+      },
+      "fr-azerty": {
+        "period": "En la distribución francesa, el punto se escribe con Mayús: es la tecla «;» de la fila inferior, la segunda a la derecha de la N.",
+        "comma": "La coma está a la derecha de la N, sin Mayús.",
+        "apostrophe": "El apóstrofo está en la tecla 4, sin Mayús. Se usa en palabras como c'est, j'ai, l'eau.",
+        "question": "El signo de interrogación se escribe con Mayús y la coma.",
+        "exclamation": "El signo de exclamación es la última tecla a la derecha de la fila inferior, sin Mayús.",
+        "hyphen": "El guion está en la tecla 6, sin Mayús. No lleva espacios alrededor: peut-être, est-ce.",
+        "colon": "Los dos puntos están en la fila inferior, a la derecha de «;», sin Mayús.",
+        "semicolon": "El punto y coma está a la derecha de la coma, sin Mayús.",
+        "quote": "Las comillas están en la tecla 3, sin Mayús.",
+        "parenLeft": "El paréntesis de apertura está en la tecla 5, y el de cierre, a la derecha del 0. Los dos sin Mayús.",
+        "parenRight": "El paréntesis de apertura está en la tecla 5, y el de cierre, a la derecha del 0. Los dos sin Mayús."
+      },
+      "es-qwerty": {
+        "question": "El signo de interrogación de cierre se escribe con Mayús y la tecla a la derecha del 0. Toda pregunta empieza con el signo de apertura: ¿Qué?",
+        "questionInverted": "El signo de interrogación de apertura se escribe con Mayús y la segunda tecla a la derecha del 0. Con él empieza toda pregunta: ¿Qué?",
+        "exclamation": "El signo de exclamación de cierre se escribe con Mayús y 1. Toda exclamación empieza con el signo de apertura: ¡Hola!",
+        "exclamationInverted": "El signo de exclamación de apertura es la segunda tecla a la derecha del 0, sin Mayús. Con él empieza toda exclamación: ¡Hola!",
+        "hyphen": "El guion está a la derecha de la fila inferior, en la tecla que escribe «/» en la distribución inglesa.",
+        "quote": "Las comillas se escriben con Mayús y 2. Las de apertura y las de cierre se teclean igual.",
+        "colon": "Los dos puntos se escriben con Mayús y el punto.",
+        "semicolon": "El punto y coma se escribe con Mayús y la coma.",
+        "parenLeft": "Los paréntesis se escriben con Mayús y 8, y con Mayús y 9.",
+        "parenRight": "Los paréntesis se escriben con Mayús y 8, y con Mayús y 9."
+      }
+    },
+    "stageBadge": "Nueva etapa"
+  },
+  "practice": {
+    "speed": "Velocidad",
+    "accuracy": "Precisión",
+    "progress": "Progreso de la lección",
+    "pause": "Pausa",
+    "resume": "Reanudar",
+    "readyHint": "Empieza a escribir: el cronómetro arranca con la primera tecla.",
+    "pausedTitle": "En pausa",
+    "pausedHint": "Pulsa cualquier tecla para continuar. Con Esc sales de la lección.",
+    "capsLock": "Bloq Mayús está activado",
+    "wrongLayout": {
+      "en-us-qwerty": "Cambia la distribución de teclado del sistema a inglés",
+      "ru-jcuken": "Cambia la distribución de teclado del sistema a ruso",
+      "de-qwertz": "Cambia la distribución de teclado del sistema a alemán",
+      "fr-azerty": "Cambia la distribución de teclado del sistema a francés",
+      "es-qwerty": "Cambia la distribución de teclado del sistema a español"
+    },
+    "nextKey": "Siguiente tecla",
+    "stage": "Etapa {{n}} de {{total}}: {{name}}",
+    "finger": {
+      "lPinky": "Meñique izquierdo",
+      "lRing": "Anular izquierdo",
+      "lMiddle": "Dedo medio izquierdo",
+      "lIndex": "Índice izquierdo",
+      "thumb": "Pulgar",
+      "rIndex": "Índice derecho",
+      "rMiddle": "Dedo medio derecho",
+      "rRing": "Anular derecho",
+      "rPinky": "Meñique derecho"
+    },
+    "view": "Qué mostrar",
+    "showKeyboard": "Teclado",
+    "showHands": "Manos"
+  },
+  "keyboard": {
+    "backspace": "⌫",
+    "tab": "Tab",
+    "capsLock": "Bloq Mayús",
+    "enter": "Enter",
+    "escape": "Esc",
+    "shift": "Mayús",
+    "shiftLeft": "Mayús izquierda",
+    "quoted": "«{{key}}»",
+    "shiftRight": "Mayús derecha",
+    "space": "Espacio"
+  },
+  "stage": {
+    "letters": "Letras",
+    "capitals": "Mayúsculas",
+    "punctuation": "Puntuación",
+    "digits": "Números",
+    "free": "Práctica libre"
+  },
+  "stageAbout": {
+    "letters": "Todas las letras de la distribución, desde la posición base hasta los bordes del teclado.",
+    "capitals": "Mayúsculas: la tecla Mayús se pulsa con el meñique de la otra mano.",
+    "punctuation": "Punto, coma, comillas y otros signos, en los lugares donde aparecen en un texto normal.",
+    "digits": "Los números de la fila superior del teclado.",
+    "free": "Frases normales con todo lo que has aprendido; las teclas más débiles aparecen más a menudo. Se desbloquea al terminar todas las etapas."
+  },
+  "courseScreen": {
+    "title": "Curso",
+    "intro": "Las etapas van en orden: la siguiente se desbloquea cuando dominas todas las teclas de la anterior.",
+    "trainHint": "Haz clic en una tecla desbloqueada para practicarla por separado. También cuenta para tu progreso en el curso.",
+    "continue": "Continuar el curso",
+    "stageN": "Etapa {{n}}.",
+    "status": {
+      "done": "Completada",
+      "current": "En curso",
+      "locked": "Aún bloqueada"
+    },
+    "mastered": "Teclas dominadas: {{mastered}} de {{total}}",
+    "keys": "Teclas de la etapa",
+    "train": "Practicar {{key}}",
+    "weakest": "Las teclas más débiles ahora"
+  },
+  "training": {
+    "label": "Practicando {{key}}",
+    "stop": "Volver al curso"
+  },
+  "units": {
+    "wpm": "palabras/min",
+    "cpm": "ppm"
+  },
+  "result": {
+    "title": "Lección completada",
+    "unlockedOne": "Nueva tecla desbloqueada",
+    "unlockedMany": "Nuevas teclas desbloqueadas",
+    "unlockedHint": "La próxima lección empieza con una breve presentación.",
+    "stageDone": "¡Etapa «{{stage}}» completada!",
+    "stageNext": "Siguiente: {{stage}}.",
+    "speed": "Velocidad",
+    "accuracy": "Precisión",
+    "time": "Tiempo",
+    "errors": "Errores",
+    "keys": "Teclas de esta lección",
+    "next": "Siguiente lección",
+    "repeat": "Repetir",
+    "home": "Inicio",
+    "record": "¡Récord personal!",
+    "vsAverage": "Tu promedio: {{average}}",
+    "achievements": "Nuevos logros",
+    "insight": {
+      "confusion": "En lugar de {{expected}} sueles escribir {{typed}}",
+      "slowest": "La tecla más lenta: {{key}}, {{speed}} {{unit}}"
+    }
+  },
+  "stats": {
+    "title": "Estadísticas",
+    "totalTime": "Tiempo de escritura",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "empty": "Termina una lección para ver tus estadísticas.",
+    "lessons": "Lecciones",
+    "recentSpeed": "Velocidad, últimas {{count}}",
+    "recentAccuracy": "Precisión, últimas {{count}}",
+    "speed": "Velocidad por lección, {{unit}}",
+    "accuracy": "Precisión por lección",
+    "target": "objetivo",
+    "lessonPoint": "Lección {{n}} · {{date}}",
+    "lessonTable": "Ver las lecciones en una tabla",
+    "date": "Fecha",
+    "keys": "Confianza por tecla",
+    "keyDetail": "{{key}}: confianza {{percent}}%, {{hits}} aciertos, {{misses}} errores",
+    "heatHint": "Pasa el puntero por una tecla para ver los detalles.",
+    "notOpen": "aún bloqueada",
+    "mastered": "dominada",
+    "keyTable": "Ver las teclas en una tabla",
+    "key": "Tecla",
+    "confidence": "Confianza",
+    "correct": "Aciertos"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "section": {
+      "learning": "Aprendizaje",
+      "practice": "Pantalla de práctica",
+      "keyboard": "Teclado",
+      "appearance": "Apariencia",
+      "motivation": "Objetivo diario y recordatorios",
+      "sound": "Sonido",
+      "data": "Datos",
+      "about": "Acerca de"
+    },
+    "layoutHint": "Cada distribución tiene su propio progreso y sus propias estadísticas.",
+    "strict": {
+      "label": "Modo estricto",
+      "hint": "Una tecla nueva se desbloquea solo cuando escribes todas las desbloqueadas con rapidez y precisión en este momento. Sin este modo, una tecla que ya dominaste una vez deja de frenarte."
+    },
+    "yo": {
+      "label": "Letra ё",
+      "hint": "El curso de ruso enseña la «ё» y la mantiene en los textos. Sin este ajuste, la «ё» se sustituye por «е», como en la mayoría de los textos rusos."
+    },
+    "speedUnit": {
+      "label": "Unidad de velocidad",
+      "hint": "En automático se muestran pulsaciones por minuto para ruso, alemán y español, y palabras por minuto para inglés y francés.",
+      "auto": "Automática",
+      "wpm": "Palabras/min",
+      "cpm": "Pulsaciones/min"
+    },
+    "inputMode": {
+      "label": "Entrada",
+      "emulate": "Por posición de la tecla",
+      "system": "Distribución del sistema",
+      "emulateHint": "La letra depende de la tecla que pulsas, así que una lección de ruso funciona aunque tengas activada la distribución inglesa.",
+      "systemHint": "La letra viene de la distribución de teclado del sistema. Cámbiala a la de la lección antes de escribir."
+    },
+    "language": {
+      "label": "Idioma de la interfaz",
+      "ru": "Русский",
+      "en": "English",
+      "de": "Deutsch",
+      "fr": "Français",
+      "es": "Español"
+    },
+    "theme": {
+      "label": "Tema",
+      "system": "Sistema",
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
+    "goal": {
+      "label": "Objetivo diario",
+      "hint": "Minutos de escritura al día. Solo cuenta el tiempo escribiendo, no las pausas."
+    },
+    "reminders": {
+      "label": "Recordarme",
+      "hint": "Una notificación del sistema a esta hora si aún no has cumplido el objetivo de hoy. KeyEd tiene que estar abierto, aunque sea minimizado.",
+      "time": "Hora",
+      "denied": "Las notificaciones no están permitidas. Permítelas para KeyEd en los ajustes del sistema."
+    },
+    "sound": {
+      "keys": "Sonido de las teclas",
+      "errors": "Sonido de error",
+      "volume": "Volumen"
+    },
+    "keyboardType": {
+      "label": "Tipo de teclado",
+      "hint": "ANSI tiene un Enter largo en una sola fila; ISO tiene un Enter alto y una Mayús izquierda corta. Las letras están en el mismo sitio.",
+      "ansi": "ANSI",
+      "iso": "ISO"
+    },
+    "targetSpeed": {
+      "label": "Velocidad objetivo",
+      "hint": "Una tecla cuenta como dominada cuando la escribes así de rápido y con precisión. Súbela si las teclas se desbloquean con demasiada facilidad.",
+      "value": "{{cpm}} ppm · {{wpm}} palabras/min"
+    },
+    "lessonLength": {
+      "label": "Longitud de la lección",
+      "hint": "Caracteres por lección. 120 es más o menos un minuto para un principiante."
+    },
+    "showKeyboard": {
+      "label": "Mostrar el teclado"
+    },
+    "showHands": {
+      "label": "Mostrar las manos"
+    },
+    "textSize": {
+      "label": "Tamaño del texto",
+      "small": "Pequeño",
+      "medium": "Mediano",
+      "large": "Grande",
+      "xlarge": "Muy grande"
+    },
+    "reduceMotion": {
+      "label": "Menos movimiento",
+      "hint": "Sin animaciones: el cursor y las barras saltan en lugar de deslizarse. También se activa cuando el sistema pide menos movimiento."
+    },
+    "autoUpdate": {
+      "label": "Buscar actualizaciones al iniciar",
+      "hint": "Lo único que KeyEd envía por la red: una consulta a GitHub para saber cuál es la última versión."
+    },
+    "data": {
+      "export": "Exportar datos",
+      "exportHint": "Todas las lecciones, el progreso, los logros y los ajustes en un archivo JSON.",
+      "exported": "Datos guardados.",
+      "import": "Importar datos",
+      "importHint": "Sustituye todo lo que hay en KeyEd por los datos de un archivo exportado.",
+      "importTitle": "¿Sustituir todos los datos?",
+      "importConfirm": "Las lecciones, el progreso, los logros y los ajustes se sustituirán por los del archivo. Los datos actuales no se podrán recuperar si no los exportas antes.",
+      "importButton": "Sustituir",
+      "reset": "Restablecer el progreso",
+      "resetHint": "Borra las lecciones, las estadísticas de las teclas, el progreso del curso, los días y los logros de todas las distribuciones. Los ajustes se mantienen.",
+      "resetTitle": "¿Restablecer todo el progreso?",
+      "resetConfirm": "No se puede deshacer. Si crees que podrías necesitar tus datos, expórtalos antes.",
+      "resetButton": "Restablecer",
+      "cancel": "Cancelar",
+      "error": {
+        "notBackup": "No es un archivo exportado de KeyEd.",
+        "newerVersion": "El archivo es de una versión más reciente de KeyEd. Actualiza la aplicación y vuelve a intentarlo.",
+        "damaged": "El archivo está dañado y no se puede importar.",
+        "failed": "No se pudo completar la operación."
+      }
+    },
+    "about": {
+      "version": "Versión {{version}}",
+      "description": "Un programa gratuito para aprender mecanografía. Funciona sin internet y sin cuenta; todos los datos se quedan en este equipo.",
+      "check": "Buscar actualizaciones",
+      "checking": "Buscando…",
+      "upToDate": "Tienes la última versión.",
+      "available": "Ya está disponible la versión {{version}}.",
+      "install": "Instalar",
+      "error": "No se pudo comprobar si hay actualizaciones. Revisa la conexión a internet.",
+      "unsupported": "Las actualizaciones se buscan en la aplicación de escritorio.",
+      "codeLicense": "KeyEd es de código abierto, con licencia MIT.",
+      "credits": "Diccionarios, fuentes e iconos",
+      "words": "Listas de palabras: FrequencyWords de Hermit Dave, a partir de OpenSubtitles 2018, CC BY-SA 4.0. Los diccionarios de las lecciones se basan en ellas y usan la misma licencia.",
+      "blocklist": "Filtro de palabras no deseadas: List of Dirty, Naughty, Obscene and Otherwise Bad Words (LDNOOBW), CC BY 4.0.",
+      "fonts": "Fuentes: JetBrains Mono e Inter, SIL Open Font License 1.1.",
+      "icons": "Iconos: Lucide, licencia ISC.",
+      "libraries": "Hecho con Tauri, React y otras bibliotecas de código abierto con licencias MIT, Apache 2.0 y similares.",
+      "repository": "Código fuente en GitHub",
+      "website": "Sitio web"
+    }
+  },
+  "goal": {
+    "label": "Objetivo diario",
+    "unit": "min",
+    "aria": "Hoy: {{done}} de {{goal}} minutos",
+    "short": "{{done}}/{{goal}} min",
+    "minutes": "{{count}} min",
+    "done": "Objetivo diario cumplido",
+    "left_one": "Falta {{count}} minuto para el objetivo diario",
+    "left_many": "Faltan {{count}} minutos para el objetivo diario",
+    "left_other": "Faltan {{count}} minutos para el objetivo diario",
+    "ofMinutes": "{{done}} de {{total}} min"
+  },
+  "streak": {
+    "days_one": "Racha: {{count}} día",
+    "days_many": "Racha: {{count}} días",
+    "days_other": "Racha: {{count}} días",
+    "none": "Aún no tienes racha: cumple el objetivo de hoy para empezar una.",
+    "broken_one": "Tu racha se cortó. La mejor fue de {{count}} día: empieza una nueva hoy.",
+    "broken_many": "Tu racha se cortó. La mejor fue de {{count}} días: empieza una nueva hoy.",
+    "broken_other": "Tu racha se cortó. La mejor fue de {{count}} días: empieza una nueva hoy.",
+    "freezes_one": "{{count}} comodín",
+    "freezes_many": "{{count}} comodines",
+    "freezes_other": "{{count}} comodines",
+    "freezesHint": "Un comodín mantiene tu racha si te saltas un día. Ganas uno por cada 7 días seguidos y puedes guardar hasta dos.",
+    "best_one": "mejor: {{count}} día",
+    "best_many": "mejor: {{count}} días",
+    "best_other": "mejor: {{count}} días",
+    "count_one": "{{count}} día",
+    "count_many": "{{count}} días",
+    "count_other": "{{count}} días"
+  },
+  "week": {
+    "title": "Últimos 7 días",
+    "vsPrevious": "cambio respecto a los 7 días anteriores",
+    "speed": "Velocidad",
+    "accuracy": "Precisión",
+    "time": "Tiempo de escritura",
+    "noData": "No hay lecciones en los últimos 7 días."
+  },
+  "records": {
+    "title": "Récords personales",
+    "bestSpeed": "Mejor velocidad",
+    "bestAccuracy": "Mejor precisión",
+    "bestStreak": "Racha más larga",
+    "bestDay": "Día más productivo"
+  },
+  "calendar": {
+    "title": "Actividad",
+    "hint": "Pasa el puntero por un día para ver cuánto practicaste.",
+    "none": "sin práctica",
+    "goalMet": "objetivo cumplido",
+    "frozen": "comodín usado",
+    "belowShare": "menos del {{percent}}% del objetivo",
+    "aboveShare": "el {{percent}}% del objetivo o más"
+  },
+  "achievements": {
+    "title": "Logros",
+    "toast": "Logro desbloqueado",
+    "all": "Todos los logros",
+    "close": "Cerrar",
+    "levels": "Niveles",
+    "reached": "alcanzado",
+    "unlockedOn": "Conseguido el {{date}}",
+    "progress": "{{value}} de {{next}}",
+    "notYet": "Aún no conseguido",
+    "list": {
+      "first-step": {
+        "name": "Primer paso",
+        "condition": "Termina tu primera lección"
+      },
+      "home-row": {
+        "name": "Posición base",
+        "condition": "Domina las teclas de las primeras lecciones"
+      },
+      "halfway": {
+        "name": "A mitad de camino",
+        "condition": "Desbloquea la mitad de las letras de una distribución"
+      },
+      "alphabet": {
+        "name": "Todo el alfabeto",
+        "condition": "Domina todas las letras de una distribución"
+      },
+      "speed": {
+        "name": "Ganando velocidad",
+        "condition": "Una lección a {{value}} pulsaciones por minuto"
+      },
+      "flawless": {
+        "name": "Impecable",
+        "condition": "Una lección sin un solo error"
+      },
+      "steady-hand": {
+        "name": "Pulso firme",
+        "condition": "Lecciones seguidas con un 97% de precisión o más: {{value}}"
+      },
+      "streak": {
+        "name": "Racha",
+        "condition": "Días seguidos cumpliendo el objetivo diario: {{value}}"
+      },
+      "practice-time": {
+        "name": "Tiempo de práctica",
+        "condition": "Horas escribiendo en total: {{value}}"
+      },
+      "volume": {
+        "name": "Volumen",
+        "condition": "Caracteres escritos en total: {{value}}"
+      },
+      "two-layouts": {
+        "name": "Dos distribuciones",
+        "condition": "Domina las teclas de las primeras lecciones en una segunda distribución"
+      }
+    }
+  },
+  "reminder": {
+    "title": "KeyEd",
+    "body_one": "Falta {{count}} minuto para el objetivo de hoy.",
+    "body_many": "Faltan {{count}} minutos para el objetivo de hoy.",
+    "body_other": "Faltan {{count}} minutos para el objetivo de hoy."
+  },
+  "updates": {
+    "available": "Actualización disponible: versión {{version}}",
+    "description": "La actualización se descarga de GitHub, se instala y KeyEd se reinicia. Tus datos se conservan.",
+    "install": "Actualizar y reiniciar",
+    "installing": "Instalando… {{percent}}%",
+    "later": "Más tarde"
+  },
+  "welcome": {
+    "step": "Paso {{n}} de {{total}}",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "finish": "Empezar a aprender",
+    "language": {
+      "title": "Te damos la bienvenida a KeyEd",
+      "text": "KeyEd te enseña a escribir con los diez dedos sin mirar el teclado. Primero, elige el idioma de la interfaz."
+    },
+    "layout": {
+      "title": "¿Qué distribución quieres aprender?",
+      "text": "Puedes añadir otras más adelante: cada distribución guarda su propio progreso."
+    },
+    "keyboard": {
+      "title": "¿Cómo es tu teclado?",
+      "text": "Fíjate en la tecla Enter y en la Mayús izquierda.",
+      "ansiHint": "Enter largo en una sola fila y Mayús izquierda larga.",
+      "isoHint": "Enter alto que ocupa dos filas y Mayús izquierda corta, con una tecla de más al lado.",
+      "unsure": "¿No lo sabes seguro? Elige ANSI: las letras están en el mismo sitio en los dos."
+    },
+    "level": {
+      "title": "¿Cómo escribes ahora?",
+      "text": "Esto decide dónde empieza el curso. Puedes cambiar la velocidad más tarde en los ajustes.",
+      "beginner": "Empiezo desde cero",
+      "beginnerHint": "El curso empieza con dos teclas bajo los dedos índices y desbloquea teclas nuevas a medida que las dominas.",
+      "looking": "Escribo, pero miro el teclado",
+      "lookingHint": "El mismo curso desde la posición base: te enseña con qué dedo se pulsa cada tecla. Las teclas que ya conoces se desbloquean rápido.",
+      "blind": "Escribo sin mirar y quiero ir más rápido",
+      "blindHint": "Todas las letras se desbloquean a la vez, la velocidad objetivo es de {{cpm}} pulsaciones por minuto y la ayuda de las manos se oculta."
+    },
+    "hands": {
+      "title": "Pon las manos en la posición base",
+      "text": "Busca con los índices los relieves de {{left}} y {{right}}. Los demás dedos descansan en las teclas de al lado, y los pulgares, en la barra espaciadora.",
+      "check": "Ahora pulsa {{left}} y {{right}} sin mirar el teclado.",
+      "done": "¡Genial, tienes las manos en su sitio!"
+    },
+    "goal": {
+      "title": "¿Cuánto vas a practicar al día?",
+      "text": "Solo cuenta el tiempo escribiendo. 10–15 minutos cada día funcionan mejor que una hora una vez a la semana."
+    },
+    "reminders": {
+      "title": "¿Te recordamos que practiques?",
+      "text": "Una notificación a la hora elegida si aún no has cumplido el objetivo de hoy. KeyEd tiene que estar abierto, aunque sea minimizado.",
+      "on": "Recordarme",
+      "off": "Sin recordatorios"
+    }
+  }
+}

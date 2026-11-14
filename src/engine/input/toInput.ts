@@ -1,4 +1,4 @@
-import type { KeyCode, Layout } from '../layout/layout';
+import { isDeadKey, type KeyCode, type Layout } from '../layout/layout';
 
 /** A key press that typed a character. */
 export interface KeyInput {
@@ -6,6 +6,20 @@ export interface KeyInput {
   code: KeyCode;
   /** `KeyboardEvent.timeStamp`, ms. */
   time: number;
+}
+
+/** A dead key waiting for the next press: "´" on the Spanish layout. */
+export interface DeadKey {
+  accent: string;
+  code: KeyCode;
+}
+
+/** What a key press did. */
+export interface InputStep {
+  /** The typed character; null when the press typed nothing. */
+  input: KeyInput | null;
+  /** The dead key waiting for the next press. */
+  dead: DeadKey | null;
 }
 
 /**
@@ -28,17 +42,48 @@ export interface KeyEventLike {
   readonly timeStamp: number;
 }
 
-/** Turns a key press into a typed character; returns null for presses that type nothing. */
-export function toInput(event: KeyEventLike, layout: Layout, mode: InputMode): KeyInput | null {
-  // Auto-repeat and shortcuts never count as typing.
+/**
+ * Turns a key press into a typed character. `dead` is the dead key pressed
+ * just before, if any: it changes this press, "´" then "e" types "é". A space
+ * after a dead key types the accent itself. A key the accent does not change
+ * types the accent too: the lesson takes one character per press, and the
+ * system would type the accent first.
+ */
+export function toInput(
+  event: KeyEventLike,
+  layout: Layout,
+  mode: InputMode,
+  dead: DeadKey | null = null,
+): InputStep {
+  // Auto-repeat and shortcuts never count as typing. A waiting dead key stays.
   if (event.repeat || event.isComposing || event.ctrlKey || event.altKey || event.metaKey) {
-    return null;
+    return { input: null, dead };
   }
-  const char =
-    mode === 'emulate'
-      ? layout.keys[event.code]?.[event.shiftKey ? 'shift' : 'base']
-      : [...event.key].length === 1
-        ? event.key
-        : undefined;
-  return char === undefined ? null : { char, code: event.code, time: event.timeStamp };
+  const typed = (char: string): InputStep => ({
+    input: { char, code: event.code, time: event.timeStamp },
+    dead: null,
+  });
+  const keyChar = layout.keys[event.code]?.[event.shiftKey ? 'shift' : 'base'];
+  const accentOf = (char: string) =>
+    event.code === 'Space' ? dead?.accent : layout.dead[dead?.accent ?? '']?.[char];
+
+  if (mode === 'emulate') {
+    // Shift, Caps Lock and other keys outside the layout type nothing.
+    if (keyChar === undefined) return { input: null, dead };
+    if (dead !== null) return typed(accentOf(keyChar) ?? dead.accent);
+    if (isDeadKey(layout, keyChar)) {
+      return { input: null, dead: { accent: keyChar, code: event.code } };
+    }
+    return typed(keyChar);
+  }
+
+  if (event.key === 'Dead') {
+    // Remembered only where the lesson layout has this dead key.
+    const accent = keyChar !== undefined && isDeadKey(layout, keyChar) ? keyChar : null;
+    return { input: null, dead: accent === null ? null : { accent, code: event.code } };
+  }
+  if ([...event.key].length !== 1) return { input: null, dead };
+  // Some systems send the letter with its accent, others the plain letter.
+  if (dead !== null) return typed(accentOf(event.key) ?? event.key);
+  return typed(event.key);
 }

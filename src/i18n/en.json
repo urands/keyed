@@ -16,11 +16,17 @@
     "label": "Layout",
     "name": {
       "en-us-qwerty": "English (QWERTY)",
-      "ru-jcuken": "Russian (ЙЦУКЕН)"
+      "ru-jcuken": "Russian (ЙЦУКЕН)",
+      "de-qwertz": "German (QWERTZ)",
+      "fr-azerty": "French (AZERTY)",
+      "es-qwerty": "Spanish (QWERTY)"
     },
     "short": {
       "en-us-qwerty": "EN",
-      "ru-jcuken": "RU"
+      "ru-jcuken": "RU",
+      "de-qwertz": "DE",
+      "fr-azerty": "FR",
+      "es-qwerty": "ES"
     }
   },
   "home": {
@@ -73,6 +79,8 @@
     },
     "hint": "Keep your fingers on the home row and reach with one finger only. Return it to its place after each press.",
     "shiftHint": "First hold Shift with the little finger of the other hand, then press the key and release both. The other fingers stay on the home row.",
+    "deadKey": "First press and release {{accent}}: this key types nothing by itself and puts an accent on the next letter. Then press the letter.",
+    "deadKeyShift": "First press {{accent}} together with Shift and release: this key types nothing by itself and puts an accent on the next letter. Then press the letter.",
     "start": "Start",
     "stageTitle": "New stage: {{name}}",
     "stage": {
@@ -97,6 +105,40 @@
         "apostrophe": "The apostrophe is right of \";\". It is used in contractions: don't, it's, I'm.",
         "quote": "Quotes are on the apostrophe key, with Shift.",
         "hyphen": "The hyphen is right of 0. There are no spaces around it: well-known, e-mail."
+      },
+      "de-qwertz": {
+        "question": "The question mark is Shift and ß, right of 0.",
+        "quote": "Quotes are Shift and 2. Opening and closing quotes are typed the same way.",
+        "hyphen": "The hyphen is at the right of the bottom row, on the key that types \"/\" on the English layout. There are no spaces around it: E-Mail, T-Shirt.",
+        "colon": "The colon is Shift and the full stop.",
+        "semicolon": "The semicolon is Shift and the comma.",
+        "parenLeft": "Parentheses are Shift and 8, Shift and 9.",
+        "parenRight": "Parentheses are Shift and 8, Shift and 9."
+      },
+      "fr-azerty": {
+        "period": "On the French layout the full stop needs Shift: it is the \";\" key in the bottom row, second right of N.",
+        "comma": "The comma is right of N, without Shift.",
+        "apostrophe": "The apostrophe is on the 4 key, without Shift. It is used in words like c'est, j'ai, l'eau.",
+        "question": "The question mark is Shift and the comma.",
+        "exclamation": "The exclamation mark is the rightmost key of the bottom row, without Shift.",
+        "hyphen": "The hyphen is on the 6 key, without Shift. There are no spaces around it: peut-être, est-ce.",
+        "colon": "The colon is in the bottom row, right of \";\", without Shift.",
+        "semicolon": "The semicolon is right of the comma, without Shift.",
+        "quote": "Quotes are on the 3 key, without Shift.",
+        "parenLeft": "The opening parenthesis is on the 5 key, the closing one right of 0. Both without Shift.",
+        "parenRight": "The opening parenthesis is on the 5 key, the closing one right of 0. Both without Shift."
+      },
+      "es-qwerty": {
+        "question": "The question mark is Shift and the key right of 0. A question starts with an inverted mark: ¿Qué?",
+        "questionInverted": "The inverted question mark is Shift and the second key right of 0. A question starts with it: ¿Qué?",
+        "exclamation": "The exclamation mark is Shift and 1. An exclamation starts with an inverted mark: ¡Hola!",
+        "exclamationInverted": "The inverted exclamation mark is the second key right of 0, without Shift. An exclamation starts with it: ¡Hola!",
+        "hyphen": "The hyphen is at the right of the bottom row, on the key that types \"/\" on the English layout.",
+        "quote": "Quotes are Shift and 2. Opening and closing quotes are typed the same way.",
+        "colon": "The colon is Shift and the full stop.",
+        "semicolon": "The semicolon is Shift and the comma.",
+        "parenLeft": "Parentheses are Shift and 8, Shift and 9.",
+        "parenRight": "Parentheses are Shift and 8, Shift and 9."
       }
     },
     "stageBadge": "New stage"
@@ -113,7 +155,10 @@
     "capsLock": "Caps Lock is on",
     "wrongLayout": {
       "en-us-qwerty": "Switch the system keyboard layout to English",
-      "ru-jcuken": "Switch the system keyboard layout to Russian"
+      "ru-jcuken": "Switch the system keyboard layout to Russian",
+      "de-qwertz": "Switch the system keyboard layout to German",
+      "fr-azerty": "Switch the system keyboard layout to French",
+      "es-qwerty": "Switch the system keyboard layout to Spanish"
     },
     "nextKey": "Next key",
     "stage": "Stage {{n}} of {{total}}: {{name}}",
@@ -252,7 +297,7 @@
     },
     "speedUnit": {
       "label": "Speed unit",
-      "hint": "Automatic shows characters per minute for Russian and words per minute for English.",
+      "hint": "Automatic shows characters per minute for Russian, German and Spanish and words per minute for English and French.",
       "auto": "Automatic",
       "wpm": "WPM",
       "cpm": "Characters/min"
@@ -267,7 +312,10 @@
     "language": {
       "label": "Interface language",
       "ru": "Русский",
-      "en": "English"
+      "en": "English",
+      "de": "Deutsch",
+      "fr": "Français",
+      "es": "Español"
     },
     "theme": {
       "label": "Theme",
@@ -336,7 +384,7 @@
       "importConfirm": "Lessons, progress, achievements and settings will be replaced with the ones from the file. The current data cannot be restored unless you export it first.",
       "importButton": "Replace",
       "reset": "Reset progress",
-      "resetHint": "Deletes lessons, key statistics, course progress, days and achievements of both layouts. Settings stay.",
+      "resetHint": "Deletes lessons, key statistics, course progress, days and achievements of all layouts. Settings stay.",
       "resetTitle": "Reset all progress?",
       "resetConfirm": "This cannot be undone. Export your data first if you may want it back.",
       "resetButton": "Reset",
@@ -498,7 +546,7 @@
     },
     "layout": {
       "title": "Which layout do you want to learn?",
-      "text": "You can add the other one later: each layout keeps its own progress."
+      "text": "You can add others later: each layout keeps its own progress."
     },
     "keyboard": {
       "title": "What does your keyboard look like?",

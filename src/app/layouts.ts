@@ -1,13 +1,22 @@
 import {
   ansiGeometry,
+  deQwertz,
+  deQwertzCourse,
   englishContent,
   enUsQwerty,
   enUsQwertyCourse,
+  esQwerty,
+  esQwertyCourse,
+  frAzerty,
+  frAzertyCourse,
+  frenchContent,
+  germanContent,
   isoGeometry,
   ruJcuken,
   ruJcukenCourse,
   russianContent,
   russianYoContent,
+  spanishContent,
   type LanguageContent,
 } from '../content';
 import type { Geometry, GeometryId } from '../engine/layout/geometry';
@@ -52,17 +61,29 @@ function makeKit(layout: Layout, fullCourse: Course, content: LanguageContent, o
   };
 }
 
-const english = makeKit(enUsQwerty, enUsQwertyCourse, englishContent, []);
 const russian = makeKit(ruJcuken, ruJcukenCourse, russianContent, []);
 const russianYo = makeKit(ruJcuken, ruJcukenCourse, russianYoContent, ['ё']);
+/** Kits that no setting changes. */
+const KITS: Record<Exclude<LayoutId, 'ru-jcuken'>, LayoutKit> = {
+  'en-us-qwerty': makeKit(enUsQwerty, enUsQwertyCourse, englishContent, []),
+  'de-qwertz': makeKit(deQwertz, deQwertzCourse, germanContent, []),
+  'fr-azerty': makeKit(frAzerty, frAzertyCourse, frenchContent, []),
+  'es-qwerty': makeKit(esQwerty, esQwertyCourse, spanishContent, []),
+};
 
 export function kitFor(layoutId: LayoutId, options: KitOptions): LayoutKit {
-  if (layoutId === 'en-us-qwerty') return english;
-  return options.yoLetter ? russianYo : russian;
+  if (layoutId === 'ru-jcuken') return options.yoLetter ? russianYo : russian;
+  return KITS[layoutId];
 }
 
 /** Layouts in the order the switch shows them. */
-export const PRACTICE_LAYOUTS: readonly LayoutId[] = ['en-us-qwerty', 'ru-jcuken'];
+export const PRACTICE_LAYOUTS: readonly LayoutId[] = [
+  'en-us-qwerty',
+  'ru-jcuken',
+  'de-qwertz',
+  'fr-azerty',
+  'es-qwerty',
+];
 
 export function geometryFor(id: GeometryId): Geometry {
   return id === 'iso' ? isoGeometry : ansiGeometry;

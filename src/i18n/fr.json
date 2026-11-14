@@ -1,0 +1,592 @@
+{
+  "app": {
+    "name": "KeyEd",
+    "storageError": "Impossible d’enregistrer votre progression. Les leçons fonctionnent, mais les résultats seront perdus à la fermeture de l’application."
+  },
+  "nav": {
+    "label": "Sections",
+    "home": "Accueil",
+    "practice": "Entraînement",
+    "course": "Parcours",
+    "stats": "Statistiques",
+    "settings": "Paramètres",
+    "achievements": "Succès"
+  },
+  "layout": {
+    "label": "Disposition",
+    "name": {
+      "en-us-qwerty": "Anglais (QWERTY)",
+      "ru-jcuken": "Russe (ЙЦУКЕН)",
+      "de-qwertz": "Allemand (QWERTZ)",
+      "fr-azerty": "Français (AZERTY)",
+      "es-qwerty": "Espagnol (QWERTY)"
+    },
+    "short": {
+      "en-us-qwerty": "EN",
+      "ru-jcuken": "RU",
+      "de-qwertz": "DE",
+      "fr-azerty": "FR",
+      "es-qwerty": "ES"
+    }
+  },
+  "home": {
+    "title": "Apprenez à taper à l’aveugle",
+    "intro": "De courtes leçons s’adaptent à vous : une nouvelle touche se débloque quand vous maîtrisez les précédentes.",
+    "chooseLayout": "Quelle disposition apprendre",
+    "and": " et ",
+    "how": {
+      "start": "Vous commencez avec deux touches sous vos index : {{keys}}.",
+      "unlock": "Une nouvelle touche se débloque quand vous tapez les touches débloquées vite et avec précision.",
+      "focus": "Les leçons insistent sur les touches qui vous posent le plus de difficultés."
+    },
+    "start": "Commencer l’entraînement",
+    "continue": "Continuer",
+    "next": "{{key}} se débloquera quand vous maîtriserez {{keys}}.",
+    "nextSoon": "{{key}} se débloquera après votre prochaine leçon.",
+    "allOpen": "Toutes les touches de cette étape sont débloquées. Il reste à consolider : {{keys}}.",
+    "complete": "Toutes les touches du parcours sont maîtrisées.",
+    "stage": "Étape {{n}} sur {{total}} : {{name}}",
+    "courseLink": "tout le parcours",
+    "free": "Parcours terminé, place à l’entraînement libre. Les leçons insistent surtout sur : {{keys}}.",
+    "keyboard": "Votre clavier",
+    "legend": {
+      "open": "débloquée",
+      "mastered": "maîtrisée",
+      "next": "prochaine à débloquer",
+      "closed": "pas encore débloquée"
+    }
+  },
+  "course": {
+    "strip": "Touches du parcours",
+    "closed": "{{key}} : pas encore débloquée",
+    "open": "{{key}} : maîtrise {{percent}} %",
+    "mastered": "{{key}} : maîtrisée",
+    "focus": "Touche ciblée"
+  },
+  "newKey": {
+    "titleOne": "Nouvelle touche : {{keys}}",
+    "titleMany": "Nouvelles touches : {{keys}}",
+    "direction": {
+      "home": "en position de base",
+      "up": "vers le haut depuis {{key}}",
+      "down": "vers le bas depuis {{key}}",
+      "left": "vers la gauche depuis {{key}}",
+      "right": "vers la droite depuis {{key}}",
+      "upLeft": "vers le haut et la gauche depuis {{key}}",
+      "upRight": "vers le haut et la droite depuis {{key}}",
+      "downLeft": "vers le bas et la gauche depuis {{key}}",
+      "downRight": "vers le bas et la droite depuis {{key}}"
+    },
+    "hint": "Gardez les doigts sur la rangée de base et allez chercher la touche avec un seul doigt. Après chaque frappe, ramenez-le à sa place.",
+    "shiftHint": "Maintenez d’abord Maj avec l’auriculaire de l’autre main, puis appuyez sur la touche et relâchez les deux. Les autres doigts restent sur la rangée de base.",
+    "deadKey": "Appuyez d’abord sur {{accent}} et relâchez : cette touche n’écrit rien seule, elle ajoute un accent à la lettre suivante. Appuyez ensuite sur la lettre.",
+    "deadKeyShift": "Appuyez d’abord sur {{accent}} avec Maj et relâchez : cette touche n’écrit rien seule, elle ajoute un accent à la lettre suivante. Appuyez ensuite sur la lettre.",
+    "start": "Commencer",
+    "stageTitle": "Nouvelle étape : {{name}}",
+    "stage": {
+      "letters": "Les lettres de la disposition, en partant de la position de base.",
+      "capitals": "Les majuscules se tapent avec Maj. Appuyez sur Maj avec l’auriculaire de l’autre main : Maj droite pour les lettres de la main gauche, Maj gauche pour celles de la main droite.",
+      "punctuation": "Le point, la virgule et les autres signes. Après un point, un point d’exclamation ou un point d’interrogation, la phrase commence par une majuscule.",
+      "digits": "Les chiffres sont sur la rangée du haut. Allez chercher un chiffre avec le même doigt que la lettre en dessous, puis ramenez le doigt sur la rangée de base.",
+      "free": "Des phrases ordinaires avec tout ce que vous avez appris."
+    },
+    "holdShift": {
+      "ShiftLeft": "Touche {{key}} avec Maj gauche : appuyez sur Maj avec l’auriculaire gauche.",
+      "ShiftRight": "Touche {{key}} avec Maj droite : appuyez sur Maj avec l’auriculaire droit."
+    },
+    "notes": {
+      "ru-jcuken": {
+        "period": "Sur la disposition russe, le point est dans la rangée du bas, à droite, sur la touche qui tape « / » sur la disposition anglaise.",
+        "comma": "La virgule est sur la même touche que le point, avec Maj.",
+        "hyphen": "Le trait d’union est à droite de 0. Pas d’espace autour : «кто-то», «по-моему».",
+        "quote": "Les guillemets : Maj et 2. Les guillemets ouvrants et fermants se tapent de la même façon."
+      },
+      "en-us-qwerty": {
+        "apostrophe": "L’apostrophe est à droite de « ; ». Elle sert dans les contractions : don't, it's, I'm.",
+        "quote": "Les guillemets sont sur la touche de l’apostrophe, avec Maj.",
+        "hyphen": "Le trait d’union est à droite de 0. Pas d’espace autour : well-known, e-mail."
+      },
+      "de-qwertz": {
+        "question": "Le point d’interrogation : Maj et ß, à droite de 0.",
+        "quote": "Les guillemets : Maj et 2. Les guillemets ouvrants et fermants se tapent de la même façon.",
+        "hyphen": "Le trait d’union est dans la rangée du bas, à droite, sur la touche qui tape « / » sur la disposition anglaise. Pas d’espace autour : E-Mail, T-Shirt.",
+        "colon": "Les deux-points : Maj et le point.",
+        "semicolon": "Le point-virgule : Maj et la virgule.",
+        "parenLeft": "Les parenthèses : Maj et 8, Maj et 9.",
+        "parenRight": "Les parenthèses : Maj et 8, Maj et 9."
+      },
+      "fr-azerty": {
+        "period": "Sur la disposition française, le point se tape avec Maj : c’est la touche « ; » de la rangée du bas, la deuxième à droite de N.",
+        "comma": "La virgule est à droite de N, sans Maj.",
+        "apostrophe": "L’apostrophe est sur la touche 4, sans Maj. Elle sert dans des mots comme c'est, j'ai, l'eau.",
+        "question": "Le point d’interrogation : Maj et la virgule.",
+        "exclamation": "Le point d’exclamation est la dernière touche à droite de la rangée du bas, sans Maj.",
+        "hyphen": "Le trait d’union est sur la touche 6, sans Maj. Pas d’espace autour : peut-être, est-ce.",
+        "colon": "Les deux-points sont dans la rangée du bas, à droite de « ; », sans Maj.",
+        "semicolon": "Le point-virgule est à droite de la virgule, sans Maj.",
+        "quote": "Les guillemets sont sur la touche 3, sans Maj.",
+        "parenLeft": "La parenthèse ouvrante est sur la touche 5, la fermante à droite de 0. Les deux sans Maj.",
+        "parenRight": "La parenthèse ouvrante est sur la touche 5, la fermante à droite de 0. Les deux sans Maj."
+      },
+      "es-qwerty": {
+        "question": "Le point d’interrogation : Maj et la touche à droite de 0. Une question commence par le signe inversé : ¿Qué?",
+        "questionInverted": "Le point d’interrogation inversé : Maj et la deuxième touche à droite de 0. Il ouvre une question : ¿Qué?",
+        "exclamation": "Le point d’exclamation : Maj et 1. Une exclamation commence par le signe inversé : ¡Hola!",
+        "exclamationInverted": "Le point d’exclamation inversé est la deuxième touche à droite de 0, sans Maj. Il ouvre une exclamation : ¡Hola!",
+        "hyphen": "Le trait d’union est dans la rangée du bas, à droite, sur la touche qui tape « / » sur la disposition anglaise.",
+        "quote": "Les guillemets : Maj et 2. Les guillemets ouvrants et fermants se tapent de la même façon.",
+        "colon": "Les deux-points : Maj et le point.",
+        "semicolon": "Le point-virgule : Maj et la virgule.",
+        "parenLeft": "Les parenthèses : Maj et 8, Maj et 9.",
+        "parenRight": "Les parenthèses : Maj et 8, Maj et 9."
+      }
+    },
+    "stageBadge": "Nouvelle étape"
+  },
+  "practice": {
+    "speed": "Vitesse",
+    "accuracy": "Précision",
+    "progress": "Progression de la leçon",
+    "pause": "Pause",
+    "resume": "Reprendre",
+    "readyHint": "Commencez à taper : le chronomètre démarre à la première touche.",
+    "pausedTitle": "En pause",
+    "pausedHint": "Appuyez sur une touche pour continuer. Échap pour quitter la leçon.",
+    "capsLock": "Verr. Maj est activé",
+    "wrongLayout": {
+      "en-us-qwerty": "Passez la disposition du clavier du système en anglais",
+      "ru-jcuken": "Passez la disposition du clavier du système en russe",
+      "de-qwertz": "Passez la disposition du clavier du système en allemand",
+      "fr-azerty": "Passez la disposition du clavier du système en français",
+      "es-qwerty": "Passez la disposition du clavier du système en espagnol"
+    },
+    "nextKey": "Touche suivante",
+    "stage": "Étape {{n}} sur {{total}} : {{name}}",
+    "finger": {
+      "lPinky": "Auriculaire gauche",
+      "lRing": "Annulaire gauche",
+      "lMiddle": "Majeur gauche",
+      "lIndex": "Index gauche",
+      "thumb": "Pouce",
+      "rIndex": "Index droit",
+      "rMiddle": "Majeur droit",
+      "rRing": "Annulaire droit",
+      "rPinky": "Auriculaire droit"
+    },
+    "view": "Affichage",
+    "showKeyboard": "Clavier",
+    "showHands": "Mains"
+  },
+  "keyboard": {
+    "backspace": "⌫",
+    "tab": "Tab",
+    "capsLock": "Verr. Maj",
+    "enter": "Entrée",
+    "escape": "Échap",
+    "shift": "Maj",
+    "shiftLeft": "Maj gauche",
+    "quoted": "« {{key}} »",
+    "shiftRight": "Maj droite",
+    "space": "Espace"
+  },
+  "stage": {
+    "letters": "Lettres",
+    "capitals": "Majuscules",
+    "punctuation": "Ponctuation",
+    "digits": "Chiffres",
+    "free": "Entraînement libre"
+  },
+  "stageAbout": {
+    "letters": "Toutes les lettres de la disposition, de la position de base jusqu’aux bords du clavier.",
+    "capitals": "Les majuscules : on appuie sur Maj avec l’auriculaire de l’autre main.",
+    "punctuation": "Point, virgule, guillemets et autres signes, là où ils apparaissent dans un texte ordinaire.",
+    "digits": "Les nombres, sur la rangée du haut du clavier.",
+    "free": "Des phrases ordinaires avec tout ce que vous avez appris, en insistant sur les touches les plus faibles. Se débloque après toutes les étapes."
+  },
+  "courseScreen": {
+    "title": "Parcours",
+    "intro": "Les étapes se suivent dans l’ordre : la suivante se débloque quand toutes les touches de la précédente sont maîtrisées.",
+    "trainHint": "Cliquez sur une touche débloquée pour l’entraîner seule. Cela compte aussi pour votre progression dans le parcours.",
+    "continue": "Continuer le parcours",
+    "stageN": "Étape {{n}}.",
+    "status": {
+      "done": "Terminée",
+      "current": "En cours",
+      "locked": "Pas encore débloquée"
+    },
+    "mastered": "Touches maîtrisées : {{mastered}} sur {{total}}",
+    "keys": "Touches de l’étape",
+    "train": "S’entraîner sur {{key}}",
+    "weakest": "Les touches les plus faibles en ce moment"
+  },
+  "training": {
+    "label": "Entraînement : {{key}}",
+    "stop": "Retour au parcours"
+  },
+  "units": {
+    "wpm": "mots/min",
+    "cpm": "car./min"
+  },
+  "result": {
+    "title": "Leçon terminée",
+    "unlockedOne": "Nouvelle touche débloquée",
+    "unlockedMany": "Nouvelles touches débloquées",
+    "unlockedHint": "La prochaine leçon commence par une courte présentation.",
+    "stageDone": "Étape « {{stage}} » terminée !",
+    "stageNext": "Ensuite : {{stage}}.",
+    "speed": "Vitesse",
+    "accuracy": "Précision",
+    "time": "Temps",
+    "errors": "Erreurs",
+    "keys": "Touches de cette leçon",
+    "next": "Leçon suivante",
+    "repeat": "Recommencer",
+    "home": "Accueil",
+    "record": "Record personnel !",
+    "vsAverage": "Votre moyenne : {{average}}",
+    "achievements": "Nouveaux succès",
+    "insight": {
+      "confusion": "Au lieu de {{expected}}, vous tapez souvent {{typed}}",
+      "slowest": "La touche la plus lente : {{key}}, {{speed}} {{unit}}"
+    }
+  },
+  "stats": {
+    "title": "Statistiques",
+    "totalTime": "Temps de frappe",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "empty": "Terminez une leçon pour voir vos statistiques.",
+    "lessons": "Leçons",
+    "recentSpeed": "Vitesse, {{count}} dernières",
+    "recentAccuracy": "Précision, {{count}} dernières",
+    "speed": "Vitesse par leçon, {{unit}}",
+    "accuracy": "Précision par leçon",
+    "target": "objectif",
+    "lessonPoint": "Leçon {{n}} · {{date}}",
+    "lessonTable": "Afficher les leçons sous forme de tableau",
+    "date": "Date",
+    "keys": "Maîtrise des touches",
+    "keyDetail": "{{key}} : maîtrise {{percent}} %, réussies : {{hits}}, erreurs : {{misses}}",
+    "heatHint": "Survolez une touche pour voir le détail.",
+    "notOpen": "pas encore débloquée",
+    "mastered": "maîtrisée",
+    "keyTable": "Afficher les touches sous forme de tableau",
+    "key": "Touche",
+    "confidence": "Maîtrise",
+    "correct": "Réussies"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "section": {
+      "learning": "Apprentissage",
+      "practice": "Écran d’entraînement",
+      "keyboard": "Clavier",
+      "appearance": "Apparence",
+      "motivation": "Objectif du jour et rappels",
+      "sound": "Son",
+      "data": "Données",
+      "about": "À propos"
+    },
+    "layoutHint": "Chaque disposition a sa propre progression et ses propres statistiques.",
+    "strict": {
+      "label": "Mode strict",
+      "hint": "Une nouvelle touche ne se débloque que si toutes les touches débloquées sont rapides et précises en ce moment. Sans ce mode, une touche maîtrisée une fois ne vous retient plus."
+    },
+    "yo": {
+      "label": "Lettre ё",
+      "hint": "Le parcours de russe enseigne « ё » et la garde dans les textes. Sans cette option, « ё » est remplacée par « е », comme dans la plupart des textes russes."
+    },
+    "speedUnit": {
+      "label": "Unité de vitesse",
+      "hint": "En automatique : caractères par minute pour le russe, l’allemand et l’espagnol, mots par minute pour l’anglais et le français.",
+      "auto": "Automatique",
+      "wpm": "Mots/min",
+      "cpm": "Caractères/min"
+    },
+    "inputMode": {
+      "label": "Saisie",
+      "emulate": "Selon la position des touches",
+      "system": "Disposition du système",
+      "emulateHint": "La lettre dépend de la touche physique sur laquelle vous appuyez : une leçon de russe fonctionne même avec la disposition anglaise active.",
+      "systemHint": "La lettre vient de la disposition du clavier du système. Passez-la sur celle de la leçon avant de taper."
+    },
+    "language": {
+      "label": "Langue de l’interface",
+      "ru": "Русский",
+      "en": "English",
+      "de": "Deutsch",
+      "fr": "Français",
+      "es": "Español"
+    },
+    "theme": {
+      "label": "Thème",
+      "system": "Système",
+      "light": "Clair",
+      "dark": "Sombre"
+    },
+    "goal": {
+      "label": "Objectif du jour",
+      "hint": "Minutes de frappe par jour. Seul le temps de frappe compte, pas les pauses."
+    },
+    "reminders": {
+      "label": "Me rappeler",
+      "hint": "Une notification système à cette heure si l’objectif du jour n’est pas encore atteint. KeyEd doit être ouvert, par exemple dans une fenêtre réduite.",
+      "time": "Heure",
+      "denied": "Les notifications ne sont pas autorisées. Autorisez-les pour KeyEd dans les paramètres du système."
+    },
+    "sound": {
+      "keys": "Son des touches",
+      "errors": "Son des erreurs",
+      "volume": "Volume"
+    },
+    "keyboardType": {
+      "label": "Type de clavier",
+      "hint": "Sur un clavier ANSI, Entrée est longue et sur une seule rangée ; sur un clavier ISO, Entrée est haute et Maj gauche est courte. Les lettres sont aux mêmes endroits.",
+      "ansi": "ANSI",
+      "iso": "ISO"
+    },
+    "targetSpeed": {
+      "label": "Vitesse cible",
+      "hint": "Une touche est maîtrisée quand vous la tapez à cette vitesse et avec précision. Augmentez-la si les touches se débloquent trop facilement.",
+      "value": "{{cpm}} car./min · {{wpm}} mots/min"
+    },
+    "lessonLength": {
+      "label": "Longueur des leçons",
+      "hint": "Nombre de caractères par leçon. 120, c’est environ une minute pour un débutant."
+    },
+    "showKeyboard": {
+      "label": "Afficher le clavier"
+    },
+    "showHands": {
+      "label": "Afficher les mains"
+    },
+    "textSize": {
+      "label": "Taille du texte",
+      "small": "Petite",
+      "medium": "Moyenne",
+      "large": "Grande",
+      "xlarge": "Très grande"
+    },
+    "reduceMotion": {
+      "label": "Réduire les animations",
+      "hint": "Pas d’animations : le curseur et les barres sautent au lieu de glisser. L’option s’active aussi quand le système demande moins de mouvement."
+    },
+    "autoUpdate": {
+      "label": "Rechercher les mises à jour au démarrage",
+      "hint": "La seule chose que KeyEd envoie sur le réseau : une requête à GitHub pour connaître la dernière version."
+    },
+    "data": {
+      "export": "Exporter les données",
+      "exportHint": "Toutes les leçons, la progression, les succès et les paramètres dans un seul fichier JSON.",
+      "exported": "Données enregistrées.",
+      "import": "Importer des données",
+      "importHint": "Remplace toutes les données de KeyEd par celles d’un fichier d’export.",
+      "importTitle": "Remplacer toutes les données ?",
+      "importConfirm": "Les leçons, la progression, les succès et les paramètres seront remplacés par ceux du fichier. Les données actuelles seront perdues si vous ne les exportez pas d’abord.",
+      "importButton": "Remplacer",
+      "reset": "Réinitialiser la progression",
+      "resetHint": "Supprime les leçons, les statistiques des touches, la progression du parcours, les jours et les succès de toutes les dispositions. Les paramètres sont conservés.",
+      "resetTitle": "Réinitialiser toute la progression ?",
+      "resetConfirm": "Cette action est irréversible. Exportez d’abord vos données si vous pensez en avoir besoin plus tard.",
+      "resetButton": "Réinitialiser",
+      "cancel": "Annuler",
+      "error": {
+        "notBackup": "Ce n’est pas un fichier d’export KeyEd.",
+        "newerVersion": "Ce fichier vient d’une version plus récente de KeyEd. Mettez l’application à jour et réessayez.",
+        "damaged": "Le fichier est endommagé et ne peut pas être importé.",
+        "failed": "L’opération n’a pas pu aboutir."
+      }
+    },
+    "about": {
+      "version": "Version {{version}}",
+      "description": "Un logiciel gratuit pour apprendre à taper à l’aveugle. Il fonctionne sans Internet et sans compte ; toutes les données restent sur cet ordinateur.",
+      "check": "Rechercher des mises à jour",
+      "checking": "Recherche…",
+      "upToDate": "Vous avez la dernière version.",
+      "available": "La version {{version}} est disponible.",
+      "install": "Installer",
+      "error": "Impossible de rechercher les mises à jour. Vérifiez la connexion Internet.",
+      "unsupported": "Les mises à jour se recherchent dans l’application de bureau.",
+      "codeLicense": "KeyEd est open source, sous licence MIT.",
+      "credits": "Dictionnaires, polices et icônes",
+      "words": "Listes de mots : FrequencyWords de Hermit Dave, d’après OpenSubtitles 2018, CC BY-SA 4.0. Les dictionnaires des leçons en sont dérivés et sont sous la même licence.",
+      "blocklist": "Filtre des mots indésirables : List of Dirty, Naughty, Obscene and Otherwise Bad Words (LDNOOBW), CC BY 4.0.",
+      "fonts": "Polices : JetBrains Mono et Inter, SIL Open Font License 1.1.",
+      "icons": "Icônes : Lucide, licence ISC.",
+      "libraries": "Conçu avec Tauri, React et d’autres bibliothèques open source sous licences MIT, Apache 2.0 et similaires.",
+      "repository": "Code source sur GitHub",
+      "website": "Site web"
+    }
+  },
+  "goal": {
+    "label": "Objectif du jour",
+    "unit": "min",
+    "aria": "Aujourd’hui : {{done}} sur {{goal}} minutes",
+    "short": "{{done}}/{{goal}} min",
+    "minutes": "{{count}} min",
+    "done": "Objectif du jour atteint",
+    "left_one": "Plus que {{count}} minute pour l’objectif du jour",
+    "left_many": "Plus que {{count}} de minutes pour l’objectif du jour",
+    "left_other": "Plus que {{count}} minutes pour l’objectif du jour",
+    "ofMinutes": "{{done}} sur {{total}} min"
+  },
+  "streak": {
+    "days_one": "Série : {{count}} jour",
+    "days_many": "Série : {{count}} de jours",
+    "days_other": "Série : {{count}} jours",
+    "none": "Pas encore de série : atteignez l’objectif du jour pour en commencer une.",
+    "broken_one": "La série s’est arrêtée. Votre meilleure était de {{count}} jour : commencez-en une nouvelle aujourd’hui.",
+    "broken_many": "La série s’est arrêtée. Votre meilleure était de {{count}} de jours : commencez-en une nouvelle aujourd’hui.",
+    "broken_other": "La série s’est arrêtée. Votre meilleure était de {{count}} jours : commencez-en une nouvelle aujourd’hui.",
+    "freezes_one": "{{count}} gel",
+    "freezes_many": "{{count}} de gels",
+    "freezes_other": "{{count}} gels",
+    "freezesHint": "Un gel préserve la série quand vous manquez un jour. Vous en gagnez un tous les 7 jours d’affilée et pouvez en garder deux.",
+    "best_one": "record : {{count}} jour",
+    "best_many": "record : {{count}} de jours",
+    "best_other": "record : {{count}} jours",
+    "count_one": "{{count}} jour",
+    "count_many": "{{count}} de jours",
+    "count_other": "{{count}} jours"
+  },
+  "week": {
+    "title": "7 derniers jours",
+    "vsPrevious": "évolution par rapport aux 7 jours précédents",
+    "speed": "Vitesse",
+    "accuracy": "Précision",
+    "time": "Temps de frappe",
+    "noData": "Aucune leçon ces 7 derniers jours."
+  },
+  "records": {
+    "title": "Records personnels",
+    "bestSpeed": "Meilleure vitesse",
+    "bestAccuracy": "Meilleure précision",
+    "bestStreak": "Plus longue série",
+    "bestDay": "Journée la plus productive"
+  },
+  "calendar": {
+    "title": "Activité",
+    "hint": "Survolez un jour pour voir votre entraînement.",
+    "none": "pas d’entraînement",
+    "goalMet": "objectif atteint",
+    "frozen": "gel utilisé",
+    "belowShare": "moins de {{percent}} % de l’objectif",
+    "aboveShare": "{{percent}} % de l’objectif ou plus"
+  },
+  "achievements": {
+    "title": "Succès",
+    "toast": "Succès débloqué",
+    "all": "Tous les succès",
+    "close": "Fermer",
+    "levels": "Niveaux",
+    "reached": "atteint",
+    "unlockedOn": "Obtenu le {{date}}",
+    "progress": "{{value}} sur {{next}}",
+    "notYet": "Pas encore obtenu",
+    "list": {
+      "first-step": {
+        "name": "Premier pas",
+        "condition": "Terminer votre première leçon"
+      },
+      "home-row": {
+        "name": "Position de base",
+        "condition": "Maîtriser les touches des premières leçons"
+      },
+      "halfway": {
+        "name": "À mi-chemin",
+        "condition": "Débloquer la moitié des lettres d’une disposition"
+      },
+      "alphabet": {
+        "name": "Tout l’alphabet",
+        "condition": "Maîtriser toutes les lettres d’une disposition"
+      },
+      "speed": {
+        "name": "Accélération",
+        "condition": "Une leçon à {{value}} caractères par minute"
+      },
+      "flawless": {
+        "name": "Sans faute",
+        "condition": "Une leçon sans une seule erreur"
+      },
+      "steady-hand": {
+        "name": "Main sûre",
+        "condition": "Leçons d’affilée avec 97 % de précision ou plus : {{value}}"
+      },
+      "streak": {
+        "name": "Série",
+        "condition": "Jours d’affilée avec l’objectif du jour atteint : {{value}}"
+      },
+      "practice-time": {
+        "name": "Temps d’entraînement",
+        "condition": "Heures de frappe au total : {{value}}"
+      },
+      "volume": {
+        "name": "Volume",
+        "condition": "Caractères tapés au total : {{value}}"
+      },
+      "two-layouts": {
+        "name": "Deux dispositions",
+        "condition": "Maîtriser les touches des premières leçons dans une deuxième disposition"
+      }
+    }
+  },
+  "reminder": {
+    "title": "KeyEd",
+    "body_one": "Plus que {{count}} minute pour atteindre l’objectif du jour.",
+    "body_many": "Plus que {{count}} de minutes pour atteindre l’objectif du jour.",
+    "body_other": "Plus que {{count}} minutes pour atteindre l’objectif du jour."
+  },
+  "updates": {
+    "available": "Mise à jour disponible : version {{version}}",
+    "description": "La mise à jour se télécharge depuis GitHub, s’installe et redémarre KeyEd. Vos données sont conservées.",
+    "install": "Mettre à jour et redémarrer",
+    "installing": "Installation… {{percent}} %",
+    "later": "Plus tard"
+  },
+  "welcome": {
+    "step": "Étape {{n}} sur {{total}}",
+    "next": "Suivant",
+    "back": "Retour",
+    "finish": "Commencer à apprendre",
+    "language": {
+      "title": "Bienvenue dans KeyEd",
+      "text": "KeyEd vous apprend à taper avec les dix doigts sans regarder le clavier. Choisissez d’abord la langue de l’interface."
+    },
+    "layout": {
+      "title": "Quelle disposition voulez-vous apprendre ?",
+      "text": "Vous pourrez en ajouter d’autres plus tard : chaque disposition garde sa propre progression."
+    },
+    "keyboard": {
+      "title": "À quoi ressemble votre clavier ?",
+      "text": "Regardez la touche Entrée et la touche Maj gauche.",
+      "ansiHint": "Entrée longue sur une seule rangée et Maj gauche longue.",
+      "isoHint": "Entrée haute sur deux rangées et Maj gauche courte, avec une touche en plus à côté.",
+      "unsure": "Vous hésitez ? Choisissez ANSI : les lettres sont aux mêmes endroits sur les deux."
+    },
+    "level": {
+      "title": "Comment tapez-vous aujourd’hui ?",
+      "text": "Cela détermine le point de départ du parcours. Vous pourrez changer la vitesse plus tard dans les paramètres.",
+      "beginner": "J’apprends de zéro",
+      "beginnerHint": "Le parcours commence avec deux touches sous vos index et débloque de nouvelles touches à mesure que vous les maîtrisez.",
+      "looking": "Je tape, mais je regarde le clavier",
+      "lookingHint": "Le même parcours depuis la position de base : il vous apprend quel doigt utiliser pour chaque touche. Les touches familières se débloquent vite.",
+      "blind": "Je tape à l’aveugle et je veux aller plus vite",
+      "blindHint": "Toutes les lettres sont débloquées d’emblée, la vitesse cible est de {{cpm}} caractères par minute et l’aide pour les mains est masquée."
+    },
+    "hands": {
+      "title": "Placez vos mains en position de base",
+      "text": "Trouvez avec vos index les petits reliefs sur {{left}} et {{right}}. Les autres doigts reposent sur les touches voisines, les pouces sur la barre d’espace.",
+      "check": "Appuyez maintenant sur {{left}} et {{right}} sans regarder le clavier.",
+      "done": "Parfait, vos mains sont en place."
+    },
+    "goal": {
+      "title": "Combien de temps par jour ?",
+      "text": "Seul le temps de frappe compte. 10 à 15 minutes chaque jour valent mieux qu’une heure une fois par semaine."
+    },
+    "reminders": {
+      "title": "Recevoir un rappel pour vous entraîner ?",
+      "text": "Une notification à l’heure choisie si l’objectif du jour n’est pas encore atteint. KeyEd doit être ouvert, par exemple dans une fenêtre réduite.",
+      "on": "Me rappeler",
+      "off": "Pas de rappel"
+    }
+  }
+}

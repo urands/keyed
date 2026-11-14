@@ -6,17 +6,27 @@ import { stageKeys, startSetKeys, withOptionalKeys, type Course } from '../engin
 import { isBlocked } from '../engine/textgen/blocklist';
 import {
   ansiGeometry,
+  deQwertz,
+  deQwertzCourse,
   englishContent,
   enUsQwerty,
   enUsQwertyCourse,
+  esQwerty,
+  esQwertyCourse,
+  frAzerty,
+  frAzertyCourse,
+  frenchContent,
+  germanContent,
   isoGeometry,
   ruJcuken,
   ruJcukenCourse,
   russianContent,
+  spanishContent,
   type LanguageContent,
 } from './index';
 
-const geometryCodes = new Set(ansiGeometry.rows.flat().map((key) => key.code));
+// ISO has every ANSI key and one more, which the European layouts describe.
+const geometryCodes = new Set(isoGeometry.rows.flat().map((key) => key.code));
 
 interface LanguageCase {
   name: string;
@@ -83,11 +93,81 @@ const CASES: LanguageCase[] = [
     order: 'вл ыд р п е и н т с к м у я ь г з б ч й ж х ш ю э ц щ ф ъ',
     wordPattern: /^[а-я]{2,10}$/,
   },
+  {
+    name: 'German QWERTZ',
+    layout: deQwertz,
+    course: deQwertzCourse,
+    content: germanContent,
+    letters: 'abcdefghijklmnopqrstuvwxyzäöüß',
+    noCapitals: 'ß',
+    zones: {
+      lPinky: '^1qay',
+      lRing: '2wsx',
+      lMiddle: '3edc',
+      lIndex: '45rtfgvb',
+      thumb: ' ',
+      rIndex: '67zuhjnm',
+      rMiddle: '8ik,',
+      rRing: '9ol.',
+      rPinky: '0ß´pü+#öä-',
+    },
+    startKeys: 'fj',
+    startSet: 'fjdksla',
+    order: 'dk sl a e n i r t h u c g m o b w z p ü v ä ö ß y x q',
+    wordPattern: /^[a-zäöüß]{2,10}$/,
+  },
+  {
+    name: 'French AZERTY',
+    layout: frAzerty,
+    course: frAzertyCourse,
+    content: frenchContent,
+    letters: 'abcdefghijklmnopqrstuvwxyzàâçéèêîïôùû',
+    // On AZERTY the accented capitals are not on the keys; words start with "E".
+    noCapitals: 'àâçéèêîïôùû',
+    zones: {
+      lPinky: '²&aqw',
+      lRing: 'ézsx',
+      lMiddle: '"edc',
+      lIndex: "'(rtfgvb",
+      thumb: ' ',
+      rIndex: '-èyuhjn,',
+      rMiddle: '_ik;',
+      rRing: 'çol:',
+      rPinky: 'à)=p^$*mù!',
+    },
+    startKeys: 'fj',
+    startSet: 'fjdksle',
+    order: 'dk sl e a i n r t u o c p m é v q b g h è ç à x y ê z w ù â ô î û ï',
+    wordPattern: /^[a-zàâçéèêîïôùû]{2,10}$/,
+  },
+  {
+    name: 'Spanish QWERTY',
+    layout: esQwerty,
+    course: esQwertyCourse,
+    content: spanishContent,
+    letters: 'abcdefghijklmnopqrstuvwxyzñáéíóú',
+    noCapitals: 'ñ',
+    zones: {
+      lPinky: 'º1qaz',
+      lRing: '2wsx',
+      lMiddle: '3edc',
+      lIndex: '45rtfgvb',
+      thumb: ' ',
+      rIndex: '67yuhjnm',
+      rMiddle: '8ik,',
+      rRing: '9ol.',
+      rPinky: "0'¡p`+çñ´-",
+    },
+    startKeys: 'fj',
+    startSet: 'fjdksla',
+    order: 'dk sl a e o r n i c t u m p ó b g í v á y q é h z ñ ú x w',
+    wordPattern: /^[a-zñáéíóú]{2,10}$/,
+  },
 ];
 
 describe.each(CASES)('$name', (c) => {
   describe('layout', () => {
-    it('only uses keys that exist in the ANSI geometry', () => {
+    it('only uses keys that exist in the ISO geometry', () => {
       for (const code of Object.keys(c.layout.keys)) expect(geometryCodes).toContain(code);
     });
 
@@ -133,6 +213,7 @@ describe.each(CASES)('$name', (c) => {
       for (const letter of c.letters) {
         const capital = letter.toLocaleUpperCase(c.layout.language);
         // Words never start with "ъ", "ь" and "ы": their capitals are not taught.
+        // The same goes for "ß", "ñ" and the French accented letters.
         if (!c.noCapitals.includes(letter)) expect(keys, capital).toContain(capital);
       }
     });
@@ -240,5 +321,67 @@ describe('Russian dictionary', () => {
 
   it('starts with the most frequent words', () => {
     expect(russianContent.words.slice(0, 10)).toEqual(expect.arrayContaining(['не', 'что']));
+  });
+});
+
+describe('dead keys', () => {
+  it.each([
+    ['German', deQwertz, '^´`'],
+    ['French', frAzerty, '^¨'],
+    ['Spanish', esQwerty, '´¨`^'],
+  ])(
+    '%s: the accents are dead keys and change letters into one character',
+    (_name, layout, accents) => {
+      expect(Object.keys(layout.dead).sort()).toEqual([...accents].sort());
+      for (const table of Object.values(layout.dead)) {
+        for (const [letter, result] of Object.entries(table)) {
+          expect(result).toBe(result.normalize('NFC'));
+          expect(result.normalize('NFD').startsWith(letter), `${letter} → ${result}`).toBe(true);
+        }
+      }
+    },
+  );
+
+  it('types every Spanish accent with the dead key and the letter', () => {
+    for (const char of 'áéíóú') {
+      const stroke = keyForChar(esQwerty, char);
+      expect(stroke?.dead, char).toBeDefined();
+      expect(stroke?.code).toBe(keyForChar(esQwerty, char.normalize('NFD').charAt(0))?.code);
+    }
+  });
+
+  it('types the French letters on AZERTY by themselves or with ^ and ¨', () => {
+    for (const char of 'éèçàù') expect(keyForChar(frAzerty, char)?.dead, char).toBeUndefined();
+    for (const char of 'âêîôû') {
+      expect(keyForChar(frAzerty, char)?.dead, char).toEqual({ code: 'BracketLeft', shift: false });
+    }
+    expect(keyForChar(frAzerty, 'ï')?.dead).toEqual({ code: 'BracketLeft', shift: true });
+  });
+});
+
+describe('European dictionaries', () => {
+  it('start with the most frequent words', () => {
+    expect(germanContent.words.slice(0, 10)).toEqual(expect.arrayContaining(['ich', 'das']));
+    expect(frenchContent.words.slice(0, 10)).toEqual(expect.arrayContaining(['de', 'est']));
+    expect(spanishContent.words.slice(0, 10)).toEqual(expect.arrayContaining(['que', 'no']));
+  });
+
+  it('write French "œ" as "oe", as it is typed on AZERTY', () => {
+    expect(frenchContent.words).toContain('coeur');
+    expect(frenchContent.words.filter((word) => /[œæ]/u.test(word))).toEqual([]);
+  });
+
+  it('have hyphen and apostrophe words made of the layout characters', () => {
+    const cases = [
+      [deQwertz, germanContent],
+      [frAzerty, frenchContent],
+      [esQwerty, spanishContent],
+    ] as const;
+    for (const [layout, content] of cases) {
+      for (const word of [...(content.hyphenated ?? []), ...(content.contractions ?? [])]) {
+        for (const char of word)
+          expect(keyForChar(layout, char), `${word}: ${char}`).not.toBeNull();
+      }
+    }
   });
 });

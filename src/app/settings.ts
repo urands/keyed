@@ -70,9 +70,17 @@ interface SettingsState extends SettingsValues {
   update: (patch: Partial<SettingsValues>) => void;
 }
 
+const LAYOUT_OF_LANGUAGE: Record<Language, LayoutId> = {
+  ru: 'ru-jcuken',
+  en: 'en-us-qwerty',
+  de: 'de-qwertz',
+  fr: 'fr-azerty',
+  es: 'es-qwerty',
+};
+
 /** The layout to start with: the one that matches the interface language. */
 export function defaultLayoutFor(language: Language): LayoutId {
-  return language === 'ru' ? 'ru-jcuken' : 'en-us-qwerty';
+  return LAYOUT_OF_LANGUAGE[language];
 }
 
 const language = detectLanguage(navigator.language);

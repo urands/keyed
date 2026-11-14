@@ -40,7 +40,11 @@ const WRAPS: Record<string, readonly [string, string]> = {
   "'": ["'", "'"],
   '(': ['(', ')'],
   ')': ['(', ')'],
+  '¿': ['¿', '?'],
+  '¡': ['¡', '!'],
 };
+/** Spanish questions and exclamations open with an inverted mark. */
+const OPENERS: Record<string, string> = { '?': '¿', '!': '¡' };
 /** Free practice: sentence length in words. */
 const SENTENCE_MIN = 4;
 const SENTENCE_MAX = 9;
@@ -72,6 +76,11 @@ export function buildCourseText(input: CourseTextInput): string {
 
   const upperFirst = (word: string) => word.charAt(0).toLocaleUpperCase(locale) + word.slice(1);
   const canCapitalize = (word: string) => open.has(word.charAt(0).toLocaleUpperCase(locale));
+  /** True when the first letter of a token, maybe after a quote, has an open capital. */
+  const canStartSentence = (token: string) => {
+    const letter = /^\P{L}*(\p{L})/u.exec(token)?.[1];
+    return letter !== undefined && open.has(letter.toLocaleUpperCase(locale));
+  };
   /** Capitalizes the first letter, also after an opening quote or parenthesis. */
   const startSentence = (token: string) =>
     token.replace(/^(\P{L}*)(\p{Ll})/u, (whole, lead: string, letter: string) => {
@@ -131,6 +140,8 @@ export function buildCourseText(input: CourseTextInput): string {
 
   /** Puts a mark on a word: after it, around it, or joining it to another word. */
   const withMark = (word: string, mark: string): string => {
+    const opener = OPENERS[mark];
+    if (opener !== undefined && open.has(opener)) return `${opener}${word}${mark}`;
     if (AFTER_WORD.has(mark)) return `${word}${mark}`;
     if (mark === '-') {
       if (hyphenated.length > 0 && random() < HYPHENATED_SHARE) return pick(hyphenated, random);
@@ -201,9 +212,10 @@ export function buildCourseText(input: CourseTextInput): string {
 
     // Sentence rules once capitals are open: a capital after ".", "!" and "?".
     if (capitalizeNext) {
-      if (/^\p{Nd}/u.test(token)) {
-        // A sentence does not start with a number: a word goes first.
-        const lead = startSentence(anyWord());
+      if (!canStartSentence(token)) {
+        // A sentence starts with a capital, so a number or a word whose capital
+        // is not learned ("été" without "É") gets a word in front.
+        const lead = startSentence(pickWord({ id: 'capital', test: canCapitalize }) ?? anyWord());
         tokens.push(lead);
         length += lead.length + 1;
         sentenceLength += 1;
@@ -214,7 +226,10 @@ export function buildCourseText(input: CourseTextInput): string {
     capitalizeNext = false;
     sentenceLength += 1;
     if (kind === 'free' && sentenceLength >= sentenceTarget && !/[.!?]$/u.test(token)) {
-      const ends = [...SENTENCE_END].filter((mark) => open.has(mark));
+      // A Spanish "?" or "!" needs "¿" or "¡" at the start, so such a sentence ends with ".".
+      const ends = [...SENTENCE_END].filter(
+        (mark) => open.has(mark) && !open.has(OPENERS[mark] ?? ''),
+      );
       if (ends.length > 0) {
         const end = random() < 0.75 ? (ends[0] ?? '.') : pick(ends, random);
         // "word," + "." would read as "word,."; the sentence end replaces the comma.

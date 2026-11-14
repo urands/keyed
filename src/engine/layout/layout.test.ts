@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { parseGeometry } from './geometry';
-import { keyForChar, parseLayout } from './layout';
+import { isDeadKey, keyForChar, parseLayout, shiftAllowance } from './layout';
 
 const layout = parseLayout({
   id: 'en-us-qwerty',
@@ -16,7 +16,7 @@ const layout = parseLayout({
 describe('parseLayout', () => {
   it('rejects unknown ids and languages', () => {
     expect(() => parseLayout({ id: 'dvorak', language: 'en', keys: {} })).toThrow(/unknown id/);
-    expect(() => parseLayout({ id: 'en-us-qwerty', language: 'de', keys: {} })).toThrow(
+    expect(() => parseLayout({ id: 'en-us-qwerty', language: 'xx', keys: {} })).toThrow(
       /unknown language/,
     );
   });
@@ -43,6 +43,60 @@ describe('keyForChar', () => {
 
   it('returns null for characters the layout cannot type', () => {
     expect(keyForChar(layout, 'я')).toBeNull();
+  });
+});
+
+const spanishData = {
+  id: 'es-qwerty',
+  language: 'es',
+  keys: {
+    KeyE: { base: 'e', shift: 'E' },
+    Quote: { base: '´', shift: '¨' },
+    Semicolon: { base: 'ñ', shift: 'Ñ' },
+  },
+  dead: { '´': { e: 'é', E: 'É' }, '¨': { e: 'ë' } },
+};
+const spanish = parseLayout(spanishData);
+
+describe('dead keys', () => {
+  it('marks the accents of dead keys', () => {
+    expect(isDeadKey(spanish, '´')).toBe(true);
+    expect(isDeadKey(spanish, 'ñ')).toBe(false);
+    expect(isDeadKey(layout, '´')).toBe(false);
+  });
+
+  it('types a letter with an accent as the dead key and then the letter', () => {
+    expect(keyForChar(spanish, 'é')).toEqual({
+      code: 'KeyE',
+      shift: false,
+      dead: { code: 'Quote', shift: false },
+    });
+    expect(keyForChar(spanish, 'É')).toEqual({
+      code: 'KeyE',
+      shift: true,
+      dead: { code: 'Quote', shift: false },
+    });
+    expect(keyForChar(spanish, 'ë')?.dead).toEqual({ code: 'Quote', shift: true });
+  });
+
+  it('prefers a key that types the character by itself', () => {
+    expect(keyForChar(spanish, 'ñ')).toEqual({ code: 'Semicolon', shift: false });
+  });
+
+  it('counts the dead key as one more press in the time allowance', () => {
+    const allowance = shiftAllowance(spanish, 1.25);
+    expect(allowance('e')).toBe(1);
+    expect(allowance('E')).toBe(1.25);
+    expect(allowance('é')).toBe(2);
+    expect(allowance('É')).toBe(2.25);
+    expect(allowance('ë')).toBe(2.25);
+  });
+
+  it('rejects dead keys that are on no key or change characters the layout lacks', () => {
+    const bad = (dead: unknown) => parseLayout({ ...spanishData, dead });
+    expect(() => bad({ '`': { e: 'è' } })).toThrow(/on no key/);
+    expect(() => bad({ '´': { a: 'á' } })).toThrow(/bad entry "a"/);
+    expect(() => bad({ '´': { e: 'éé' } })).toThrow(/bad entry "e"/);
   });
 });
 

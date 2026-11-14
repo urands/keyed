@@ -1,17 +1,19 @@
 # KeyEd
 
-English | [Русский](README.ru.md)
+English | [Русский](README.ru.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md)
 
-A free desktop app for learning touch typing with all ten fingers. The first version teaches the English QWERTY layout and the Russian ЙЦУКЕН layout.
+A free desktop app for learning touch typing with all ten fingers. It teaches the English QWERTY, Russian ЙЦУКЕН, German QWERTZ, French AZERTY and Spanish QWERTY layouts.
 
 **Download:** [urands.github.io/keyed](https://urands.github.io/keyed/) or the [releases page](https://github.com/urands/keyed/releases/latest).
 
-All phases of the [implementation plan](docs/implementation-plan.md) are done. KeyEd is a full course for the English and Russian layouts: letters, capitals with Shift on the opposite hand, punctuation, digits, and free practice with sentences. New keys unlock as you master the previous ones. It also has:
+All phases of the [implementation plan](docs/implementation-plan.md) are done. KeyEd is a full course for every layout: letters, capitals with Shift on the opposite hand, punctuation, digits, and free practice with sentences. New keys unlock as you master the previous ones. It also has:
 
 - a first-run wizard, ANSI and ISO keyboards, and an optional «ё» letter;
+- dead keys for accented letters (´ then e types é), as on real European keyboards;
 - a course screen where you can practise any key, plus statistics;
 - a daily goal, day streaks, achievements, reminders and sounds;
 - light and dark themes;
+- the interface in English, Russian, German, French and Spanish;
 - data export, import and reset;
 - automatic updates.
 

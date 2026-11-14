@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { KeyInput } from '../engine/input/toInput';
+import type { DeadKey, KeyInput } from '../engine/input/toInput';
 import { keyForChar, type KeyCode, type LayoutId } from '../engine/layout/layout';
 import { stageKeys, startSetKeys, type StageKind } from '../engine/progress/course';
 import { courseState, type CourseState } from '../engine/progress/courseState';
@@ -103,6 +103,8 @@ interface PracticeState {
    * system keyboard layout is probably wrong. Not counted as a mistake.
    */
   wrongLayout: boolean;
+  /** A dead key pressed for the next character: "´" before "é". */
+  deadKey: DeadKey | null;
   /** Progress of the other layouts used in this session, so switching back is instant. */
   cache: Partial<Record<LayoutId, SavedProgress>>;
   /** Records and achievements of the lesson just finished, for the result screen. */
@@ -128,6 +130,8 @@ interface PracticeState {
   /** Starts the current text again from the beginning. */
   repeatLesson: () => void;
   press: (input: KeyInput) => void;
+  /** Remembers a dead key until the next press types a character. */
+  setDeadKey: (dead: DeadKey | null) => void;
   pause: () => void;
   resume: () => void;
   dismissIntro: () => void;
@@ -160,6 +164,7 @@ function viewOf(layoutId: LayoutId, saved: SavedProgress) {
     introduce: fresh ? stage.start : [],
     feedback: null,
     wrongLayout: false,
+    deadKey: null,
     outcome: null,
   };
 }
@@ -247,6 +252,7 @@ export const usePractice = create<PracticeState>()((set, get) => ({
       stageDone: null,
       feedback: null,
       wrongLayout: false,
+      deadKey: null,
     }));
   },
 
@@ -262,7 +268,7 @@ export const usePractice = create<PracticeState>()((set, get) => ({
     // In system layout mode a character from another layout means the wrong
     // system layout is on. That is a hint, not a typing mistake.
     if (keyForChar(kit.layout, input.char) === null) {
-      if (!state.wrongLayout) set({ wrongLayout: true });
+      if (!state.wrongLayout || state.deadKey !== null) set({ wrongLayout: true, deadKey: null });
       return;
     }
 
@@ -276,7 +282,7 @@ export const usePractice = create<PracticeState>()((set, get) => ({
     };
 
     if (next.status !== 'finished') {
-      set({ lesson: next, startedAt, feedback, wrongLayout: false });
+      set({ lesson: next, startedAt, feedback, wrongLayout: false, deadKey: null });
       return;
     }
 
@@ -323,6 +329,7 @@ export const usePractice = create<PracticeState>()((set, get) => ({
       startedAt,
       feedback,
       wrongLayout: false,
+      deadKey: null,
       result,
       outcome,
       keyStats,
@@ -336,10 +343,14 @@ export const usePractice = create<PracticeState>()((set, get) => ({
     });
   },
 
+  setDeadKey: (deadKey) => {
+    set({ deadKey });
+  },
+
   pause: () => {
     const { lesson } = get();
     const paused = pauseLesson(lesson);
-    if (paused !== lesson) set({ lesson: paused });
+    if (paused !== lesson) set({ lesson: paused, deadKey: null });
   },
 
   resume: () => {

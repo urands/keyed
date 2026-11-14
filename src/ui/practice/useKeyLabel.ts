@@ -17,11 +17,18 @@ function isNamedKey(code: KeyCode): code is keyof typeof NAMED_KEYS {
 }
 
 /**
- * The characters on a key. The extra ISO key by the left Shift types the same
- * as the backslash key in both layouts; lessons never use it.
+ * The characters on a key. The extra ISO key by the left Shift has its own
+ * characters on European layouts ("<" and ">"); the English and Russian
+ * layouts do not describe it, so it shows the backslash key. Lessons never use it.
  */
 function charsOf(layout: Layout, code: KeyCode) {
-  return layout.keys[code === 'IntlBackslash' ? 'Backslash' : code];
+  return layout.keys[code] ?? (code === 'IntlBackslash' ? layout.keys.Backslash : undefined);
+}
+
+/** The key's character in upper case when Shift types that capital, as it is otherwise. */
+function mainLabel(layout: Layout, chars: { base: string; shift: string }): string {
+  const upper = chars.base.toLocaleUpperCase(layout.language);
+  return chars.shift === upper ? upper : chars.base;
 }
 
 /**
@@ -31,7 +38,9 @@ function charsOf(layout: Layout, code: KeyCode) {
 export function shiftLabel(layout: Layout, code: KeyCode): string {
   const chars = charsOf(layout, code);
   if (!chars || code === 'Space') return '';
-  return chars.shift === chars.base.toLocaleUpperCase(layout.language) ? '' : chars.shift;
+  return chars.shift === chars.base.toLocaleUpperCase(layout.language) || chars.shift === chars.base
+    ? ''
+    : chars.shift;
 }
 
 /**
@@ -45,7 +54,7 @@ export function useKeyLabel(layout: Layout): (code: KeyCode) => string {
       if (isNamedKey(code)) return t(NAMED_KEYS[code]);
       const chars = charsOf(layout, code);
       if (!chars || code === 'Space') return '';
-      return chars.base.toLocaleUpperCase(layout.language);
+      return mainLabel(layout, chars);
     },
     [layout, t],
   );

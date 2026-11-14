@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router';
 import { geometryFor, kitFor, PRACTICE_LAYOUTS } from '../../app/layouts';
 import { requestNotifications } from '../../app/notify';
 import { usePractice } from '../../app/practice';
-import { DAILY_GOALS, useSettings, type DailyGoal } from '../../app/settings';
+import { DAILY_GOALS, defaultLayoutFor, useSettings, type DailyGoal } from '../../app/settings';
 import { GEOMETRY_IDS, type Finger, type GeometryId } from '../../engine/layout/geometry';
 import { keyForChar, type LayoutId } from '../../engine/layout/layout';
 import { LANGUAGES, type Language } from '../../i18n';
@@ -179,6 +179,8 @@ export function WelcomeWizard() {
             }))}
             onChange={(value) => {
               settings.setLanguage(value);
+              // The next step offers the layout of the chosen language first.
+              setLayout(defaultLayoutFor(value));
             }}
           />
         );
